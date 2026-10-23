@@ -6,7 +6,7 @@ function Step({ n, title, children }) {
   return (
     <section className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5">
       <h2 className="font-semibold mb-4 flex items-center gap-3">
-        <span className="h-7 w-7 rounded-full bg-green-500 text-black text-sm font-bold flex items-center justify-center">
+        <span className="h-7 w-7 rounded-full bg-yellow-300 text-black text-sm font-bold flex items-center justify-center">
           {n}
         </span>
         {title}
@@ -44,12 +44,12 @@ export default function Checkout({ game }) {
                 onClick={() => setPkgId(p.id)}
                 className={`rounded-xl border p-3 text-left transition active:scale-95 ${
                   pkgId === p.id
-                    ? 'border-green-400 bg-green-400/10 ring-1 ring-green-400'
+                    ? 'border-yellow-300 bg-yellow-300/10 ring-1 ring-yellow-300'
                     : 'border-white/15 bg-white/5 hover:border-white/30'
                 }`}
               >
                 <div className="font-semibold">{p.label}</div>
-                <div className="text-green-400 font-bold mt-1">Bs {p.price}</div>
+                <div className="text-yellow-300 font-bold mt-1">Bs {p.price}</div>
               </button>
             ))}
           </div>
@@ -61,7 +61,7 @@ export default function Checkout({ game }) {
             onChange={(e) => setPlayerId(e.target.value)}
             placeholder={game.idLabel}
             inputMode="numeric"
-            className="w-full rounded-xl bg-black/30 border border-white/15 px-4 py-3 outline-none focus:border-green-400"
+            className="w-full rounded-xl bg-black/30 border border-white/15 px-4 py-3 outline-none focus:border-yellow-300"
           />
         </Step>
       </div>
@@ -84,7 +84,7 @@ export default function Checkout({ game }) {
             </div>
             <div className="flex justify-between border-t border-white/10 pt-3 text-base font-bold">
               <dt>Total</dt>
-              <dd className="text-green-400">{pkg ? `Bs ${pkg.price}` : '—'}</dd>
+              <dd className="text-yellow-300">{pkg ? `Bs ${pkg.price}` : '—'}</dd>
             </div>
           </dl>
           <p className="text-xs text-white/40 mt-3">
@@ -98,7 +98,7 @@ export default function Checkout({ game }) {
             target="_blank"
             rel="noreferrer"
             className={`block text-center rounded-xl py-3.5 font-bold ${
-              ready ? 'bg-green-500 text-black' : 'bg-white/10 text-white/40 pointer-events-none'
+              ready ? 'bg-yellow-300 text-black' : 'bg-white/10 text-white/40 pointer-events-none'
             }`}
           >
             {ready ? `Pedir por WhatsApp · Bs ${pkg.price}` : 'Completa los pasos'}

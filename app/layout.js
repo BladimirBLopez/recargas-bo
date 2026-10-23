@@ -13,18 +13,18 @@ export default function RootLayout({ children }) {
   return (
     <html lang="es">
       <body className="min-h-screen flex flex-col">
-        <header className="sticky top-0 z-10 border-b border-white/10 bg-black/70 backdrop-blur px-4 py-3">
+        <header className="sticky top-0 z-10 bg-black border-b border-white/10 px-4 py-3">
           <div className="max-w-5xl mx-auto flex items-center justify-between">
-            <Link href="/" className="text-xl font-extrabold text-white">
-              🎮 {SITE_NAME}
+            <Link href="/" className="text-2xl font-black italic tracking-tight text-yellow-300">
+              {SITE_NAME.toUpperCase()}
             </Link>
             <a
               href={wa}
               target="_blank"
               rel="noreferrer"
-              className="rounded-full bg-green-500 text-black text-sm font-semibold px-4 py-2"
+              className="rounded-full bg-yellow-300 text-black font-bold px-4 py-2 text-sm"
             >
-              Soporte
+              🎧 Soporte
             </a>
           </div>
         </header>
@@ -34,7 +34,7 @@ export default function RootLayout({ children }) {
         <footer className="border-t border-white/10 px-4 py-8 text-sm text-white/60">
           <div className="max-w-5xl mx-auto grid gap-6 sm:grid-cols-3">
             <div>
-              <div className="font-bold text-white mb-2">{SITE_NAME}</div>
+              <div className="font-black italic text-yellow-300 mb-2">{SITE_NAME.toUpperCase()}</div>
               <p>Recargas para tus juegos favoritos en Bolivia.</p>
             </div>
             <div>
