@@ -16,22 +16,46 @@ function Step({ n, title, children }) {
   );
 }
 
+const inputCls =
+  'w-full rounded-xl bg-black/30 border border-white/15 px-4 py-3 outline-none focus:border-yellow-300';
+
 export default function Checkout({ game }) {
   const [pkgId, setPkgId] = useState(null);
   const [playerId, setPlayerId] = useState('');
+  const [playerId2, setPlayerId2] = useState('');
+  const [nick, setNick] = useState('');
   const pkg = game.packages.find((p) => p.id === pkgId);
-  const ready = Boolean(pkg) && playerId.trim().length > 3;
 
-  const text = ready
+  const isFF = game.slug === 'free-fire';
+  const id = playerId.trim();
+  const id2 = playerId2.trim();
+  const idFormatOk = /^\d{6,12}$/.test(id);
+  const idMatch = id !== '' && id === id2;
+  const nickOk = nick.trim().length >= 2;
+
+  const idReady = isFF ? idFormatOk && idMatch && nickOk : id.length > 3;
+  const ready = Boolean(pkg) && idReady;
+
+  const lines = ready
     ? [
         `Hola, quiero recargar *${game.name}*`,
         `Paquete: ${pkg.label}`,
         `Precio: Bs ${pkg.price}`,
-        `${game.idLabel}: ${playerId.trim()}`,
+        `${game.idLabel}: ${id}`,
+        ...(isFF ? [`Nickname: ${nick.trim()}`] : []),
         'Quiero pagar por QR.',
-      ].join('\n')
-    : '';
-  const href = ready ? `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}` : undefined;
+      ]
+    : [];
+  const href = ready
+    ? `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(lines.join('\n'))}`
+    : undefined;
+
+  let hint = 'Completa los pasos';
+  if (pkg && isFF) {
+    if (!idFormatOk) hint = 'Escribe tu ID (solo números)';
+    else if (!idMatch) hint = 'Los IDs no coinciden';
+    else if (!nickOk) hint = 'Escribe tu nickname';
+  }
 
   return (
     <div className="grid gap-5 lg:grid-cols-[1fr_340px] pb-28 lg:pb-0">
@@ -56,13 +80,41 @@ export default function Checkout({ game }) {
         </Step>
 
         <Step n="2" title={game.idLabel}>
-          <input
-            value={playerId}
-            onChange={(e) => setPlayerId(e.target.value)}
-            placeholder={game.idLabel}
-            inputMode="numeric"
-            className="w-full rounded-xl bg-black/30 border border-white/15 px-4 py-3 outline-none focus:border-yellow-300"
-          />
+          <div className="space-y-3">
+            <input
+              value={playerId}
+              onChange={(e) => setPlayerId(e.target.value)}
+              placeholder={game.idLabel}
+              inputMode="numeric"
+              className={inputCls}
+            />
+            {isFF && (
+              <>
+                <input
+                  value={playerId2}
+                  onChange={(e) => setPlayerId2(e.target.value)}
+                  placeholder="Repite tu ID"
+                  inputMode="numeric"
+                  className={inputCls}
+                />
+                {id2 !== '' && !idMatch && (
+                  <p className="text-sm text-red-400">Los IDs no coinciden.</p>
+                )}
+                {id !== '' && !idFormatOk && (
+                  <p className="text-sm text-red-400">El ID debe tener solo números (6 a 12 dígitos).</p>
+                )}
+                <input
+                  value={nick}
+                  onChange={(e) => setNick(e.target.value)}
+                  placeholder="Tu nickname en el juego"
+                  className={inputCls}
+                />
+                <p className="text-xs text-white/50">
+                  Si te equivocas en un dígito, los diamantes van a otra cuenta. Revisa bien tu ID.
+                </p>
+              </>
+            )}
+          </div>
         </Step>
       </div>
 
@@ -80,8 +132,14 @@ export default function Checkout({ game }) {
             </div>
             <div className="flex justify-between gap-3">
               <dt className="text-white/60">{game.idLabel}</dt>
-              <dd className="truncate">{playerId.trim() || '—'}</dd>
+              <dd className="truncate">{id || '—'}</dd>
             </div>
+            {isFF && (
+              <div className="flex justify-between gap-3">
+                <dt className="text-white/60">Nickname</dt>
+                <dd className="truncate">{nick.trim() || '—'}</dd>
+              </div>
+            )}
             <div className="flex justify-between border-t border-white/10 pt-3 text-base font-bold">
               <dt>Total</dt>
               <dd className="text-yellow-300">{pkg ? `Bs ${pkg.price}` : '—'}</dd>
@@ -101,7 +159,7 @@ export default function Checkout({ game }) {
               ready ? 'bg-yellow-300 text-black' : 'bg-white/10 text-white/40 pointer-events-none'
             }`}
           >
-            {ready ? `Pedir por WhatsApp · Bs ${pkg.price}` : 'Completa los pasos'}
+            {ready ? `Pedir por WhatsApp · Bs ${pkg.price}` : hint}
           </a>
         </div>
       </aside>
