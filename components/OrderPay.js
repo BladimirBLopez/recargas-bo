@@ -37,6 +37,16 @@ export default function OrderPay({ order, onBack }) {
     `${order.idLabel}: ${order.id}`,
   ].join('\n');
   const href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
+  const avisar = () => {
+    try {
+      fetch('/api/pedido/avisar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: order.code }),
+        keepalive: true,
+      }).catch(() => {});
+    } catch (e) {}
+  };
 
   return (
     <div className="space-y-6 pb-10">
@@ -113,6 +123,7 @@ export default function OrderPay({ order, onBack }) {
           </div>
           <a
             href={href}
+            onClick={avisar}
             target="_blank"
             rel="noreferrer"
             className="flex items-center justify-center gap-2 rounded-xl bg-yellow-300 text-black py-3.5 font-bold"
