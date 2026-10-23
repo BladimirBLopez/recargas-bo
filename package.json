@@ -8,6 +8,7 @@
     "start": "node node_modules/next/dist/bin/next start"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.2.0",
     "embla-carousel-autoplay": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
     "lucide-react": "^1.61.0",
