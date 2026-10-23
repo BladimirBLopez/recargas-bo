@@ -137,9 +137,28 @@ export default function Checkout({ game }) {
             <p className="text-sm text-white/60">Verificando ID...</p>
           )}
           {isFF && verif?.state === 'ok' && (
-            <p className="text-sm text-green-400">
-              Cuenta: {verif.nickname}{verif.region ? ` (${verif.region})` : ''}. ¿Es tu cuenta?
-            </p>
+            <div className="rounded-3xl border border-white/15 bg-black p-5">
+              <div className="flex items-center gap-4">
+                <div className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${game.color} text-3xl`}>
+                  {game.emoji}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xl font-bold text-white">{game.name}</p>
+                  <div className="mt-1 flex justify-between gap-3 text-sm">
+                    <span className="text-white/50">Usuario:</span>
+                    <span className="truncate font-bold text-white">{verif.nickname}</span>
+                  </div>
+                  <div className="flex justify-between gap-3 text-sm">
+                    <span className="text-white/50">ID del juego:</span>
+                    <span className="font-bold text-white">{id}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-4 flex items-center gap-3 border-t border-white/15 pt-4 text-sm text-white/50">
+                <span className="text-lg text-green-400">🔒</span>
+                <span>Tu recarga será entregada directamente a esta cuenta.</span>
+              </div>
+            </div>
           )}
           {isFF && verif?.state === 'invalid' && (
             <p className="text-sm text-red-400">No encontramos ese ID en Free Fire. Revísalo.</p>
