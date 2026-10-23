@@ -55,6 +55,7 @@ export default function Checkout({ game }) {
   const [tab, setTab] = useState('rec');
   const [all, setAll] = useState(false);
   const [order, setOrder] = useState(null);
+  const [verif, setVerif] = useState(null);
 
   useEffect(() => {
     try {
@@ -75,8 +76,32 @@ export default function Checkout({ game }) {
 
   const isFF = game.slug === 'free-fire';
   const id = playerId.trim();
-  const idFormatOk = /^\d{6,12}$/.test(id);
-  const idReady = isFF ? idFormatOk : id.length > 3;
+  const idFormatOk = /^\d{8,12}$/.test(id);
+
+  useEffect(() => {
+    if (!isFF || !idFormatOk) {
+      setVerif(null);
+      return;
+    }
+    setVerif({ state: 'loading' });
+    const ctrl = new AbortController();
+    const t = setTimeout(async () => {
+      try {
+        const r = await fetch(`/api/verificar-id?game=${game.slug}&id=${id}`, { signal: ctrl.signal });
+        const d = await r.json();
+        if (d.ok) setVerif({ state: 'ok', nickname: d.nickname, region: d.region });
+        else if (d.code === 'INVALID_PLAYER') setVerif({ state: 'invalid' });
+        else setVerif({ state: 'unknown' });
+      } catch (e) {
+        if (!ctrl.signal.aborted) setVerif({ state: 'unknown' });
+      }
+    }, 600);
+    return () => {
+      clearTimeout(t);
+      ctrl.abort();
+    };
+  }, [id, isFF, idFormatOk, game.slug]);
+  const idReady = isFF ? idFormatOk && (verif?.state === 'ok' || verif?.state === 'unknown') : id.length > 3;
   const ready = Boolean(pkg) && idReady;
 
   const lines = ready
@@ -108,8 +133,22 @@ export default function Checkout({ game }) {
             inputMode="numeric"
             className={inputCls}
           />
+          {isFF && verif?.state === 'loading' && (
+            <p className="text-sm text-white/60">Verificando ID...</p>
+          )}
+          {isFF && verif?.state === 'ok' && (
+            <p className="text-sm text-green-400">
+              Cuenta: {verif.nickname}{verif.region ? ` (${verif.region})` : ''}. ¿Es tu cuenta?
+            </p>
+          )}
+          {isFF && verif?.state === 'invalid' && (
+            <p className="text-sm text-red-400">No encontramos ese ID en Free Fire. Revísalo.</p>
+          )}
+          {isFF && verif?.state === 'unknown' && (
+            <p className="text-sm text-yellow-300">No pudimos verificar el ID ahora. Revísalo bien antes de continuar.</p>
+          )}
           {id !== '' && isFF && !idFormatOk && (
-            <p className="text-sm text-red-400">El ID debe tener solo números (6 a 12 dígitos).</p>
+            <p className="text-sm text-red-400">El ID debe tener solo números (8 a 12 dígitos).</p>
           )}
           <p className="text-xs text-white/50">
             Revisa bien tu ID: si te equivocas, la recarga va a otra cuenta.
