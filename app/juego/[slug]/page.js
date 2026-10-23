@@ -13,10 +13,16 @@ export default async function GamePage({ params }) {
   const game = getGame(slug);
   if (!game) notFound();
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-6">
-        {game.emoji} Recargar {game.name}
-      </h1>
+    <div className="space-y-6">
+      <section
+        className={`rounded-3xl bg-gradient-to-br ${game.color} p-6 sm:p-8 flex items-center gap-4 shadow-lg`}
+      >
+        <div className="text-6xl">{game.emoji}</div>
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold">Recargar {game.name}</h1>
+          <p className="text-white/85 text-sm mt-1">Paga por QR y recibe tu recarga.</p>
+        </div>
+      </section>
       <Checkout game={game} />
     </div>
   );
