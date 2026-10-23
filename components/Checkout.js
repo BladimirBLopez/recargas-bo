@@ -51,8 +51,6 @@ const isPass = (p) => /pase/i.test(p.label);
 export default function Checkout({ game }) {
   const [pkgId, setPkgId] = useState(null);
   const [playerId, setPlayerId] = useState('');
-  const [playerId2, setPlayerId2] = useState('');
-  const [nick, setNick] = useState('');
   const [tab, setTab] = useState('rec');
   const [all, setAll] = useState(false);
 
@@ -67,9 +65,7 @@ export default function Checkout({ game }) {
   const isFF = game.slug === 'free-fire';
   const id = playerId.trim();
   const idFormatOk = /^\d{6,12}$/.test(id);
-  const idMatch = id !== '' && id === playerId2.trim();
-  const nickOk = nick.trim().length >= 2;
-  const idReady = isFF ? idFormatOk && idMatch && nickOk : id.length > 3;
+  const idReady = isFF ? idFormatOk : id.length > 3;
   const ready = Boolean(pkg) && idReady;
 
   const lines = ready
@@ -78,7 +74,6 @@ export default function Checkout({ game }) {
         `Paquete: ${pkg.label}`,
         `Precio: Bs ${pkg.price}`,
         `${game.idLabel}: ${id}`,
-        ...(isFF ? [`Nickname: ${nick.trim()}`] : []),
         'Quiero pagar por QR.',
       ]
     : [];
@@ -86,12 +81,7 @@ export default function Checkout({ game }) {
     ? `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(lines.join('\n'))}`
     : undefined;
 
-  let hint = 'Escribe tu ID';
-  if (isFF) {
-    if (!idFormatOk) hint = 'Escribe tu ID (solo números)';
-    else if (!idMatch) hint = 'Los IDs no coinciden';
-    else if (!nickOk) hint = 'Escribe tu nickname';
-  }
+  const hint = isFF ? 'Escribe tu ID (solo números)' : 'Escribe tu ID';
 
   return (
     <div className="space-y-8 pb-32">
@@ -104,32 +94,12 @@ export default function Checkout({ game }) {
             inputMode="numeric"
             className={inputCls}
           />
-          {isFF && (
-            <>
-              <input
-                value={playerId2}
-                onChange={(e) => setPlayerId2(e.target.value)}
-                placeholder="Repite tu ID"
-                inputMode="numeric"
-                className={inputCls}
-              />
-              {playerId2.trim() !== '' && !idMatch && (
-                <p className="text-sm text-red-400">Los IDs no coinciden.</p>
-              )}
-              {id !== '' && !idFormatOk && (
-                <p className="text-sm text-red-400">El ID debe tener solo números (6 a 12 dígitos).</p>
-              )}
-              <input
-                value={nick}
-                onChange={(e) => setNick(e.target.value)}
-                placeholder="Tu nickname en el juego"
-                className={inputCls}
-              />
-              <p className="text-xs text-white/50">
-                Si te equivocas en un dígito, los diamantes van a otra cuenta. Revisa bien tu ID.
-              </p>
-            </>
+          {id !== '' && isFF && !idFormatOk && (
+            <p className="text-sm text-red-400">El ID debe tener solo números (6 a 12 dígitos).</p>
           )}
+          <p className="text-xs text-white/50">
+            Revisa bien tu ID: si te equivocas, la recarga va a otra cuenta.
+          </p>
         </div>
       </Step>
 
@@ -222,7 +192,7 @@ export default function Checkout({ game }) {
             <p>Recarga {game.name} en Bolivia usando solo tu {game.idLabel}.</p>
           </Acc>
           <Acc icon={ListOrdered} title="Cómo comprar">
-            <p>1. Escribe tu {game.idLabel}{isFF ? ' y tu nickname' : ''}.</p>
+            <p>1. Escribe tu {game.idLabel}.</p>
             <p>2. Elige tu pack.</p>
             <p>3. Toca CONTINUAR: se abre WhatsApp con tu pedido.</p>
             <p>4. Te enviamos el QR de pago y entregamos al confirmar.</p>
