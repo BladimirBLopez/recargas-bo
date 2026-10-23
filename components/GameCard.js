@@ -1,13 +1,24 @@
 import Link from 'next/link';
 
 export default function GameCard({ game }) {
+  const prices = (game.packages || []).map((p) => p.price);
+  const min = prices.length ? Math.min(...prices) : null;
   return (
     <Link
       href={`/juego/${game.slug}`}
-      className={`rounded-2xl p-4 bg-gradient-to-br ${game.color} flex flex-col items-center justify-center gap-2 aspect-square shadow-lg active:scale-95 transition`}
+      className="group rounded-2xl overflow-hidden border border-white/10 bg-white/5 active:scale-95 transition"
     >
-      <span className="text-5xl">{game.emoji}</span>
-      <span className="font-semibold text-center">{game.name}</span>
+      <div
+        className={`bg-gradient-to-br ${game.color} aspect-[4/3] flex items-center justify-center`}
+      >
+        <span className="text-6xl drop-shadow">{game.emoji}</span>
+      </div>
+      <div className="p-3">
+        <div className="font-semibold leading-tight">{game.name}</div>
+        {min !== null && (
+          <div className="text-xs text-white/60 mt-1">Desde Bs {min}</div>
+        )}
+      </div>
     </Link>
   );
 }
