@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Gem, QrCode, ChevronRight, ChevronDown, FileText, ListOrdered } from 'lucide-react';
 import { WHATSAPP } from '@/data/games';
+import OrderPay from '@/components/OrderPay';
 
 const inputCls =
   'w-full rounded-xl bg-black/30 border border-white/15 px-4 py-3 outline-none focus:border-yellow-300';
@@ -53,6 +54,7 @@ export default function Checkout({ game }) {
   const [playerId, setPlayerId] = useState('');
   const [tab, setTab] = useState('rec');
   const [all, setAll] = useState(false);
+  const [order, setOrder] = useState(null);
 
   const pkg = game.packages.find((p) => p.id === pkgId);
   const rec = game.packages.filter((p) => !isPass(p));
@@ -83,8 +85,11 @@ export default function Checkout({ game }) {
 
   const hint = isFF ? 'Escribe tu ID (solo números)' : 'Escribe tu ID';
 
+  if (order) return <OrderPay order={order} onBack={() => setOrder(null)} />;
+
   return (
     <div className="space-y-8 pb-32">
+
       <Step n="1" title={game.idLabel}>
         <div className="space-y-3">
           <input
@@ -225,16 +230,23 @@ export default function Checkout({ game }) {
               <span className="text-white/60">Ningún pack elegido</span>
             )}
           </div>
-          <a
-            href={href}
-            target="_blank"
-            rel="noreferrer"
+          <button
+            disabled={!ready}
+            onClick={() => {
+              if (!ready) return;
+              const code =
+                'RB-' +
+                Date.now().toString(36).toUpperCase().slice(-5) +
+                Math.random().toString(36).slice(2, 4).toUpperCase();
+              setOrder({ code, game: game.name, pkg: pkg.label, price: pkg.price, idLabel: game.idLabel, id });
+              window.scrollTo(0, 0);
+            }}
             className={`flex items-center gap-1 rounded-xl px-5 py-3 font-bold ${
-              ready ? 'bg-yellow-300 text-black' : 'bg-white/10 text-white/40 pointer-events-none'
+              ready ? 'bg-yellow-300 text-black' : 'bg-white/10 text-white/40'
             }`}
           >
             CONTINUAR <ChevronRight size={18} />
-          </a>
+          </button>
         </div>
       </div>
     </div>
