@@ -1,5 +1,5 @@
 // Cambia aquí tu número de WhatsApp (con código de país, sin +)
-export const WHATSAPP = '59100000000';
+export const WHATSAPP = '59169356292';
 export const SITE_NAME = 'Recargas BO';
 
 export const games = [
