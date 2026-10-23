@@ -56,6 +56,7 @@ export default function Checkout({ game }) {
   const [all, setAll] = useState(false);
   const [order, setOrder] = useState(null);
   const [verif, setVerif] = useState(null);
+  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
     try {
@@ -118,6 +119,34 @@ export default function Checkout({ game }) {
     : undefined;
 
   const hint = isFF ? 'Escribe tu ID (solo números)' : 'Escribe tu ID';
+
+  async function createOrder() {
+    if (creating) return;
+    setCreating(true);
+    try {
+      const r = await fetch('/api/pedido', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          slug: game.slug,
+          packageId: pkg.id,
+          playerId: id,
+          nickname: verif?.state === 'ok' ? verif.nickname : undefined,
+        }),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok || !d.code) {
+        alert('No pudimos crear tu pedido. Intenta otra vez en unos segundos.');
+        return;
+      }
+      setOrder({ code: d.code, orderId: d.orderId, slug: game.slug, ts: Date.now(), game: game.name, pkg: pkg.label, price: d.price, idLabel: game.idLabel, id });
+      window.scrollTo(0, 0);
+    } catch (e) {
+      alert('Sin conexión. Revisa tu internet e intenta otra vez.');
+    } finally {
+      setCreating(false);
+    }
+  }
 
   if (order) return <OrderPay order={order} onBack={() => setOrder(null)} />;
 
@@ -298,21 +327,16 @@ export default function Checkout({ game }) {
             )}
           </div>
           <button
-            disabled={!ready}
+            disabled={!ready || creating}
             onClick={() => {
-              if (!ready) return;
-              const code =
-                'RB-' +
-                Date.now().toString(36).toUpperCase().slice(-5) +
-                Math.random().toString(36).slice(2, 4).toUpperCase();
-              setOrder({ code, slug: game.slug, ts: Date.now(), game: game.name, pkg: pkg.label, price: pkg.price, idLabel: game.idLabel, id });
-              window.scrollTo(0, 0);
+              if (!ready || creating) return;
+              createOrder();
             }}
             className={`flex items-center gap-1 rounded-xl px-5 py-3 font-bold ${
               ready ? 'bg-yellow-300 text-black' : 'bg-white/10 text-white/40'
             }`}
           >
-            CONTINUAR <ChevronRight size={18} />
+            {creating ? 'CREANDO...' : <>CONTINUAR <ChevronRight size={18} /></>}
           </button>
         </div>
       </div>
