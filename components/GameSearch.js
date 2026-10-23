@@ -1,6 +1,8 @@
 'use client';
 import { useState } from 'react';
 import GameCard from '@/components/GameCard';
+import Banner from '@/components/Banner';
+import { Search } from 'lucide-react';
 
 function Title({ children }) {
   return (
