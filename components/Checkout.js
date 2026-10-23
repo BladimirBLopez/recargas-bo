@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Gem, QrCode, ChevronRight, ChevronDown, FileText, ListOrdered } from 'lucide-react';
 import { WHATSAPP } from '@/data/games';
 import OrderPay from '@/components/OrderPay';
@@ -55,6 +55,15 @@ export default function Checkout({ game }) {
   const [tab, setTab] = useState('rec');
   const [all, setAll] = useState(false);
   const [order, setOrder] = useState(null);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('rb_order');
+      if (!raw) return;
+      const o = JSON.parse(raw);
+      if (o.slug === game.slug && Date.now() - o.ts < 2 * 60 * 60 * 1000) setOrder(o);
+    } catch (e) {}
+  }, [game.slug]);
 
   const pkg = game.packages.find((p) => p.id === pkgId);
   const rec = game.packages.filter((p) => !isPass(p));
@@ -238,7 +247,7 @@ export default function Checkout({ game }) {
                 'RB-' +
                 Date.now().toString(36).toUpperCase().slice(-5) +
                 Math.random().toString(36).slice(2, 4).toUpperCase();
-              setOrder({ code, game: game.name, pkg: pkg.label, price: pkg.price, idLabel: game.idLabel, id });
+              setOrder({ code, slug: game.slug, ts: Date.now(), game: game.name, pkg: pkg.label, price: pkg.price, idLabel: game.idLabel, id });
               window.scrollTo(0, 0);
             }}
             className={`flex items-center gap-1 rounded-xl px-5 py-3 font-bold ${
