@@ -36,7 +36,7 @@ export default function GameCard({ game, big = false }) {
         </span>
       )}
       <div className="absolute inset-x-0 bottom-0 px-2 pb-2">
-        <div className={`font-extrabold uppercase leading-tight ${big ? 'text-base' : 'text-xs'}`}>
+        <div className={`font-display font-extrabold uppercase leading-tight ${big ? 'text-xl' : 'text-sm'}`}>
           {game.name}
         </div>
         {min !== null && <div className="text-[10px] text-white/70">Desde Bs {min}</div>}

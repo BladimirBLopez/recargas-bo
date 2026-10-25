@@ -1,10 +1,11 @@
 import './globals.css';
 import Link from 'next/link';
-import { Poppins } from 'next/font/google';
+import { Poppins, Barlow_Condensed } from 'next/font/google';
 import { SITE_NAME, WHATSAPP } from '@/data/games';
 import BottomNav from '@/components/BottomNav';
 
 const font = Poppins({ subsets: ['latin'], weight: ['400', '600', '700', '800', '900'], style: ['normal', 'italic'] });
+const display = Barlow_Condensed({ subsets: ['latin'], weight: ['500', '600', '700', '800'], style: ['normal', 'italic'], variable: '--font-display' });
 
 export const metadata = {
   title: `${SITE_NAME} | Recargas de juegos en Bolivia`,
@@ -16,10 +17,10 @@ export default function RootLayout({ children }) {
   const wa = `https://wa.me/${WHATSAPP}`;
   return (
     <html lang="es">
-      <body className={`${font.className} min-h-screen flex flex-col`}>
-        <header className="sticky top-0 z-10 bg-black border-b border-white/10 px-4 py-3">
+      <body style={{ '--accent': '253 224 71' }} className={`${font.className} ${display.variable} min-h-screen flex flex-col`}>
+        <header className="sticky top-0 z-10 bg-black border-b border-yellow-300/40 px-4 py-3">
           <div className="max-w-5xl mx-auto flex items-center justify-between">
-            <Link href="/" className="text-2xl font-black italic tracking-tight text-yellow-300">
+            <Link href="/" className="font-display text-3xl font-extrabold italic uppercase tracking-tight text-yellow-300">
               {SITE_NAME.toUpperCase()}
             </Link>
             <a

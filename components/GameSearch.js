@@ -7,7 +7,7 @@ import { WHATSAPP } from '@/data/games';
 
 function Title({ emoji, children }) {
   return (
-    <h2 className="flex items-center gap-3 text-xl font-extrabold uppercase italic mb-4">
+    <h2 className="font-display flex items-center gap-3 text-2xl font-extrabold uppercase italic mb-4">
       <span className="h-7 w-1.5 rounded-full bg-yellow-300" />
       {emoji && <span>{emoji}</span>}
       {children}
