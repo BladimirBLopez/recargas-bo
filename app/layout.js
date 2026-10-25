@@ -2,6 +2,7 @@ import './globals.css';
 import Link from 'next/link';
 import { Poppins } from 'next/font/google';
 import { SITE_NAME, WHATSAPP } from '@/data/games';
+import BottomNav from '@/components/BottomNav';
 
 const font = Poppins({ subsets: ['latin'], weight: ['400', '600', '700', '800', '900'], style: ['normal', 'italic'] });
 
@@ -34,7 +35,7 @@ export default function RootLayout({ children }) {
 
         <main className="flex-1 w-full max-w-5xl mx-auto px-4 py-6">{children}</main>
 
-        <footer className="border-t border-white/10 px-4 py-8 text-sm text-white/60">
+        <footer className="border-t border-white/10 px-4 pt-8 pb-28 text-sm text-white/60">
           <div className="max-w-5xl mx-auto grid gap-6 sm:grid-cols-3">
             <div>
               <div className="font-black italic text-yellow-300 mb-2">{SITE_NAME.toUpperCase()}</div>
@@ -57,6 +58,7 @@ export default function RootLayout({ children }) {
             © {new Date().getFullYear()} {SITE_NAME} · Bolivia
           </p>
         </footer>
+      <BottomNav />
       </body>
     </html>
   );
