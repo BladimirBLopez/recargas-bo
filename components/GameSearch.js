@@ -2,23 +2,29 @@
 import { useState } from 'react';
 import GameCard from '@/components/GameCard';
 import Banner from '@/components/Banner';
-import { Search } from 'lucide-react';
+import { Search, MessageCircle } from 'lucide-react';
+import { WHATSAPP } from '@/data/games';
 
-function Title({ children }) {
+function Title({ emoji, children }) {
   return (
-    <h2 className="flex items-center gap-3 text-xl font-semibold mb-4">
+    <h2 className="flex items-center gap-3 text-xl font-extrabold uppercase italic mb-4">
       <span className="h-7 w-1.5 rounded-full bg-yellow-300" />
+      {emoji && <span>{emoji}</span>}
       {children}
     </h2>
   );
 }
 
+const PERKS = [
+  ['💳', 'Paga con QR de tu banco'],
+  ['🧾', 'Pedido con código'],
+  ['💬', 'Soporte por WhatsApp'],
+];
+
 export default function GameSearch({ games }) {
   const [q, setQ] = useState('');
   const term = q.trim().toLowerCase();
   const found = term ? games.filter((g) => g.name.toLowerCase().includes(term)) : [];
-  const rec = games.slice(0, 2);
-  const pop = games.slice(2);
 
   return (
     <div className="space-y-8">
@@ -36,7 +42,7 @@ export default function GameSearch({ games }) {
         <section>
           <Title>Resultados</Title>
           {found.length ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
               {found.map((g) => (
                 <GameCard key={g.slug} game={g} />
               ))}
@@ -49,29 +55,35 @@ export default function GameSearch({ games }) {
         <>
           <Banner />
 
-          <h2 className="text-3xl sm:text-4xl font-extrabold uppercase">Tienda de juegos</h2>
-
           <section>
-            <Title>Recomendados para ti</Title>
-            <div className="grid grid-cols-2 gap-3">
-              {rec.map((g) => (
-                <GameCard key={g.slug} game={g} big />
+            <Title emoji="🔥">Los más populares</Title>
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+              {games.map((g) => (
+                <GameCard key={g.slug} game={g} />
               ))}
             </div>
           </section>
 
-          {pop.length > 0 && (
-            <section>
-              <Title>Populares en la tienda</Title>
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                {pop.map((g) => (
-                  <GameCard key={g.slug} game={g} />
-                ))}
+          <section className="grid grid-cols-3 gap-3 text-center">
+            {PERKS.map(([icon, text]) => (
+              <div key={text} className="rounded-2xl border border-white/10 bg-white/5 px-2 py-3">
+                <div className="text-2xl">{icon}</div>
+                <div className="mt-1 text-[11px] font-semibold leading-tight text-white/80">{text}</div>
               </div>
-            </section>
-          )}
+            ))}
+          </section>
         </>
       )}
+
+      <a
+        href={`https://wa.me/${WHATSAPP}`}
+        target="_blank"
+        rel="noreferrer"
+        aria-label="WhatsApp"
+        className="fixed bottom-5 right-4 z-20 flex h-14 w-14 items-center justify-center rounded-full bg-green-500 text-white shadow-lg active:scale-95 transition"
+      >
+        <MessageCircle size={28} />
+      </a>
     </div>
   );
 }
