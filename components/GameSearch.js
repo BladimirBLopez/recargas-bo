@@ -19,8 +19,8 @@ const PERKS = [
 
 function Title({ emoji, children }) {
   return (
-    <h2 className="mb-4 flex items-center gap-3 font-display text-2xl font-extrabold uppercase italic">
-      <span className="h-7 w-1.5 rounded-full bg-yellow-300" />
+    <h2 className="mb-3 flex items-center gap-2 font-display text-xl font-extrabold uppercase italic">
+      <span className="h-5 w-1 rounded-full bg-yellow-300" />
       {emoji && <span>{emoji}</span>}
       {children}
     </h2>
@@ -102,13 +102,13 @@ export default function GameSearch({ games }) {
         <>
           <Banner />
 
-          <div className="no-scrollbar sticky top-[72px] z-20 -mx-4 flex gap-3 overflow-x-auto bg-[#08080c]/90 px-4 py-3 backdrop-blur">
+          <div className="no-scrollbar sticky top-[60px] z-20 -mx-4 flex gap-3 overflow-x-auto bg-[#08080c]/90 px-4 py-2 backdrop-blur">
             {TABS.map((t) => (
               <button
                 key={t.id}
                 onClick={() => go(t.id)}
                 className={
-                  'shrink-0 rounded-2xl border px-5 py-2.5 font-display text-lg font-bold uppercase transition ' +
+                  'shrink-0 rounded-xl border px-4 py-2 font-display text-sm font-bold uppercase transition ' +
                   (active === t.id
                     ? 'border-yellow-300 bg-yellow-300 text-black'
                     : 'border-white/10 bg-zinc-950 text-white')
@@ -124,7 +124,7 @@ export default function GameSearch({ games }) {
             const list = games.filter(t.test);
             if (!list.length) return null;
             return (
-              <section key={t.id} id={t.id} className="scroll-mt-40">
+              <section key={t.id} id={t.id} className="scroll-mt-32">
                 <Title emoji={t.emoji && t.id !== 'directa' ? t.emoji : ''}>{t.title}</Title>
                 <div className={GRID}>
                   {list.map((g) => (
@@ -137,9 +137,9 @@ export default function GameSearch({ games }) {
 
           <section className="space-y-4 pt-2">
             {PERKS.map(([icon, title, text]) => (
-              <div key={title} className="relative rounded-3xl border border-white/10 bg-zinc-950/80 px-6 py-4">
+              <div key={title} className="relative rounded-3xl border border-white/10 bg-zinc-950/80 px-5 py-3">
                 <span className="absolute bottom-4 left-0 top-4 w-1 rounded-r bg-yellow-300" />
-                <div className="font-display text-xl font-bold uppercase">
+                <div className="font-display text-lg font-bold uppercase">
                   <span className="mr-2">{icon}</span>
                   {title}
                 </div>

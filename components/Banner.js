@@ -16,7 +16,7 @@ function Slide({ s }) {
   const [fail, setFail] = useState(false);
   const Icon = s.icon;
   return (
-    <div className="relative h-40 overflow-hidden rounded-3xl border-2 border-yellow-300 bg-black sm:h-56">
+    <div className="relative aspect-[8/3] overflow-hidden rounded-3xl border-2 border-yellow-300 bg-black">
       {!fail && (
         <img
           src={s.img}
@@ -26,19 +26,19 @@ function Slide({ s }) {
         />
       )}
       {fail && (
-        <div className="absolute inset-0 flex items-center justify-between gap-3 bg-gradient-to-r from-zinc-900 via-orange-950 to-black p-5 sm:p-10">
+        <div className="absolute inset-0 flex items-center justify-between gap-3 bg-gradient-to-r from-zinc-900 via-orange-950 to-black p-4 sm:p-8">
           <div className="min-w-0">
-            <p className="font-display text-sm font-bold uppercase italic tracking-wide text-white/80 sm:text-lg">
+            <p className="font-display text-xs font-bold uppercase italic tracking-wide text-white/80 sm:text-base">
               {s.kicker}
             </p>
-            <h1 className="font-display text-4xl font-extrabold uppercase italic leading-none sm:text-6xl">
+            <h1 className="font-display text-2xl font-extrabold uppercase italic leading-none sm:text-5xl">
               {s.title}
             </h1>
-            <span className="mt-3 inline-block -skew-x-12 rounded bg-white px-3 py-1 font-display text-sm font-bold uppercase italic text-black">
+            <span className="mt-2 inline-block -skew-x-12 rounded bg-white px-2.5 py-0.5 font-display text-xs font-bold uppercase italic text-black">
               {s.cta}
             </span>
           </div>
-          <Icon className="shrink-0 text-yellow-300/40" size={84} strokeWidth={1.5} />
+          <Icon className="shrink-0 text-yellow-300/40" size={56} strokeWidth={1.5} />
         </div>
       )}
     </div>

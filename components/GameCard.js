@@ -21,19 +21,19 @@ export default function GameCard({ game, big = false }) {
       <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black to-transparent" />
       {badge && (
         <span
-          className={`absolute top-2 right-2 rounded-full px-2.5 py-0.5 font-display text-xs font-bold uppercase ${badge[1]}`}
+          className={`absolute top-2 right-2 rounded-full px-2 py-0.5 font-display text-[10px] font-bold uppercase ${badge[1]}`}
         >
           {badge[0]}
         </span>
       )}
       {off && (
-        <span className="absolute left-[-10%] right-[-10%] top-1/2 -translate-y-1/2 -rotate-12 border-y-2 border-red-500 bg-white py-1 text-center font-display text-xs font-extrabold uppercase tracking-wide text-red-600">
+        <span className="absolute left-[-10%] right-[-10%] top-1/2 -translate-y-1/2 -rotate-12 border-y-2 border-red-500 bg-white py-1 text-center font-display text-[10px] font-extrabold uppercase tracking-wide text-red-600">
           Mantenimiento
         </span>
       )}
       <div className="absolute inset-x-0 bottom-0 px-3 pb-2.5">
         <div
-          className={`font-display font-bold uppercase italic leading-tight ${big ? 'text-2xl' : 'text-base'} ${
+          className={`font-display font-bold uppercase italic leading-tight ${big ? 'text-xl' : 'text-sm'} ${
             off ? 'text-white/60' : ''
           }`}
         >
@@ -44,7 +44,7 @@ export default function GameCard({ game, big = false }) {
     </div>
   );
 
-  const cls = 'group block rounded-3xl overflow-hidden border border-white/15 bg-black';
+  const cls = 'group block rounded-2xl overflow-hidden border border-white/15 bg-black';
   if (off) return <div className={cls}>{body}</div>;
   return (
     <Link href={`/juego/${game.slug}`} className={`${cls} active:scale-95 transition`}>
