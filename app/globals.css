@@ -6,13 +6,24 @@
   --accent: 249 115 22;
 }
 
+html {
+  -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
+}
+
 body {
   background:
     radial-gradient(90% 45% at 50% 0%, rgb(var(--accent) / 0.22), transparent 70%),
     radial-gradient(70% 40% at 100% 55%, rgb(var(--accent) / 0.1), transparent 70%),
+    radial-gradient(60% 35% at 0% 85%, rgb(var(--accent) / 0.07), transparent 70%),
     #08080c;
   background-attachment: fixed;
   color: #f1f1f5;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: rgb(var(--accent) / 0.4);
 }
 
 .no-scrollbar {
@@ -20,4 +31,28 @@ body {
 }
 .no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+@keyframes shine {
+  from { transform: translateX(-150%) skewX(-20deg); }
+  to { transform: translateX(450%) skewX(-20deg); }
+}
+
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, rgb(255 255 255 / 0.04) 25%, rgb(255 255 255 / 0.12) 50%, rgb(255 255 255 / 0.04) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
