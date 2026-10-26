@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react';
 import GameCard from '@/components/GameCard';
 import Banner from '@/components/Banner';
-import { Search, X } from 'lucide-react';
 
 const TABS = [
   { id: 'populares', label: 'Populares', emoji: '🔥', title: 'Los más populares', test: (g) => g.popular },
@@ -31,17 +30,15 @@ const GRID = 'grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5';
 
 export default function GameSearch({ games }) {
   const [q, setQ] = useState('');
-  const [open, setOpen] = useState(false);
   const [active, setActive] = useState('populares');
   const term = q.trim().toLowerCase();
   const found = term ? games.filter((g) => g.name.toLowerCase().includes(term)) : [];
 
-  // El botón de lupa del header abre el buscador.
+  // El buscador del header avisa lo que se escribe.
   useEffect(() => {
-    const show = () => setOpen(true);
-    window.addEventListener('rb-search', show);
-    if (window.location.search.includes('buscar')) setOpen(true);
-    return () => window.removeEventListener('rb-search', show);
+    const on = (e) => setQ(e.detail || '');
+    window.addEventListener('rb-q', on);
+    return () => window.removeEventListener('rb-q', on);
   }, []);
 
   // Marca la pestaña según la sección visible.
@@ -63,28 +60,6 @@ export default function GameSearch({ games }) {
 
   return (
     <div className="space-y-6">
-      {open && (
-        <div className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/5 px-4 py-3">
-          <Search size={20} className="text-white/50" />
-          <input
-            autoFocus
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Busca juegos, gift cards y más"
-            className="w-full bg-transparent outline-none placeholder:text-white/40"
-          />
-          <button
-            aria-label="Cerrar búsqueda"
-            onClick={() => {
-              setQ('');
-              setOpen(false);
-            }}
-          >
-            <X size={20} className="text-white/60" />
-          </button>
-        </div>
-      )}
-
       {term ? (
         <section>
           <Title>Resultados</Title>
@@ -102,7 +77,7 @@ export default function GameSearch({ games }) {
         <>
           <Banner />
 
-          <div className="no-scrollbar sticky top-[60px] z-20 -mx-4 flex gap-3 overflow-x-auto bg-[#08080c]/90 px-4 py-2 backdrop-blur">
+          <div className="no-scrollbar sticky top-[var(--hh,62px)] z-20 -mx-4 flex gap-3 overflow-x-auto bg-[#08080c]/90 px-4 py-2 backdrop-blur">
             {TABS.map((t) => (
               <button
                 key={t.id}
@@ -124,7 +99,7 @@ export default function GameSearch({ games }) {
             const list = games.filter(t.test);
             if (!list.length) return null;
             return (
-              <section key={t.id} id={t.id} className="scroll-mt-32">
+              <section key={t.id} id={t.id} className="scroll-mt-44">
                 <Title emoji={t.emoji && t.id !== 'directa' ? t.emoji : ''}>{t.title}</Title>
                 <div className={GRID}>
                   {list.map((g) => (
