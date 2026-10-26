@@ -14,14 +14,15 @@ const slides = [
 
 function Slide({ s }) {
   const [fail, setFail] = useState(false);
+  const [svg, setSvg] = useState(false);
   const Icon = s.icon;
   return (
     <div className="relative aspect-[8/3] overflow-hidden rounded-3xl border-2 border-yellow-300 bg-black">
       {!fail && (
         <img
-          src={s.img}
+          src={svg ? s.img.replace('.jpg', '.svg') : s.img}
           alt={s.title}
-          onError={() => setFail(true)}
+          onError={() => (svg ? setFail(true) : setSvg(true))}
           className="absolute inset-0 h-full w-full object-cover"
         />
       )}
