@@ -3,6 +3,7 @@ import { Poppins, Barlow_Condensed } from 'next/font/google';
 import { SITE_NAME, WHATSAPP } from '@/data/games';
 import BottomNav from '@/components/BottomNav';
 import Header from '@/components/Header';
+import SalesToast from '@/components/SalesToast';
 
 const font = Poppins({ subsets: ['latin'], weight: ['400', '600', '700', '800', '900'], style: ['normal', 'italic'] });
 const display = Barlow_Condensed({ subsets: ['latin'], weight: ['500', '600', '700', '800'], style: ['normal', 'italic'], variable: '--font-display' });
@@ -19,6 +20,7 @@ export default function RootLayout({ children }) {
     <html lang="es">
       <body className={`${font.className} ${display.variable} min-h-screen flex flex-col`}>
         <Header />
+        <SalesToast />
 
         <main className="flex-1 w-full max-w-5xl mx-auto px-4 py-6">{children}</main>
 
