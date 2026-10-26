@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
-import { QrCode, Zap, Headset } from 'lucide-react';
+import { MdQrCode2 as QrCode, MdFlashOn as Zap, MdHeadsetMic as Headset } from 'react-icons/md';
 
 // Para usar tus propias imágenes: pon los archivos en public/banners/ (1.jpg, 2.jpg, 3.jpg).
 // Si la imagen no existe se muestra el diseño de texto.
@@ -38,7 +38,7 @@ function Slide({ s }) {
               {s.cta}
             </span>
           </div>
-          <Icon className="shrink-0 text-yellow-300/40" size={56} strokeWidth={1.5} />
+          <Icon className="shrink-0 text-yellow-300/40" size={56} />
         </div>
       )}
     </div>
