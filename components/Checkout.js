@@ -9,7 +9,9 @@ import {
   MdDescription,
   MdListAlt,
   MdLock,
+  MdCheckCircle,
 } from 'react-icons/md';
+import { motion } from 'framer-motion';
 import OrderPay from '@/components/OrderPay';
 
 const inputCls =
@@ -20,7 +22,7 @@ function Step({ n, title, action, children }) {
   return (
     <section>
       <div className="mb-3 flex items-center gap-3">
-        <span className="grid h-8 w-8 place-items-center rounded-full bg-yellow-300 font-display text-lg font-extrabold text-black">
+        <span className="grid h-8 w-8 place-items-center rounded-full bg-yellow-300 font-display text-lg font-extrabold text-black shadow-[0_0_14px_rgb(var(--accent)/0.6)]">
           {n}
         </span>
         <h2 className="flex-1 font-display text-xl font-extrabold uppercase italic">{title}</h2>
@@ -264,7 +266,7 @@ export default function Checkout({ game }) {
                 onClick={() => setPkgId(p.id)}
                 className={`relative rounded-2xl border-2 p-4 text-left transition active:scale-95 ${
                   on
-                    ? 'border-yellow-300 bg-yellow-300/10'
+                    ? 'border-yellow-300 bg-yellow-300/10 shadow-[0_0_22px_-6px_rgb(var(--accent)/0.7)]'
                     : p.recommended
                     ? 'border-yellow-300/40 bg-zinc-950'
                     : 'border-white/10 bg-zinc-950'
@@ -284,7 +286,10 @@ export default function Checkout({ game }) {
                     {unit && <div className="text-xs font-semibold tracking-wide text-white/60">{unit}</div>}
                   </div>
                 </div>
-                <div className="mt-3 text-right font-display text-lg font-bold text-yellow-300">Bs {p.price}</div>
+                <div className="mt-3 flex items-center justify-between">
+                  {on ? <MdCheckCircle size={20} className="text-yellow-300" /> : <span />}
+                  <span className="font-display text-lg font-bold text-yellow-300">Bs {p.price}</span>
+                </div>
               </button>
             );
           })}
@@ -358,13 +363,20 @@ export default function Checkout({ game }) {
         </div>
       </section>
 
-      <div className="fixed inset-x-0 bottom-0 z-10 border-t-2 border-yellow-300/60 bg-black/95 px-4 py-3 backdrop-blur">
+      <div className="fixed inset-x-0 bottom-0 z-10 border-t-2 border-yellow-300/60 bg-gradient-to-t from-black via-black/95 to-zinc-950/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-3">
           <div className="min-w-0 text-sm">
             {pkg ? (
               <>
                 <div className="truncate font-semibold">{pkg.label}</div>
-                <div className="font-display text-xl font-bold text-yellow-300">Bs {pkg.price}</div>
+                <motion.div
+                  key={pkg.id}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="font-display text-xl font-bold text-yellow-300"
+                >
+                  Bs {pkg.price}
+                </motion.div>
               </>
             ) : (
               <span className="text-white/60">Ningún paquete elegido</span>
@@ -375,7 +387,7 @@ export default function Checkout({ game }) {
             disabled={!ready || creating}
             onClick={createOrder}
             className={`flex items-center gap-1 rounded-2xl px-5 py-3 font-display text-lg font-extrabold uppercase ${
-              ready ? 'bg-yellow-300 text-black active:scale-95' : 'bg-white/10 text-white/40'
+              ready ? 'bg-gradient-to-r from-yellow-300 to-orange-400 text-black shadow-[0_6px_20px_-6px_rgb(var(--accent)/0.8)] active:scale-95' : 'bg-white/10 text-white/40'
             }`}
           >
             Comprar ahora <MdChevronRight size={22} />
