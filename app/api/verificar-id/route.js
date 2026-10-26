@@ -1,3 +1,5 @@
+import { limited } from '../../../lib/ratelimit.js';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -6,14 +8,6 @@ const ENDPOINT = 'https://shop2game.com/api/auth/player_id_login';
 const UA =
   'Mozilla/5.0 (Linux; Android 11; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Mobile Safari/537.36';
 
-const hits = new Map();
-function limited(ip) {
-  const now = Date.now();
-  const arr = (hits.get(ip) || []).filter((t) => now - t < 60000);
-  arr.push(now);
-  hits.set(ip, arr);
-  return arr.length > 15;
-}
 
 function json(body, status = 200) {
   return Response.json(body, { status, headers: { 'Cache-Control': 'no-store' } });
@@ -95,7 +89,7 @@ export async function GET(request) {
   }
 
   const ip = (request.headers.get('x-forwarded-for') || 'x').split(',')[0].trim();
-  if (limited(ip)) {
+  if (await limited('verificar:' + ip, 15)) {
     return json({ ok: false, code: 'RATE_LIMITED', message: 'Demasiadas consultas, espera un minuto.' }, 429);
   }
 
