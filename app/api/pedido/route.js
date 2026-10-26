@@ -1,17 +1,10 @@
 import { games } from '../../../data/games.js';
 import { sql } from '../../../lib/db.js';
+import { limited } from '../../../lib/ratelimit.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const hits = new Map();
-function limited(ip) {
-  const now = Date.now();
-  const arr = (hits.get(ip) || []).filter((t) => now - t < 60000);
-  arr.push(now);
-  hits.set(ip, arr);
-  return arr.length > 10;
-}
 
 function json(body, status = 200) {
   return Response.json(body, { status, headers: { 'Cache-Control': 'no-store' } });
@@ -25,7 +18,7 @@ function newCode() {
 
 export async function POST(req) {
   const ip = (req.headers.get('x-forwarded-for') || 'x').split(',')[0].trim();
-  if (limited(ip)) return json({ error: 'limite' }, 429);
+  if (await limited('pedido:' + ip, 10)) return json({ error: 'limite' }, 429);
 
   let body;
   try {

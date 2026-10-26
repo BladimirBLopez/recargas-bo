@@ -1,19 +1,11 @@
 import { games } from '../../../../data/games.js';
 import { sql } from '../../../../lib/db.js';
+import { limited } from '../../../../lib/ratelimit.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const SITE = 'https://recargas-bo.vercel.app';
 
-const hits = new Map();
-function limited(ip) {
-  const now = Date.now();
-  const arr = (hits.get(ip) || []).filter((t) => now - t < 60000);
-  arr.push(now);
-  hits.set(ip, arr);
-  return arr.length > 10;
-}
 
 function json(body, status = 200) {
   return Response.json(body, { status, headers: { 'Cache-Control': 'no-store' } });
@@ -25,7 +17,7 @@ export async function POST(req) {
   if (!token || !chat) return json({ ok: false, error: 'sin_config' }, 500);
 
   const ip = (req.headers.get('x-forwarded-for') || 'x').split(',')[0].trim();
-  if (limited(ip)) return json({ error: 'limite' }, 429);
+  if (await limited('avisar:' + ip, 10)) return json({ error: 'limite' }, 429);
 
   let body;
   try {
@@ -48,7 +40,7 @@ export async function POST(req) {
     const text =
       '🔔 ' + o.code + ' · ' + gameName + ' · ' + o.package_label + ' · Bs ' + Number(o.price) +
       '\nID: ' + o.player_id + (o.nickname ? ' · ' + o.nickname : '') +
-      '\nPanel: ' + SITE + '/admin';
+      '\nPanel: ' + new URL(req.url).origin + '/admin';
 
     let sent = false;
     try {
