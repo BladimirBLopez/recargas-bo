@@ -15,8 +15,8 @@ export async function generateMetadata({ params }) {
 export default async function GamePage({ params }) {
   const { slug } = await params;
   const game = getGame(slug);
-  if (!game) notFound();
-  const others = games.filter((g) => g.slug !== game.slug).slice(0, 4);
+  if (!game || game.maintenance) notFound();
+  const others = games.filter((g) => g.slug !== game.slug && !g.maintenance).slice(0, 4);
 
   return (
     <div className="space-y-6">

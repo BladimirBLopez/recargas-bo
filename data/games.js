@@ -6,6 +6,9 @@ export const games = [
   {
     slug: 'free-fire',
     name: 'Free Fire',
+    kind: 'directa',
+    popular: true,
+    badge: 'promo',
     emoji: '🔥',
     color: 'from-orange-500 to-red-600',
     idLabel: 'ID de jugador',
@@ -20,6 +23,8 @@ export const games = [
   {
     slug: 'mobile-legends',
     name: 'Mobile Legends',
+    kind: 'directa',
+    popular: true,
     emoji: '⚔️',
     color: 'from-blue-500 to-indigo-700',
     idLabel: 'ID de usuario (Zona)',
@@ -33,6 +38,8 @@ export const games = [
   {
     slug: 'pubg-mobile',
     name: 'PUBG Mobile',
+    kind: 'directa',
+    popular: true,
     emoji: '🎯',
     color: 'from-yellow-500 to-amber-700',
     idLabel: 'ID de jugador',
@@ -45,6 +52,7 @@ export const games = [
   {
     slug: 'credito-entel',
     name: 'Crédito Entel',
+    kind: 'directa',
     emoji: '📱',
     color: 'from-sky-500 to-blue-700',
     idLabel: 'Número de celular',
@@ -53,6 +61,51 @@ export const games = [
       { id: 'en-20', label: 'Bs 20', price: 20 },
       { id: 'en-50', label: 'Bs 50', price: 50 },
     ],
+  },
+  // ---- Próximamente: se muestran con la franja MANTENIMIENTO (sin link). ----
+  // Para activarlos: quita `maintenance`, agrega `packages` y la imagen en public/games/<slug>.jpg
+  {
+    slug: 'blood-strike',
+    name: 'Blood Strike',
+    emoji: '🩸',
+    color: 'from-zinc-600 to-red-900',
+    kind: 'directa',
+    popular: true,
+    maintenance: true,
+    idLabel: 'ID de jugador',
+    packages: [],
+  },
+  {
+    slug: 'steam-wallet',
+    name: 'Steam Wallet',
+    emoji: '🎮',
+    color: 'from-slate-600 to-slate-900',
+    kind: 'tarjeta',
+    badge: 'nuevo',
+    maintenance: true,
+    idLabel: 'Correo',
+    packages: [],
+  },
+  {
+    slug: 'razer-gold',
+    name: 'Razer Gold',
+    emoji: '🪙',
+    color: 'from-green-700 to-black',
+    kind: 'tarjeta',
+    badge: 'nuevo',
+    maintenance: true,
+    idLabel: 'Correo',
+    packages: [],
+  },
+  {
+    slug: 'roblox',
+    name: 'Roblox',
+    emoji: '🧱',
+    color: 'from-zinc-500 to-zinc-800',
+    kind: 'tarjeta',
+    maintenance: true,
+    idLabel: 'Usuario',
+    packages: [],
   },
 ];
 

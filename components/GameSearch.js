@@ -1,13 +1,25 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import GameCard from '@/components/GameCard';
 import Banner from '@/components/Banner';
-import { Search, MessageCircle } from 'lucide-react';
-import { WHATSAPP } from '@/data/games';
+import { Search, X } from 'lucide-react';
+
+const TABS = [
+  { id: 'populares', label: 'Populares', emoji: '🔥', title: 'Los más populares', test: (g) => g.popular },
+  { id: 'nuevos', label: 'Nuevos', emoji: '🌟', title: 'Recién llegados', test: (g) => g.badge === 'nuevo' },
+  { id: 'directa', label: 'Recarga directa', emoji: '', title: 'Recarga directa al ID', test: (g) => g.kind === 'directa' },
+  { id: 'tarjetas', label: 'Tarjetas y códigos', emoji: '', title: 'Tarjetas y códigos', test: (g) => g.kind === 'tarjeta' },
+];
+
+const PERKS = [
+  ['⚡', 'Entrega rápida', 'Procesamos tu pedido en pocos minutos.'],
+  ['🔒', 'Pago seguro', 'QR bancario de Bolivia.'],
+  ['💬', 'Soporte real', 'Te atendemos por WhatsApp si algo falla.'],
+];
 
 function Title({ emoji, children }) {
   return (
-    <h2 className="font-display flex items-center gap-3 text-2xl font-extrabold uppercase italic mb-4">
+    <h2 className="mb-4 flex items-center gap-3 font-display text-2xl font-extrabold uppercase italic">
       <span className="h-7 w-1.5 rounded-full bg-yellow-300" />
       {emoji && <span>{emoji}</span>}
       {children}
@@ -15,34 +27,69 @@ function Title({ emoji, children }) {
   );
 }
 
-const PERKS = [
-  ['💳', 'Paga con QR de tu banco'],
-  ['🧾', 'Pedido con código'],
-  ['💬', 'Soporte por WhatsApp'],
-];
+const GRID = 'grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5';
 
 export default function GameSearch({ games }) {
   const [q, setQ] = useState('');
+  const [open, setOpen] = useState(false);
+  const [active, setActive] = useState('populares');
   const term = q.trim().toLowerCase();
   const found = term ? games.filter((g) => g.name.toLowerCase().includes(term)) : [];
 
+  // El botón de lupa del header abre el buscador.
+  useEffect(() => {
+    const show = () => setOpen(true);
+    window.addEventListener('rb-search', show);
+    if (window.location.search.includes('buscar')) setOpen(true);
+    return () => window.removeEventListener('rb-search', show);
+  }, []);
+
+  // Marca la pestaña según la sección visible.
+  useEffect(() => {
+    if (term) return;
+    const els = TABS.map((t) => document.getElementById(t.id)).filter(Boolean);
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => e.isIntersecting && setActive(e.target.id)),
+      { rootMargin: '-30% 0px -65% 0px' }
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [term]);
+
+  const go = (id) => {
+    setActive(id);
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   return (
-    <div className="space-y-8">
-      <div className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/5 px-4 py-3">
-        <Search size={20} className="text-white/50" />
-        <input
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="Busca juegos, gift cards y más"
-          className="w-full bg-transparent outline-none placeholder:text-white/40"
-        />
-      </div>
+    <div className="space-y-6">
+      {open && (
+        <div className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/5 px-4 py-3">
+          <Search size={20} className="text-white/50" />
+          <input
+            autoFocus
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Busca juegos, gift cards y más"
+            className="w-full bg-transparent outline-none placeholder:text-white/40"
+          />
+          <button
+            aria-label="Cerrar búsqueda"
+            onClick={() => {
+              setQ('');
+              setOpen(false);
+            }}
+          >
+            <X size={20} className="text-white/60" />
+          </button>
+        </div>
+      )}
 
       {term ? (
         <section>
           <Title>Resultados</Title>
           {found.length ? (
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+            <div className={GRID}>
               {found.map((g) => (
                 <GameCard key={g.slug} game={g} />
               ))}
@@ -55,35 +102,53 @@ export default function GameSearch({ games }) {
         <>
           <Banner />
 
-          <section>
-            <Title emoji="🔥">Los más populares</Title>
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-              {games.map((g) => (
-                <GameCard key={g.slug} game={g} />
-              ))}
-            </div>
-          </section>
+          <div className="no-scrollbar sticky top-[72px] z-20 -mx-4 flex gap-3 overflow-x-auto bg-[#08080c]/90 px-4 py-3 backdrop-blur">
+            {TABS.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => go(t.id)}
+                className={
+                  'shrink-0 rounded-2xl border px-5 py-2.5 font-display text-lg font-bold uppercase transition ' +
+                  (active === t.id
+                    ? 'border-yellow-300 bg-yellow-300 text-black'
+                    : 'border-white/10 bg-zinc-950 text-white')
+                }
+              >
+                {t.emoji && <span className="mr-1.5">{t.emoji}</span>}
+                {t.label}
+              </button>
+            ))}
+          </div>
 
-          <section className="grid grid-cols-3 gap-3 text-center">
-            {PERKS.map(([icon, text]) => (
-              <div key={text} className="rounded-2xl border border-white/10 bg-white/5 px-2 py-3">
-                <div className="text-2xl">{icon}</div>
-                <div className="mt-1 text-[11px] font-semibold leading-tight text-white/80">{text}</div>
+          {TABS.map((t) => {
+            const list = games.filter(t.test);
+            if (!list.length) return null;
+            return (
+              <section key={t.id} id={t.id} className="scroll-mt-40">
+                <Title emoji={t.emoji && t.id !== 'directa' ? t.emoji : ''}>{t.title}</Title>
+                <div className={GRID}>
+                  {list.map((g) => (
+                    <GameCard key={g.slug} game={g} />
+                  ))}
+                </div>
+              </section>
+            );
+          })}
+
+          <section className="space-y-4 pt-2">
+            {PERKS.map(([icon, title, text]) => (
+              <div key={title} className="relative rounded-3xl border border-white/10 bg-zinc-950/80 px-6 py-4">
+                <span className="absolute bottom-4 left-0 top-4 w-1 rounded-r bg-yellow-300" />
+                <div className="font-display text-xl font-bold uppercase">
+                  <span className="mr-2">{icon}</span>
+                  {title}
+                </div>
+                <p className="text-white/70">{text}</p>
               </div>
             ))}
           </section>
         </>
       )}
-
-      <a
-        href={`https://wa.me/${WHATSAPP}`}
-        target="_blank"
-        rel="noreferrer"
-        aria-label="WhatsApp"
-        className="fixed bottom-24 right-4 z-20 flex h-14 w-14 items-center justify-center rounded-full bg-green-500 text-white shadow-lg active:scale-95 transition"
-      >
-        <MessageCircle size={28} />
-      </a>
     </div>
   );
 }

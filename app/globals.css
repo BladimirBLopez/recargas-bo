@@ -2,7 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --accent: 249 115 22;
+}
+
 body {
-  background: #000;
+  background:
+    radial-gradient(90% 45% at 50% 0%, rgb(var(--accent) / 0.22), transparent 70%),
+    radial-gradient(70% 40% at 100% 55%, rgb(var(--accent) / 0.1), transparent 70%),
+    #08080c;
+  background-attachment: fixed;
   color: #f1f1f5;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
