@@ -1,5 +1,6 @@
 import LegalPage from '@/components/LegalPage';
-import { SITE_NAME, WHATSAPP } from '@/data/games';
+import { SITE_NAME } from '@/data/games';
+import { getSettings } from '@/lib/settings';
 
 export const metadata = { title: `Ayuda | ${SITE_NAME}` };
 
@@ -11,7 +12,8 @@ const FAQ = [
   ['Pagué y no llega mi recarga', 'Escríbenos por WhatsApp con tu código de pedido y la captura del pago.'],
 ];
 
-export default function Ayuda() {
+export default async function Ayuda() {
+  const { whatsapp } = await getSettings();
   return (
     <LegalPage title="Ayuda">
       <div className="-mx-5 -my-2 divide-y divide-white/10">
@@ -25,7 +27,7 @@ export default function Ayuda() {
         ))}
       </div>
       <a
-        href={'https://wa.me/' + WHATSAPP}
+        href={'https://wa.me/' + whatsapp}
         target="_blank"
         rel="noreferrer"
         className="block rounded-2xl bg-green-500 py-3 text-center font-bold text-white"

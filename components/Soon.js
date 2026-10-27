@@ -1,7 +1,8 @@
-import { WHATSAPP } from '@/data/games';
+import { getSettings } from '@/lib/settings';
 import { FaWhatsapp } from 'react-icons/fa';
 
-export default function Soon({ icon: Icon, title, soon = [], children }) {
+export default async function Soon({ icon: Icon, title, soon = [], children }) {
+  const { whatsapp } = await getSettings();
   return (
     <div className="space-y-6 pb-28">
       <h2 className="flex items-center gap-3 font-display text-3xl font-extrabold uppercase italic">
@@ -27,7 +28,7 @@ export default function Soon({ icon: Icon, title, soon = [], children }) {
           </ul>
         )}
         <a
-          href={'https://wa.me/' + WHATSAPP}
+          href={'https://wa.me/' + whatsapp}
           target="_blank"
           rel="noreferrer"
           className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-green-500 px-5 py-3 font-bold text-white shadow-lg shadow-green-500/20 transition active:scale-95"

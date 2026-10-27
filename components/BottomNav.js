@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { MdHome, MdHistory, MdAccountBalanceWallet, MdFileDownload, MdPerson } from 'react-icons/md';
 import { FaWhatsapp } from 'react-icons/fa';
-import { WHATSAPP } from '@/data/games';
+import { useSettings } from '@/components/SettingsProvider';
 import { useInstall } from '@/components/useInstall';
 
 const ITEMS = [
@@ -17,12 +17,13 @@ const ITEMS = [
 
 export default function BottomNav() {
   const path = usePathname() || '/';
+  const { whatsapp } = useSettings();
   const { canInstall, install } = useInstall();
   if (path.startsWith('/juego') || path.startsWith('/admin')) return null;
   return (
     <>
       <a
-        href={'https://wa.me/' + WHATSAPP}
+        href={'https://wa.me/' + whatsapp}
         target="_blank"
         rel="noreferrer"
         aria-label="WhatsApp"

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MdArrowBack, MdFileDownload, MdCheckCircle, MdError } from 'react-icons/md';
 import { FaWhatsapp } from 'react-icons/fa';
-import { WHATSAPP } from '@/data/games';
+import { useSettings } from '@/components/SettingsProvider';
 
 const OK = ['PAGADO', 'ENTREGADO'];
 const BAD = ['CANCELADO', 'EXPIRADO'];
@@ -163,7 +163,8 @@ export default function OrderPay({ order, onBack }) {
     onBack();
   };
 
-  const wa = (text) => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`;
+  const { whatsapp } = useSettings();
+  const wa = (text) => `https://wa.me/${whatsapp}?text=${encodeURIComponent(text)}`;
   const proofMsg = [
     `Hola, te envío mi comprobante del pedido ${order.code}`,
     `Juego: ${order.game}`,
