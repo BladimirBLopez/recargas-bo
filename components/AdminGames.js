@@ -42,33 +42,54 @@ export default function AdminGames() {
     setBusy('');
   }
 
-  if (!list) return <p className="text-white/60">{err || 'Cargando...'}</p>;
+  if (!list) {
+    return err ? (
+      <div className="rounded-2xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-200">{err}</div>
+    ) : (
+      <div className="skeleton h-20 rounded-3xl" />
+    );
+  }
+
+  const activos = list.filter((g) => !g.maintenance).length;
 
   return (
-    <div className="space-y-3">
-      {err && <p className="text-sm text-red-300">{err}</p>}
-      {list.map((g) => (
-        <div key={g.slug} className="flex items-center gap-3 rounded-2xl bg-white/5 p-4">
-          <span className="text-2xl">{g.emoji}</span>
-          <div className="min-w-0 flex-1">
-            <div className="truncate font-bold">{g.name}</div>
-            <div className={'text-xs font-semibold ' + (g.maintenance ? 'text-red-300' : 'text-green-300')}>
-              {g.maintenance ? 'En mantenimiento' : 'Activo'}
-              {!g.canToggle && ' · sin paquetes'}
+    <div>
+      <div className="mb-3 text-sm text-white/50">
+        {activos} activos · {list.length - activos} en mantenimiento
+      </div>
+      {err && (
+        <div className="mb-3 rounded-2xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-200">{err}</div>
+      )}
+      <div className="grid gap-3 lg:grid-cols-2">
+        {list.map((g) => (
+          <div key={g.slug} className="flex items-center gap-3 rounded-3xl border border-white/10 bg-zinc-950/80 p-4">
+            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-white/5 text-2xl">{g.emoji}</span>
+            <div className="min-w-0 flex-1">
+              <div className="truncate font-bold">{g.name}</div>
+              <div
+                className={
+                  'mt-0.5 flex items-center gap-1.5 text-xs font-semibold ' +
+                  (g.maintenance ? 'text-red-300' : 'text-emerald-300')
+                }
+              >
+                <span className={'h-1.5 w-1.5 rounded-full ' + (g.maintenance ? 'bg-red-400' : 'bg-emerald-400')} />
+                {g.maintenance ? 'En mantenimiento' : 'Activo'}
+                {!g.canToggle && ' · sin paquetes'}
+              </div>
             </div>
+            <button
+              disabled={!g.canToggle || busy === g.slug}
+              onClick={() => toggle(g)}
+              className={
+                'rounded-2xl px-4 py-2 text-sm font-bold disabled:opacity-40 ' +
+                (g.maintenance ? 'bg-emerald-400 text-black' : 'border border-red-400/30 bg-red-400/10 text-red-300')
+              }
+            >
+              {g.maintenance ? 'Activar' : 'Pausar'}
+            </button>
           </div>
-          <button
-            disabled={!g.canToggle || busy === g.slug}
-            onClick={() => toggle(g)}
-            className={
-              'rounded-xl px-4 py-2 text-sm font-bold disabled:opacity-40 ' +
-              (g.maintenance ? 'bg-green-400 text-black' : 'bg-red-400 text-black')
-            }
-          >
-            {g.maintenance ? 'Activar' : 'Pausar'}
-          </button>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }
