@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import GameImg from '@/components/GameImg';
 
 const BADGE = {
-  promo: ['🔥 PROMO', 'bg-gradient-to-r from-orange-500 to-red-500 text-white'],
+  promo: ['🔥 PROMO', 'bg-gradient-to-r from-red-500 to-rose-500 text-white'],
   nuevo: ['NUEVO', 'bg-yellow-300 text-black'],
 };
 

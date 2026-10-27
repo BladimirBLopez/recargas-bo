@@ -43,7 +43,7 @@ export default function Historial() {
 
       {order && (
         <div className="relative overflow-hidden rounded-3xl border border-yellow-300/30 bg-zinc-950/80 p-5 shadow-[0_0_30px_-10px_rgb(var(--accent)/0.6)]">
-          <span className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-yellow-300 to-red-500" />
+          <span className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-yellow-300 to-orange-500" />
           <div className="flex items-center justify-between gap-3">
             <div className="font-mono text-lg font-bold text-yellow-300">{order.code}</div>
             <span className="rounded-full bg-yellow-300/15 px-3 py-0.5 font-display text-xs font-bold uppercase text-yellow-300">

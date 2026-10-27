@@ -9,7 +9,7 @@ export default function InstallCard() {
   return (
     <div className="mx-auto max-w-md space-y-5 pb-28 text-center">
       <div className="rounded-3xl border border-yellow-300/30 bg-zinc-950/80 p-6 shadow-[0_0_40px_-12px_rgb(var(--accent)/0.6)]">
-        <span className="mx-auto grid h-20 w-20 place-items-center rounded-2xl bg-gradient-to-br from-yellow-300 to-red-500 text-black shadow-lg">
+        <span className="mx-auto grid h-20 w-20 place-items-center rounded-2xl bg-gradient-to-br from-yellow-300 to-orange-500 text-black shadow-lg">
           <MdFlashOn size={48} />
         </span>
         <h1 className="mt-4 font-display text-3xl font-extrabold uppercase italic">Instala {SITE_NAME}</h1>

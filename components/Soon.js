@@ -10,7 +10,7 @@ export default async function Soon({ icon: Icon, title, soon = [], children }) {
         {title}
       </h2>
       <div className="rounded-3xl border border-yellow-300/25 bg-zinc-950/80 p-6 text-center shadow-[0_0_40px_-14px_rgb(var(--accent)/0.6)]">
-        <span className="clip-corner mx-auto grid h-20 w-20 place-items-center bg-gradient-to-br from-yellow-300 to-red-500 text-black shadow-lg">
+        <span className="clip-corner mx-auto grid h-20 w-20 place-items-center bg-gradient-to-br from-yellow-300 to-orange-500 text-black shadow-lg">
           {Icon && <Icon size={44} />}
         </span>
         <span className="mt-4 inline-block rounded-full border border-yellow-300/40 bg-yellow-300/10 px-3 py-0.5 font-display text-xs font-bold uppercase tracking-wide text-yellow-300">

@@ -47,7 +47,7 @@ export default function Header() {
     <header className="sticky top-0 z-30 border-b-2 border-yellow-300 bg-black/90 shadow-[0_6px_24px_-8px_rgb(var(--accent)/0.6)] backdrop-blur">
       <div className="mx-auto flex h-[60px] max-w-5xl items-center gap-2 px-4">
         <Link href="/" className="flex min-w-0 flex-1 items-center gap-2">
-          <img src="/logo-header.png" alt={SITE_NAME} height="40" className="h-10 w-auto shrink-0" />
+          <img src="/logo-header.png" alt={SITE_NAME} height="48" className="h-12 w-auto shrink-0" />
         </Link>
 
         <button

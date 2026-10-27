@@ -59,7 +59,7 @@ export default function SalesToast() {
       }
     >
       <div className="pointer-events-auto relative overflow-hidden rounded-2xl border border-yellow-300/40 bg-zinc-950/95 p-3 shadow-[0_8px_30px_-8px_rgb(var(--accent)/0.6)] backdrop-blur">
-        <span className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-yellow-300 to-red-500" />
+        <span className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-yellow-300 to-orange-500" />
         <div className="flex items-center gap-3 pl-1.5">
           <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-yellow-300 to-orange-500 text-black shadow-[0_0_14px_rgb(var(--accent)/0.6)]">
             <MdFlashOn size={22} />
