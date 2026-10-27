@@ -1,4 +1,5 @@
 import './globals.css';
+import './theme.css';
 import { Poppins, Barlow_Condensed } from 'next/font/google';
 import { SITE_NAME } from '@/data/games';
 import ShopFrame from '@/components/ShopFrame';
@@ -17,9 +18,15 @@ export const metadata = {
 
 export const viewport = { themeColor: '#08080c', viewportFit: 'cover' };
 
+const THEME_SCRIPT =
+  "(function(){try{var t=localStorage.getItem('rb_theme');document.documentElement.dataset.theme=t==='light'?'light':'dark';}catch(e){document.documentElement.dataset.theme='dark';}})();";
+
 export default function RootLayout({ children }) {
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      </head>
       <body className={`${font.className} ${display.variable} min-h-screen flex flex-col`}>
         <ShopFrame>{children}</ShopFrame>
       </body>

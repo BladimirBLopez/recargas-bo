@@ -1,6 +1,7 @@
 'use client';
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import ThemeToggle from '@/components/ThemeToggle';
 import { usePathname } from 'next/navigation';
 import { MdDashboard, MdReceiptLong, MdSportsEsports, MdLogout, MdRefresh, MdLock, MdBarChart } from 'react-icons/md';
 
@@ -172,6 +173,7 @@ export default function AdminShell({ children }) {
           <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
             <h1 className="font-display text-xl font-bold uppercase tracking-wide">{current[1]}</h1>
             <div className="flex gap-2">
+              <ThemeToggle className="h-10 w-10 rounded-xl border border-white/10 bg-white/5" />
               <button
                 onClick={reload}
                 aria-label="Actualizar"

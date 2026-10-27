@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { MdSearch, MdClose, MdPerson, MdFlashOn } from 'react-icons/md';
 import { SITE_NAME } from '@/data/games';
 import { useUser } from '@/components/useUser';
+import ThemeToggle from '@/components/ThemeToggle';
 
 export default function Header() {
   const path = usePathname() || '/';
@@ -66,6 +67,8 @@ export default function Header() {
         >
           <MdSearch size={22} />
         </button>
+
+        <ThemeToggle className="h-9 w-9 rounded-xl border-2 border-white/10 bg-zinc-950 text-white" />
 
         <Link
           href="/perfil"
