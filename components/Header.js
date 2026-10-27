@@ -4,10 +4,12 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { MdSearch, MdClose, MdPerson, MdFlashOn } from 'react-icons/md';
 import { SITE_NAME } from '@/data/games';
+import { useUser } from '@/components/useUser';
 
 export default function Header() {
   const path = usePathname() || '/';
   const router = useRouter();
+  const { user } = useUser();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState('');
 
@@ -70,11 +72,15 @@ export default function Header() {
           className="flex shrink-0 items-center gap-2 rounded-xl border-2 border-yellow-300 bg-zinc-950 py-0.5 pl-1 pr-2.5"
         >
           <span className="grid h-7 w-7 place-items-center rounded-full bg-white/15 text-white/70">
-            <MdPerson size={20} />
+            {user ? (
+              <span className="font-display text-sm font-extrabold text-yellow-300">{user.name.charAt(0).toUpperCase()}</span>
+            ) : (
+              <MdPerson size={20} />
+            )}
           </span>
           <span className="leading-tight">
-            <span className="block text-xs font-bold">Invitado</span>
-            <span className="block text-[10px] text-white/60">Ingresar</span>
+            <span className="block max-w-[84px] truncate text-xs font-bold">{user ? user.name.split(' ')[0] : 'Invitado'}</span>
+            <span className="block text-[10px] text-white/60">{user ? 'Mi cuenta' : 'Ingresar'}</span>
           </span>
         </Link>
       </div>
