@@ -279,13 +279,14 @@ export default function Pedidos() {
         {shown.map((o) => {
           const st = ST[o.status] || ST.EXPIRADO;
           const working = busy === o.id;
+          const stale = o.status === 'PENDIENTE' && Date.now() - new Date(o.created_at).getTime() > 30 * 60 * 1000;
           return (
             <div key={o.id} className="relative overflow-hidden rounded-3xl border border-white/10 bg-zinc-950/80 p-4 pl-5">
-              <span className={'absolute inset-y-0 left-0 w-1.5 ' + st.bar} />
+              <span className={'absolute inset-y-0 left-0 w-1.5 ' + (stale ? 'bg-red-500' : st.bar)} />
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <div className="font-mono text-base font-bold text-yellow-300">{o.code}</div>
-                  <div className="text-xs text-white/40">{ago(o.created_at)} · {fmt(o.created_at)}</div>
+                  <div className={'text-xs ' + (stale ? 'font-bold text-red-400' : 'text-white/40')}>{stale ? 'Sin atender: ' : ''}{ago(o.created_at)} · {fmt(o.created_at)}</div>
                 </div>
                 <span className={'rounded-full border px-3 py-0.5 text-xs font-bold ' + st.badge}>{st.label}</span>
               </div>

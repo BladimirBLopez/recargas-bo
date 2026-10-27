@@ -1,9 +1,9 @@
 'use client';
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import ThemeToggle from '@/components/ThemeToggle';
 import { usePathname } from 'next/navigation';
-import { MdDashboard, MdReceiptLong, MdSportsEsports, MdLogout, MdRefresh, MdLock, MdBarChart } from 'react-icons/md';
+import { MdDashboard, MdReceiptLong, MdSportsEsports, MdLogout, MdRefresh, MdLock, MdBarChart, MdNotificationsActive, MdNotificationsOff } from 'react-icons/md';
 
 const Ctx = createContext({ data: null, reload: () => {}, loading: false });
 export function useAdmin() {
@@ -24,6 +24,74 @@ export default function AdminShell({ children }) {
   const [loading, setLoading] = useState(false);
   const [pw, setPw] = useState('');
   const [err, setErr] = useState('');
+  const [sound, setSound] = useState(false);
+  const [alertN, setAlertN] = useState(0);
+  const prevPend = useRef(null);
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    try {
+      setSound(localStorage.getItem('rb_admin_sound') === '1');
+    } catch (e) {}
+  }, []);
+
+  function beep() {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      if (!audioRef.current) audioRef.current = new AC();
+      const ac = audioRef.current;
+      if (ac.state === 'suspended') ac.resume();
+      [0, 0.2].forEach((t, i) => {
+        const o = ac.createOscillator();
+        const g = ac.createGain();
+        o.type = 'sine';
+        o.frequency.value = i ? 1175 : 880;
+        g.gain.setValueAtTime(0.0001, ac.currentTime + t);
+        g.gain.exponentialRampToValueAtTime(0.35, ac.currentTime + t + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + t + 0.18);
+        o.connect(g);
+        g.connect(ac.destination);
+        o.start(ac.currentTime + t);
+        o.stop(ac.currentTime + t + 0.2);
+      });
+    } catch (e) {}
+  }
+
+  function toggleSound() {
+    const next = !sound;
+    setSound(next);
+    try {
+      localStorage.setItem('rb_admin_sound', next ? '1' : '0');
+    } catch (e) {}
+    if (next) {
+      beep();
+      try {
+        navigator.vibrate && navigator.vibrate(150);
+      } catch (e) {}
+    }
+  }
+
+  useEffect(() => {
+    if (!data) return;
+    const n = data.counts?.PENDIENTE || 0;
+    if (prevPend.current !== null && n > prevPend.current) {
+      setAlertN((a) => a + (n - prevPend.current));
+      if (sound) {
+        beep();
+        try {
+          navigator.vibrate && navigator.vibrate([200, 100, 200]);
+        } catch (e) {}
+      }
+    }
+    prevPend.current = n;
+  }, [data, sound]);
+
+  useEffect(() => {
+    if (!alertN) return;
+    const t = setTimeout(() => setAlertN(0), 8000);
+    return () => clearTimeout(t);
+  }, [alertN]);
 
   const reload = useCallback(async () => {
     setLoading(true);
@@ -173,6 +241,13 @@ export default function AdminShell({ children }) {
           <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
             <h1 className="font-display text-xl font-bold uppercase tracking-wide">{current[1]}</h1>
             <div className="flex gap-2">
+              <button
+                onClick={toggleSound}
+                aria-label={sound ? 'Apagar sonido de avisos' : 'Activar sonido de avisos'}
+                className={'grid h-10 w-10 place-items-center rounded-xl border active:scale-95 ' + (sound ? 'border-yellow-300/40 bg-yellow-300/10 text-yellow-300' : 'border-white/10 bg-white/5 text-white/60')}
+              >
+                {sound ? <MdNotificationsActive className="text-xl" /> : <MdNotificationsOff className="text-xl" />}
+              </button>
               <ThemeToggle className="h-10 w-10 rounded-xl border border-white/10 bg-white/5" />
               <button
                 onClick={reload}
@@ -192,6 +267,17 @@ export default function AdminShell({ children }) {
           </div>
         </header>
 
+        {alertN > 0 && (
+          <Link
+            href="/admin/pedidos"
+            onClick={() => setAlertN(0)}
+            className="fixed inset-x-3 top-3 z-50 flex items-center gap-3 rounded-2xl bg-gradient-to-r from-yellow-300 to-orange-400 px-4 py-3 text-sm font-bold text-black shadow-xl shadow-orange-500/40 md:left-64"
+          >
+            <MdNotificationsActive className="text-2xl" />
+            {alertN === 1 ? 'Nuevo pedido pendiente' : alertN + ' pedidos nuevos pendientes'}
+            <span className="ml-auto text-xs">Ver</span>
+          </Link>
+        )}
         <main className="mx-auto max-w-5xl px-4 pb-28 pt-4 md:pb-8">{children}</main>
 
         <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-white/10 bg-black/90 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
