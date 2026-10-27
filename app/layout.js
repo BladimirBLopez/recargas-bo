@@ -1,4 +1,5 @@
 import './globals.css';
+import Link from 'next/link';
 import { Poppins, Barlow_Condensed } from 'next/font/google';
 import { SITE_NAME, WHATSAPP } from '@/data/games';
 import BottomNav from '@/components/BottomNav';
@@ -31,6 +32,11 @@ export default function RootLayout({ children }) {
             <a href={wa} target="_blank" rel="noreferrer" className="mt-1 inline-block font-semibold text-green-400">
               Escríbenos por WhatsApp
             </a>
+            <nav className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-white/60">
+              {[['/terminos', 'Términos'], ['/privacidad', 'Privacidad'], ['/garantias', 'Garantías'], ['/ayuda', 'Ayuda']].map(([h, t]) => (
+                <Link key={h} href={h} className="hover:text-white">{t}</Link>
+              ))}
+            </nav>
             <p className="mt-6 text-center text-xs text-white/40">
               © {new Date().getFullYear()} {SITE_NAME}. Todos los derechos reservados.
             </p>
