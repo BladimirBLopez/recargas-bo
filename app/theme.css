@@ -1,5 +1,5 @@
 html { color-scheme: dark; }
-html[data-theme='light'] { color-scheme: light; --accent: 14 138 152; }
+html[data-theme='light'] { color-scheme: light; --accent: 14 138 152; --accent2: 21 94 117; --accent-lt: 14 116 144; }
 
 html[data-theme='light'] body {
   background:

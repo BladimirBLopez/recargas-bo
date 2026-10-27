@@ -20,7 +20,7 @@ export async function GET(req, { params }) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'linear-gradient(135deg, #f97316, #dc2626)',
+          background: 'linear-gradient(135deg, #13a0af, #0e7490)',
         }}
       >
         <svg width={glyph} height={glyph} viewBox="0 0 24 24">
