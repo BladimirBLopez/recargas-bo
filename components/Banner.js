@@ -17,7 +17,7 @@ function Slide({ s }) {
   const [svg, setSvg] = useState(false);
   const Icon = s.icon;
   return (
-    <div className="relative aspect-[8/3] overflow-hidden rounded-3xl border-2 border-yellow-300 bg-black">
+    <div className="glow-pulse relative aspect-[8/3] overflow-hidden rounded-3xl border-2 border-yellow-300 bg-black">
       {!fail && (
         <img
           src={svg ? s.img.replace('.jpg', '.svg') : s.img}

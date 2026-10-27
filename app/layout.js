@@ -30,7 +30,7 @@ export default function RootLayout({ children }) {
 
         <main className="flex-1 w-full max-w-5xl mx-auto px-4 py-6">{children}</main>
 
-        <footer className="border-t border-white/10 px-4 pt-8 pb-32">
+        <footer className="border-t border-yellow-300/30 bg-gradient-to-t from-black/70 to-transparent px-4 pt-8 pb-32">
           <div className="max-w-5xl mx-auto">
             <div className="text-xl font-bold">{SITE_NAME}</div>
             <p className="text-white/60">Recargas de juegos en Bolivia, rápidas y seguras.</p>

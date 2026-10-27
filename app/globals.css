@@ -22,8 +22,28 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Cuadrícula gamer tenue detrás de todo el sitio */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.035) 1px, transparent 1px);
+  background-size: 34px 34px;
+  -webkit-mask-image: radial-gradient(ellipse 90% 60% at 50% 0%, #000 25%, transparent 80%);
+  mask-image: radial-gradient(ellipse 90% 60% at 50% 0%, #000 25%, transparent 80%);
+}
+
 ::selection {
   background: rgb(var(--accent) / 0.4);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--accent) / 0.5) transparent;
 }
 
 .no-scrollbar {
@@ -31,6 +51,16 @@ body {
 }
 .no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+/* Esquinas cortadas estilo gamer */
+.clip-corner {
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+}
+
+/* Texto con degradado de acento */
+.text-glow {
+  text-shadow: 0 0 18px rgb(var(--accent) / 0.55);
 }
 
 @keyframes shine {
@@ -41,6 +71,15 @@ body {
 @keyframes shimmer {
   from { background-position: -200% 0; }
   to { background-position: 200% 0; }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 18px -6px rgb(var(--accent) / 0.45); }
+  50% { box-shadow: 0 0 34px -4px rgb(var(--accent) / 0.8); }
+}
+
+.glow-pulse {
+  animation: glow-pulse 3s ease-in-out infinite;
 }
 
 .skeleton {

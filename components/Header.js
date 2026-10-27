@@ -44,10 +44,10 @@ export default function Header() {
     <header className="sticky top-0 z-30 border-b-2 border-yellow-300 bg-black/90 shadow-[0_6px_24px_-8px_rgb(var(--accent)/0.6)] backdrop-blur">
       <div className="mx-auto flex h-[60px] max-w-5xl items-center gap-2 px-4">
         <Link href="/" className="flex min-w-0 flex-1 items-center gap-2">
-          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-yellow-300 to-red-500 text-black">
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-yellow-300 to-red-500 text-black shadow-[0_0_16px_rgb(var(--accent)/0.7)]">
             <MdFlashOn size={20} />
           </span>
-          <span className="truncate font-display text-xl font-extrabold italic uppercase tracking-tight text-sky-500 sm:text-2xl">
+          <span className="truncate font-display text-xl font-extrabold italic uppercase tracking-tight bg-gradient-to-r from-white via-white to-yellow-300 bg-clip-text text-transparent sm:text-2xl">
             {SITE_NAME}
           </span>
         </Link>

@@ -11,6 +11,7 @@ const BADGE = {
 export default function GameCard({ game, big = false }) {
   const badge = BADGE[game.badge];
   const off = Boolean(game.maintenance);
+  const from = game.packages && game.packages.length ? Math.min(...game.packages.map((p) => p.price)) : null;
 
   const body = (
     <div className={`relative bg-gradient-to-br ${game.color} aspect-[3/4] overflow-hidden`}>
@@ -44,7 +45,14 @@ export default function GameCard({ game, big = false }) {
         >
           {game.name}
         </div>
-        <div className="mt-1.5 h-1 w-1/4 rounded-full bg-yellow-300 transition-all duration-300 group-hover:w-1/2" />
+        {from !== null && !off ? (
+          <div className="mt-1.5 flex items-center gap-1.5">
+            <span className="h-1 w-1/4 rounded-full bg-yellow-300 transition-all duration-300 group-hover:w-1/6" />
+            <span className="font-display text-[11px] font-bold uppercase tracking-wide text-yellow-300">Desde Bs {from}</span>
+          </div>
+        ) : (
+          <div className="mt-1.5 h-1 w-1/4 rounded-full bg-yellow-300 transition-all duration-300 group-hover:w-1/2" />
+        )}
       </div>
     </div>
   );

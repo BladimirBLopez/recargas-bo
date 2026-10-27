@@ -19,7 +19,7 @@ const PERKS = [
 function Title({ emoji, children }) {
   return (
     <h2 className="mb-3 flex items-center gap-2 font-display text-xl font-extrabold uppercase italic">
-      <span className="h-5 w-1 rounded-full bg-yellow-300" />
+      <span className="h-5 w-1.5 -skew-x-12 rounded-sm bg-yellow-300 shadow-[0_0_10px_rgb(var(--accent)/0.8)]" />
       {emoji && <span>{emoji}</span>}
       {children}
     </h2>
@@ -85,7 +85,7 @@ export default function GameSearch({ games }) {
                 className={
                   'shrink-0 rounded-xl border px-4 py-2 font-display text-sm font-bold uppercase transition ' +
                   (active === t.id
-                    ? 'border-yellow-300 bg-yellow-300 text-black'
+                    ? 'border-yellow-300 bg-yellow-300 text-black shadow-[0_0_16px_-2px_rgb(var(--accent)/0.7)]'
                     : 'border-white/10 bg-zinc-950 text-white')
                 }
               >
@@ -115,7 +115,7 @@ export default function GameSearch({ games }) {
               <div key={title} className="relative rounded-3xl border border-white/10 bg-zinc-950/80 px-5 py-3">
                 <span className="absolute bottom-4 left-0 top-4 w-1 rounded-r bg-yellow-300" />
                 <div className="font-display text-lg font-bold uppercase">
-                  <span className="mr-2">{icon}</span>
+                  <span className="mr-2 inline-grid h-8 w-8 place-items-center rounded-lg bg-yellow-300/15 align-middle text-base shadow-[0_0_14px_-4px_rgb(var(--accent)/0.8)]">{icon}</span>
                   {title}
                 </div>
                 <p className="text-white/70">{text}</p>
