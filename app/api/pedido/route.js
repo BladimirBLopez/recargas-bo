@@ -1,6 +1,7 @@
 import { games } from '../../../data/games.js';
 import { sql } from '../../../lib/db.js';
 import { limited } from '../../../lib/ratelimit.js';
+import { maintenanceMap } from '../../../lib/games-state.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -30,6 +31,8 @@ export async function POST(req) {
   const game = games.find((g) => g.slug === body?.slug);
   const pkg = game?.packages.find((p) => p.id === body?.packageId);
   if (!game || !pkg) return json({ error: 'pack_invalido' }, 400);
+  const mnt = await maintenanceMap();
+  if (mnt.has(game.slug) ? mnt.get(game.slug) : game.maintenance) return json({ error: 'mantenimiento' }, 409);
 
   const playerId = String(body?.playerId ?? '').trim();
   const okId =

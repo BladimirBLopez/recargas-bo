@@ -1,11 +1,13 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
+import AdminGames from '@/components/AdminGames';
 
 const TABS = [
   ['PENDIENTE', 'Pendientes'],
   ['PAGADO', 'Pagados'],
   ['ENTREGADO', 'Entregados'],
   ['todos', 'Todos'],
+  ['juegos', 'Juegos'],
 ];
 const ACTIONS = {
   PENDIENTE: [
@@ -45,7 +47,7 @@ export default function Admin() {
 
   const load = useCallback(async () => {
     try {
-      const r = await fetch('/api/admin/pedidos?status=' + tab, { cache: 'no-store' });
+      const r = await fetch('/api/admin/pedidos?status=' + (tab === 'juegos' ? 'PENDIENTE' : tab), { cache: 'no-store' });
       if (r.status === 401) {
         setAuthed(false);
         return;
@@ -124,7 +126,7 @@ export default function Admin() {
   }
 
   const term = search.trim().toLowerCase();
-  const shown = term
+  const shown = tab === 'juegos' ? [] : term
     ? orders.filter(
         (o) =>
           o.code.toLowerCase().includes(term) ||
@@ -192,11 +194,12 @@ export default function Admin() {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Buscar por codigo, ID o nickname"
-        className="mb-3 w-full rounded-xl bg-white/10 px-4 py-2 text-sm text-white outline-none"
+        className={'mb-3 w-full rounded-xl bg-white/10 px-4 py-2 text-sm text-white outline-none' + (tab === 'juegos' ? ' hidden' : '')}
       />
 
       {err && <p className="mb-3 text-sm text-red-300">{err}</p>}
-      {shown.length === 0 && <p className="text-white/60">No hay pedidos aqui.</p>}
+      {tab === 'juegos' && <AdminGames />}
+      {tab !== 'juegos' && shown.length === 0 && <p className="text-white/60">No hay pedidos aqui.</p>}
 
       <div className="space-y-3">
         {shown.map((o) => (

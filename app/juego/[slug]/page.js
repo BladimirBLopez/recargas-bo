@@ -4,7 +4,10 @@ import { MdQrCode2, MdVerifiedUser, MdHeadsetMic, MdChevronRight } from 'react-i
 import Checkout from '@/components/Checkout';
 import GameImg from '@/components/GameImg';
 import GameCard from '@/components/GameCard';
-import { games, getGame } from '@/data/games';
+import { getGame } from '@/data/games';
+import { getGames } from '@/lib/games-state';
+
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -20,9 +23,10 @@ const CHIPS = [
 
 export default async function GamePage({ params }) {
   const { slug } = await params;
-  const game = getGame(slug);
+  const all = await getGames();
+  const game = all.find((g) => g.slug === slug);
   if (!game || game.maintenance) notFound();
-  const others = games.filter((g) => g.slug !== game.slug && !g.maintenance).slice(0, 4);
+  const others = all.filter((g) => g.slug !== game.slug && !g.maintenance).slice(0, 4);
 
   return (
     <div className="space-y-6">

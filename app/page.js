@@ -1,6 +1,9 @@
 import GameSearch from '@/components/GameSearch';
-import { games } from '@/data/games';
+import { getGames } from '@/lib/games-state';
 
-export default function Home() {
+export const dynamic = 'force-dynamic';
+
+export default async function Home() {
+  const games = await getGames();
   return <GameSearch games={games} />;
 }
