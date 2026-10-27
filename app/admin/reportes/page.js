@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { MdTrendingUp, MdReceiptLong, MdSell, MdCancel, MdFileDownload } from 'react-icons/md';
+import { MdTrendingUp, MdReceiptLong, MdSell, MdSavings, MdFileDownload } from 'react-icons/md';
 import { Kpi, bs, pretty } from '@/components/admin/ui';
 
 function boDate(back = 0) {
@@ -153,7 +153,7 @@ export default function Reportes() {
             <Kpi icon={MdTrendingUp} label="Vendido" value={bs(res.total)} hint="Pagados + entregados" accent="bg-emerald-400/15 text-emerald-300" />
             <Kpi icon={MdReceiptLong} label="Pedidos" value={res.n} hint="Con pago confirmado" accent="bg-sky-400/15 text-sky-300" />
             <Kpi icon={MdSell} label="Ticket promedio" value={bs(Math.round(res.ticket))} hint="Por pedido" accent="bg-orange-400/15 text-orange-300" />
-            <Kpi icon={MdCancel} label="Cancelados" value={res.estados.CANCELADO || 0} hint={'Expirados: ' + (res.estados.EXPIRADO || 0)} accent="bg-red-400/15 text-red-300" />
+            <Kpi icon={MdSavings} label="Ganancia" value={res.conCosto ? bs(Math.round(res.ganancia)) : '-'} hint={res.conCosto ? res.conCosto + ' pedidos con costo · cancelados: ' + (res.estados.CANCELADO || 0) : 'Pon costos en Juegos'} accent="bg-emerald-400/15 text-emerald-300" />
           </div>
 
           <section className="rounded-3xl border border-white/10 bg-zinc-950/80 p-4">

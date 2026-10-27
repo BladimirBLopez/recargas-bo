@@ -1,7 +1,7 @@
 import { games } from '../../../../data/games.js';
 import { sql } from '../../../../lib/db.js';
 import { isAdmin } from '../../../../lib/admin.js';
-import { maintenanceMap, noPackages } from '../../../../lib/games-state.js';
+import { maintenanceMap, packageMap, applyPackages, noPackages } from '../../../../lib/games-state.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -14,6 +14,7 @@ export async function GET(req) {
   if (!isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
   try {
     const m = await maintenanceMap(true);
+    const pm = await packageMap();
     return json({
       games: games.map((g) => ({
         slug: g.slug,
@@ -21,6 +22,14 @@ export async function GET(req) {
         emoji: g.emoji,
         canToggle: !noPackages(g),
         maintenance: noPackages(g) ? true : m.has(g.slug) ? m.get(g.slug) : Boolean(g.maintenance),
+        packages: applyPackages(g, pm, true).packages.map((p) => ({
+          id: p.id,
+          label: p.label,
+          price: p.price,
+          basePrice: p.basePrice,
+          cost: p.cost,
+          active: p.active,
+        })),
       })),
     });
   } catch (e) {

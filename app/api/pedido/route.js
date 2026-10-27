@@ -1,7 +1,7 @@
 import { games } from '../../../data/games.js';
 import { sql } from '../../../lib/db.js';
 import { limited } from '../../../lib/ratelimit.js';
-import { maintenanceMap } from '../../../lib/games-state.js';
+import { maintenanceMap, packageMap, applyPackages } from '../../../lib/games-state.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -28,9 +28,10 @@ export async function POST(req) {
     return json({ error: 'json_invalido' }, 400);
   }
 
-  const game = games.find((g) => g.slug === body?.slug);
+  const base = games.find((g) => g.slug === body?.slug);
+  const game = base ? applyPackages(base, await packageMap(), true) : null;
   const pkg = game?.packages.find((p) => p.id === body?.packageId);
-  if (!game || !pkg) return json({ error: 'pack_invalido' }, 400);
+  if (!game || !pkg || !pkg.active) return json({ error: 'pack_invalido' }, 400);
   const mnt = await maintenanceMap();
   if (mnt.has(game.slug) ? mnt.get(game.slug) : game.maintenance) return json({ error: 'mantenimiento' }, 409);
 
@@ -52,6 +53,11 @@ export async function POST(req) {
           VALUES (${code}, ${game.slug}, ${pkg.id}, ${pkg.label}, ${pkg.price}, ${playerId}, ${nickname})
           RETURNING id, code, created_at`;
         const r = rows[0];
+        if (pkg.cost !== null) {
+          try {
+            await q`UPDATE orders SET cost = ${pkg.cost} WHERE id = ${r.id}`;
+          } catch (e) {}
+        }
         return json({
           orderId: r.id,
           code: r.code,

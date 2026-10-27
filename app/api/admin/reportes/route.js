@@ -82,6 +82,14 @@ export async function GET(req) {
       q`SELECT DISTINCT game_slug FROM orders ORDER BY game_slug`,
     ]);
 
+    let gan = { g: 0, n: 0 };
+    try {
+      const rg = await q`SELECT coalesce(sum(price - cost),0) AS g, count(*)::int AS n FROM orders
+        WHERE cost IS NOT NULL AND status IN ('PAGADO','ENTREGADO')
+          AND (coalesce(paid_at, created_at) - interval '4 hours')::date BETWEEN ${from}::date AND ${to}::date
+          AND (${game}::text IS NULL OR game_slug = ${game}::text)`;
+      gan = { g: Number(rg[0]?.g || 0), n: rg[0]?.n || 0 };
+    } catch (e) {}
     const series = dias.map((r) => ({ day: r.day, total: Number(r.total), n: r.n }));
     const total = series.reduce((a, d) => a + d.total, 0);
     const n = series.reduce((a, d) => a + d.n, 0);
@@ -93,6 +101,8 @@ export async function GET(req) {
       total,
       n,
       ticket: n ? total / n : 0,
+      ganancia: gan.g,
+      conCosto: gan.n,
       dias: series,
       juegos: juegos.map((r) => ({ game_slug: r.game_slug, n: r.n, total: Number(r.total) })),
       estados: est,
