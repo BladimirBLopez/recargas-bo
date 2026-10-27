@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { MdHome, MdHistory, MdAccountBalanceWallet, MdFileDownload, MdPerson } from 'react-icons/md';
 import { FaWhatsapp } from 'react-icons/fa';
 import { WHATSAPP } from '@/data/games';
+import { useInstall } from '@/components/useInstall';
 
 const ITEMS = [
   { href: '/', label: 'Inicio', Icon: MdHome },
@@ -16,6 +17,7 @@ const ITEMS = [
 
 export default function BottomNav() {
   const path = usePathname() || '/';
+  const { canInstall, install } = useInstall();
   if (path.startsWith('/juego') || path.startsWith('/admin')) return null;
   return (
     <>
@@ -32,10 +34,18 @@ export default function BottomNav() {
       <nav className="fixed inset-x-3 bottom-3 z-20 mx-auto flex max-w-md gap-1 rounded-3xl border border-yellow-300/30 bg-zinc-950/95 p-1 shadow-[0_0_24px_-6px_rgb(var(--accent)/0.5)] backdrop-blur">
         {ITEMS.map(({ href, label, Icon }) => {
           const active = path === href;
+          const isApp = href === '/app';
+          const text = isApp && canInstall ? 'Instalar' : label;
           return (
             <Link
               key={href}
               href={href}
+              onClick={(e) => {
+                if (isApp && canInstall) {
+                  e.preventDefault();
+                  install();
+                }
+              }}
               className="relative flex flex-1 flex-col items-center rounded-2xl px-1 py-1.5 font-display text-xs font-bold uppercase tracking-wide transition active:scale-95"
             >
               {active && (
@@ -48,11 +58,11 @@ export default function BottomNav() {
               <span
                 className={
                   'relative z-10 flex flex-col items-center gap-0.5 transition-colors ' +
-                  (active ? 'text-yellow-300' : 'text-white/55')
+                  (active ? 'text-yellow-300' : isApp && canInstall ? 'text-yellow-300' : 'text-white/55')
                 }
               >
                 <Icon size={24} />
-                {label}
+                {text}
               </span>
             </Link>
           );

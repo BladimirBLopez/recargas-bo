@@ -1,14 +1,8 @@
-import Soon from '@/components/Soon';
+import InstallCard from '@/components/InstallCard';
+import { SITE_NAME } from '@/data/games';
 
-export const metadata = { title: 'Instalar app' };
+export const metadata = { title: `Instalar ${SITE_NAME}` };
 
-export default function InstalarApp() {
-  return (
-    <Soon icon="📲" title="Instalar app">
-      <p>Agrega la tienda a tu pantalla de inicio y ábrela como una app.</p>
-      <p>
-        En Chrome: toca los <b>tres puntos ⋮</b> y elige <b>“Agregar a la pantalla de inicio”</b>.
-      </p>
-    </Soon>
-  );
+export default function AppPage() {
+  return <InstallCard />;
 }
