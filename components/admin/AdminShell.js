@@ -2,7 +2,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MdDashboard, MdReceiptLong, MdSportsEsports, MdLogout, MdRefresh, MdLock } from 'react-icons/md';
+import { MdDashboard, MdReceiptLong, MdSportsEsports, MdLogout, MdRefresh, MdLock, MdBarChart } from 'react-icons/md';
 
 const Ctx = createContext({ data: null, reload: () => {}, loading: false });
 export function useAdmin() {
@@ -12,6 +12,7 @@ export function useAdmin() {
 const NAV = [
   ['/admin', 'Resumen', MdDashboard],
   ['/admin/pedidos', 'Pedidos', MdReceiptLong],
+  ['/admin/reportes', 'Reportes', MdBarChart],
   ['/admin/juegos', 'Juegos', MdSportsEsports],
 ];
 
@@ -191,7 +192,7 @@ export default function AdminShell({ children }) {
 
         <main className="mx-auto max-w-5xl px-4 pb-28 pt-4 md:pb-8">{children}</main>
 
-        <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-3 border-t border-white/10 bg-black/90 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
+        <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-white/10 bg-black/90 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
           {NAV.map(([href, label, Icon]) => (
             <Link
               key={href}
