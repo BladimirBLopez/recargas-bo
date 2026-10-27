@@ -16,15 +16,46 @@ function json(body, status = 200) {
 
 export async function GET(req) {
   if (!isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
-  const status = new URL(req.url).searchParams.get('status');
+  const sp = new URL(req.url).searchParams;
+  const st = sp.get('status');
+  const status = STATUSES.includes(st) ? st : null;
+  const g = sp.get('game') || '';
+  const game = /^[a-z0-9-]{1,60}$/.test(g) ? g : null;
+  const f = sp.get('from') || '';
+  const t = sp.get('to') || '';
+  const from = /^\d{4}-\d{2}-\d{2}$/.test(f) ? f : null;
+  const to = /^\d{4}-\d{2}-\d{2}$/.test(t) ? t : null;
+  const term = (sp.get('q') || '').trim().slice(0, 40).replace(/[\\%_]/g, (m) => '\\' + m);
+  const pat = term ? '%' + term + '%' : null;
+  const limit = Math.min(200, Math.max(1, parseInt(sp.get('limit'), 10) || 30));
   try {
     const q = sql();
-    const rows = STATUSES.includes(status)
-      ? await q`SELECT id, code, game_slug, package_label, price, player_id, nickname, status, created_at, paid_at
-          FROM orders WHERE status = ${status} ORDER BY id DESC LIMIT 100`
-      : await q`SELECT id, code, game_slug, package_label, price, player_id, nickname, status, created_at, paid_at
-          FROM orders ORDER BY id DESC LIMIT 100`;
-    return json({ orders: rows });
+    const [rows, agg, games] = await Promise.all([
+      q`SELECT id, code, game_slug, package_label, price, player_id, nickname, status, created_at, paid_at
+          FROM orders
+          WHERE (${status}::text IS NULL OR status = ${status}::text)
+            AND (${game}::text IS NULL OR game_slug = ${game}::text)
+            AND (${from}::date IS NULL OR (created_at - interval '4 hours')::date >= ${from}::date)
+            AND (${to}::date IS NULL OR (created_at - interval '4 hours')::date <= ${to}::date)
+            AND (${pat}::text IS NULL OR code ILIKE ${pat}::text OR player_id ILIKE ${pat}::text OR coalesce(nickname,'') ILIKE ${pat}::text)
+          ORDER BY id DESC LIMIT ${limit + 1}`,
+      q`SELECT count(*)::int AS n,
+               coalesce(sum(price) FILTER (WHERE status IN ('PAGADO','ENTREGADO')),0) AS vendido
+          FROM orders
+          WHERE (${status}::text IS NULL OR status = ${status}::text)
+            AND (${game}::text IS NULL OR game_slug = ${game}::text)
+            AND (${from}::date IS NULL OR (created_at - interval '4 hours')::date >= ${from}::date)
+            AND (${to}::date IS NULL OR (created_at - interval '4 hours')::date <= ${to}::date)
+            AND (${pat}::text IS NULL OR code ILIKE ${pat}::text OR player_id ILIKE ${pat}::text OR coalesce(nickname,'') ILIKE ${pat}::text)`,
+      q`SELECT DISTINCT game_slug FROM orders ORDER BY game_slug`,
+    ]);
+    return json({
+      orders: rows.slice(0, limit),
+      more: rows.length > limit,
+      total: agg[0]?.n || 0,
+      vendido: Number(agg[0]?.vendido || 0),
+      games: games.map((r) => r.game_slug),
+    });
   } catch (e) {
     console.error('admin list error', e?.code || '', e?.message || '');
     return json({ error: 'db' }, 500);
