@@ -4,7 +4,7 @@ import Link from 'next/link';
 import ThemeToggle from '@/components/ThemeToggle';
 import { setNames } from '@/components/admin/ui';
 import { usePathname } from 'next/navigation';
-import { MdDashboard, MdReceiptLong, MdSportsEsports, MdLogout, MdRefresh, MdLock, MdBarChart, MdNotificationsActive, MdNotificationsOff, MdSettings } from 'react-icons/md';
+import { MdDashboard, MdReceiptLong, MdSportsEsports, MdLogout, MdRefresh, MdLock, MdBarChart, MdNotificationsActive, MdNotificationsOff, MdSettings, MdOpenInNew, MdCircle } from 'react-icons/md';
 
 const Ctx = createContext({ data: null, reload: () => {}, loading: false });
 export function useAdmin() {
@@ -12,7 +12,7 @@ export function useAdmin() {
 }
 
 const NAV = [
-  ['/admin', 'Resumen', MdDashboard],
+  ['/admin', 'Dashboard', MdDashboard],
   ['/admin/pedidos', 'Pedidos', MdReceiptLong],
   ['/admin/reportes', 'Reportes', MdBarChart],
   ['/admin/ajustes', 'Ajustes', MdSettings],
@@ -203,27 +203,28 @@ export default function AdminShell({ children }) {
 
   return (
     <Ctx.Provider value={{ data, reload, loading }}>
-      <div className="min-h-screen text-white md:pl-60">
-        <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col border-r border-white/10 bg-black/70 p-4 backdrop-blur md:flex">
-          <div className="mb-6 flex items-center gap-3">
-            <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-r from-yellow-300 to-orange-400 text-black">
+      <div className="min-h-screen text-white md:pl-64">
+        <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-white/10 bg-[#090e1c]/95 p-4 shadow-2xl shadow-black/30 backdrop-blur-xl md:flex">
+          <div className="mb-8 flex items-center gap-3 border-b border-white/10 pb-6">
+            <div className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-cyan-300 to-blue-600 text-slate-950 shadow-lg shadow-cyan-500/20">
               <MdSportsEsports className="text-2xl" />
             </div>
             <div className="leading-tight">
               <div className="font-display text-lg font-bold uppercase tracking-wide">Recargas BO</div>
-              <div className="text-[11px] text-white/40">Panel de control</div>
+              <div className="mt-1 text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-300/70">Admin Console</div>
             </div>
           </div>
-          <nav className="space-y-1">
+          <div className="mb-3 px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-white/35">Menú principal</div>
+          <nav className="space-y-1.5">
             {NAV.map(([href, label, Icon]) => (
               <Link
                 key={href}
                 href={href}
                 className={
-                  'flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold transition ' +
+                  'flex items-center gap-3 rounded-xl border px-4 py-3 text-sm font-semibold transition-all duration-200 ' +
                   (active(href)
-                    ? 'bg-gradient-to-r from-yellow-300 to-orange-400 text-black'
-                    : 'text-white/70 hover:bg-white/5')
+                    ? 'border-cyan-400/25 bg-gradient-to-r from-cyan-400/20 to-blue-500/10 text-cyan-200 shadow-sm shadow-cyan-500/10'
+                    : 'border-transparent text-slate-400 hover:border-white/10 hover:bg-white/5 hover:text-white')
                 }
               >
                 <Icon className="text-xl" />
@@ -234,17 +235,32 @@ export default function AdminShell({ children }) {
               </Link>
             ))}
           </nav>
+          <div className="mt-auto space-y-3 border-t border-white/10 pt-4">
+            <div className="flex items-center gap-3 rounded-xl border border-emerald-400/10 bg-emerald-400/5 px-3 py-3">
+              <MdCircle className="text-[9px] text-emerald-400" />
+              <div className="min-w-0">
+                <div className="text-xs font-semibold text-emerald-300">Sistema operativo</div>
+                <div className="text-[10px] text-white/40">Panel de administración</div>
+              </div>
+            </div>
+            <Link href="/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-slate-400 transition hover:bg-white/5 hover:text-white">
+              <MdOpenInNew className="text-xl" /> Ver tienda
+            </Link>
           <button
             onClick={logout}
-            className="mt-auto flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold text-white/60 hover:bg-white/5"
+            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-slate-400 transition hover:bg-red-500/10 hover:text-red-300"
           >
-            <MdLogout className="text-xl" /> Salir
+            <MdLogout className="text-xl" /> Cerrar sesión
           </button>
+          </div>
         </aside>
 
-        <header className="sticky top-0 z-20 border-b border-white/10 bg-black/80 backdrop-blur">
-          <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-            <h1 className="text-lg font-semibold">{current[1]}</h1>
+        <header className="sticky top-0 z-20 border-b border-white/10 bg-[#090e1c]/90 shadow-lg shadow-black/10 backdrop-blur-xl">
+          <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 md:px-7">
+            <div className="min-w-0">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-300/65">Recargas BO / Administración</div>
+              <h1 className="truncate text-lg font-bold tracking-tight text-white md:text-xl">{current[1]}</h1>
+            </div>
             <div className="flex gap-2">
               <button
                 onClick={toggleSound}
@@ -276,16 +292,16 @@ export default function AdminShell({ children }) {
           <Link
             href="/admin/pedidos"
             onClick={() => setAlertN(0)}
-            className="fixed inset-x-3 top-3 z-50 flex items-center gap-3 rounded-2xl bg-gradient-to-r from-yellow-300 to-orange-400 px-4 py-3 text-sm font-bold text-black shadow-xl shadow-orange-500/40 md:left-64"
+            className="fixed inset-x-3 top-3 z-50 flex items-center gap-3 rounded-2xl bg-gradient-to-r from-cyan-300 to-blue-400 px-4 py-3 text-sm font-bold text-slate-950 shadow-xl shadow-cyan-500/30 md:left-[17rem]"
           >
             <MdNotificationsActive className="text-2xl" />
             {alertN === 1 ? 'Nuevo pedido pendiente' : alertN + ' pedidos nuevos pendientes'}
             <span className="ml-auto text-xs">Ver</span>
           </Link>
         )}
-        <main className="mx-auto max-w-5xl px-4 pb-28 pt-4 md:pb-8">{children}</main>
+        <main className="mx-auto max-w-7xl px-4 pb-28 pt-6 md:px-7 md:pb-10 md:pt-8">{children}</main>
 
-        <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-white/10 bg-black/90 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
+        <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-white/10 bg-[#090e1c]/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_rgba(0,0,0,0.3)] backdrop-blur-xl md:hidden">
           {NAV.map(([href, label, Icon]) => (
             <Link
               key={href}

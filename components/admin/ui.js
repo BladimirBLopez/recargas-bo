@@ -29,15 +29,17 @@ export function bs(n) {
 
 export function Kpi({ icon: Icon, label, value, hint, accent }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-zinc-950/80 p-3.5">
-      <div className="flex items-center gap-2 text-xs font-medium text-white/50">
-        <span className={'grid h-6 w-6 place-items-center rounded-lg ' + accent}>
-          <Icon className="text-sm" />
+    <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#141e32] to-[#0b1222] p-4 shadow-xl shadow-black/10 transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-400/25 md:p-5">
+      <div className="pointer-events-none absolute -right-10 -top-12 h-28 w-28 rounded-full bg-cyan-400/5 blur-2xl transition group-hover:bg-cyan-400/10" />
+      <div className="relative flex items-center justify-between gap-3">
+        <span className="text-xs font-semibold text-slate-400">{label}</span>
+        <span className={'grid h-10 w-10 shrink-0 place-items-center rounded-xl ' + accent}>
+          <Icon className="text-xl" />
         </span>
-        {label}
       </div>
-      <div className="mt-2 text-2xl font-semibold leading-none text-white">{value}</div>
-      {hint && <div className="mt-1.5 text-xs text-white/40">{hint}</div>}
+      <div className="relative mt-3 text-2xl font-bold tracking-tight text-white md:text-3xl">{value}</div>
+      {hint && <div className="relative mt-2 text-xs leading-relaxed text-slate-400">{hint}</div>}
+      <div className="absolute bottom-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-cyan-400/20 to-transparent" />
     </div>
   );
 }
