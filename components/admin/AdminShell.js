@@ -14,7 +14,7 @@ const NAV = [
   ['/admin', 'Resumen', MdDashboard],
   ['/admin/pedidos', 'Pedidos', MdReceiptLong],
   ['/admin/reportes', 'Reportes', MdBarChart],
-  ['/admin/juegos', 'Juegos', MdSportsEsports],
+  ['/admin/juegos', 'Catálogo', MdSportsEsports],
   ['/admin/ajustes', 'Ajustes', MdSettings],
 ];
 
@@ -193,7 +193,9 @@ export default function AdminShell({ children }) {
     );
   }
 
-  const active = (href) => (href === '/admin' ? path === '/admin' : path.startsWith(href));
+  const CAT = ['/admin/juegos', '/admin/servicios', '/admin/banners'];
+  const active = (href) =>
+    href === '/admin' ? path === '/admin' : href === '/admin/juegos' ? CAT.some((p) => path.startsWith(p)) : path.startsWith(href);
   const current = NAV.find(([h]) => active(h)) || NAV[0];
   const pending = data?.counts?.PENDIENTE || 0;
 

@@ -31,7 +31,7 @@ export default function Resumen() {
 
       <section className="rounded-3xl border border-white/10 bg-zinc-950/80 p-4">
         <div className="mb-4 flex items-end justify-between">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-white/60">Ventas ultimos 7 dias</h2>
+          <h2 className="text-sm font-bold uppercase tracking-wider text-white/60">Ventas últimos 7 días</h2>
           <span className="font-display text-xl font-bold">{bs(total7)}</span>
         </div>
         <div className="flex h-40 items-end gap-2">
@@ -54,7 +54,7 @@ export default function Resumen() {
       <div className="grid gap-4 lg:grid-cols-2">
         <section className="rounded-3xl border border-white/10 bg-zinc-950/80 p-4">
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-white/60">Pendientes mas viejos</h2>
+            <h2 className="text-sm font-bold uppercase tracking-wider text-white/60">Pendientes más antiguos</h2>
             <Link href="/admin/pedidos" className="flex items-center gap-1 text-xs font-bold text-yellow-300">
               Ver todos <MdArrowForward />
             </Link>
@@ -77,8 +77,8 @@ export default function Resumen() {
         </section>
 
         <section className="rounded-3xl border border-white/10 bg-zinc-950/80 p-4">
-          <h2 className="mb-3 text-sm font-bold uppercase tracking-wider text-white/60">Mas vendidos (30 dias)</h2>
-          {data.top.length === 0 && <p className="py-6 text-center text-sm text-white/40">Aun no hay ventas</p>}
+          <h2 className="mb-3 text-sm font-bold uppercase tracking-wider text-white/60">Más vendidos (30 días)</h2>
+          {data.top.length === 0 && <p className="py-6 text-center text-sm text-white/40">Aún no hay ventas</p>}
           <div className="space-y-3">
             {data.top.map((t) => (
               <div key={t.game_slug}>
