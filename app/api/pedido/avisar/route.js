@@ -1,4 +1,4 @@
-import { games } from '../../../../data/games.js';
+import { allGames } from '../../../../lib/games-state.js';
 import { sql } from '../../../../lib/db.js';
 import { limited } from '../../../../lib/ratelimit.js';
 
@@ -36,7 +36,7 @@ export async function POST(req) {
     const o = rows[0];
     if (!o) return json({ ok: true, sent: false });
 
-    const gameName = games.find((g) => g.slug === o.game_slug)?.name || o.game_slug;
+    const gameName = (await allGames()).find((g) => g.slug === o.game_slug)?.name || o.game_slug;
     const text =
       '🔔 ' + o.code + ' · ' + gameName + ' · ' + o.package_label + ' · Bs ' + Number(o.price) +
       '\nID: ' + o.player_id + (o.nickname ? ' · ' + o.nickname : '') +
