@@ -269,6 +269,7 @@ export default function AdminGames() {
                         <DetailBannerEditor
                           key={g.slug}
                           gameSlug={g.slug}
+                          providedGames={list}
                         />
                       </div>
                     </div>

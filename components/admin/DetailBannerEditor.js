@@ -18,8 +18,8 @@ const input =
 const button =
   'rounded-xl border border-cyan-400/30 bg-[#163554] px-4 py-3 text-sm font-bold text-white disabled:opacity-40';
 
-export default function DetailBannerEditor({ gameSlug = null }) {
-  const [games, setGames] = useState([]);
+export default function DetailBannerEditor({ gameSlug = null, providedGames = null }) {
+  const [games, setGames] = useState(providedGames || []);
   const [banners, setBanners] = useState([]);
   const [slug, setSlug] = useState(gameSlug || '');
   const [form, setForm] = useState(DEFAULTS);
@@ -43,14 +43,14 @@ export default function DetailBannerEditor({ gameSlug = null }) {
 
   async function load() {
     const [gr, br] = await Promise.all([
-      fetch('/api/admin/juegos', { cache: 'no-store' }),
+      providedGames ? Promise.resolve(null) : fetch('/api/admin/juegos', { cache: 'no-store' }),
       fetch('/api/admin/detalle-banners', { cache: 'no-store' }),
     ]);
 
-    const gd = await gr.json().catch(() => ({}));
+    const gd = gr ? await gr.json().catch(() => ({})) : { games: providedGames };
     const bd = await br.json().catch(() => ({}));
 
-    if (!gr.ok || !br.ok) {
+    if ((gr && !gr.ok) || !br.ok) {
       throw new Error(
         br.status === 500
           ? 'No se pudo leer la configuración. Comprueba la tabla en Neon.'
