@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
-const card = 'rounded-3xl border border-white/10 bg-zinc-950/80 p-5';
+const card = 'rounded-2xl border border-white/10 bg-zinc-950/80 p-5';
 const input = 'mt-1 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:border-yellow-300/60';
 const btn = 'w-full rounded-2xl bg-gradient-to-r from-yellow-300 to-orange-400 py-3 font-bold text-black shadow-lg shadow-orange-500/20 transition active:scale-95 disabled:opacity-50';
 

@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import CatalogTabs from '@/components/admin/CatalogTabs';
 
-const card = 'rounded-3xl border border-white/10 bg-zinc-950/80 p-5';
+const card = 'rounded-2xl border border-white/10 bg-zinc-950/80 p-5';
 const btn = 'w-full rounded-2xl bg-gradient-to-r from-yellow-300 to-orange-400 py-3 font-bold text-black shadow-lg shadow-orange-500/20 transition active:scale-95 disabled:opacity-50';
 const mini = 'rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-bold text-white/80 transition active:scale-95 disabled:opacity-40';
 
@@ -83,7 +83,7 @@ export default function AdminBanners() {
     <div className="space-y-5 pb-24">
       <CatalogTabs />
       <div className="flex items-center justify-between">
-        <h1 className="font-display text-3xl font-extrabold uppercase italic">Banners</h1>
+        <h1 className="text-xl font-semibold">Banners</h1>
         <Link href="/admin/ajustes" className="text-sm font-bold text-white/60">‹ Ajustes</Link>
       </div>
       <div className={card}>

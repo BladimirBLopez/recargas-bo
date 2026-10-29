@@ -29,15 +29,15 @@ export function bs(n) {
 
 export function Kpi({ icon: Icon, label, value, hint, accent }) {
   return (
-    <div className="rounded-3xl border border-white/10 bg-zinc-950/80 p-4">
-      <div className="flex items-center justify-between">
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-white/50">{label}</span>
-        <span className={'grid h-8 w-8 place-items-center rounded-xl ' + accent}>
-          <Icon className="text-lg" />
+    <div className="rounded-2xl border border-white/10 bg-zinc-950/80 p-3.5">
+      <div className="flex items-center gap-2 text-xs font-medium text-white/50">
+        <span className={'grid h-6 w-6 place-items-center rounded-lg ' + accent}>
+          <Icon className="text-sm" />
         </span>
+        {label}
       </div>
-      <div className="mt-2 font-display text-3xl font-bold leading-none text-white">{value}</div>
-      {hint && <div className="mt-1 text-xs text-white/40">{hint}</div>}
+      <div className="mt-2 text-2xl font-semibold leading-none text-white">{value}</div>
+      {hint && <div className="mt-1.5 text-xs text-white/40">{hint}</div>}
     </div>
   );
 }

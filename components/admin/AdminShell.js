@@ -168,7 +168,7 @@ export default function AdminShell({ children }) {
   if (authed === false) {
     return (
       <div className="grid min-h-screen place-items-center p-6 text-white">
-        <div className="w-full max-w-sm rounded-3xl border border-white/10 bg-zinc-950/80 p-6">
+        <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-zinc-950/80 p-6">
           <div className="mb-5 grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-r from-yellow-300 to-orange-400 text-black">
             <MdLock className="text-2xl" />
           </div>
@@ -245,7 +245,7 @@ export default function AdminShell({ children }) {
 
         <header className="sticky top-0 z-20 border-b border-white/10 bg-black/80 backdrop-blur">
           <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-            <h1 className="font-display text-xl font-bold uppercase tracking-wide">{current[1]}</h1>
+            <h1 className="text-lg font-semibold">{current[1]}</h1>
             <div className="flex gap-2">
               <button
                 onClick={toggleSound}

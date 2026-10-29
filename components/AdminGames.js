@@ -143,7 +143,7 @@ export default function AdminGames() {
     return err ? (
       <div className="rounded-2xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-200">{err}</div>
     ) : (
-      <div className="skeleton h-20 rounded-3xl" />
+      <div className="skeleton h-20 rounded-2xl" />
     );
   }
 
@@ -159,7 +159,7 @@ export default function AdminGames() {
         {list.map((g) => {
           const isOpen = open === g.slug;
           return (
-            <div key={g.slug} className="rounded-3xl border border-white/10 bg-zinc-950/80 p-4">
+            <div key={g.slug} className="rounded-2xl border border-white/10 bg-zinc-950/80 p-4">
               <div className="flex items-center gap-3">
                 <span className="grid h-12 w-12 place-items-center rounded-2xl bg-white/5 text-2xl">{g.emoji}</span>
                 <div className="min-w-0 flex-1">

@@ -81,7 +81,7 @@ export default function Reportes() {
 
   return (
     <div className="space-y-4">
-      <section className="space-y-3 rounded-3xl border border-white/10 bg-zinc-950/80 p-4">
+      <section className="space-y-3 rounded-2xl border border-white/10 bg-zinc-950/80 p-4">
         <div className="flex flex-wrap gap-2">
           {chips.map(([label, f, t]) => {
             const on = from === f && to === t;
@@ -145,7 +145,7 @@ export default function Reportes() {
       </section>
 
       {err && <div className="rounded-2xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-200">{err}</div>}
-      {!res && loading && <div className="skeleton h-40 rounded-3xl" />}
+      {!res && loading && <div className="skeleton h-40 rounded-2xl" />}
 
       {res && (
         <>
@@ -156,7 +156,7 @@ export default function Reportes() {
             <Kpi icon={MdSavings} label="Ganancia" value={res.conCosto ? bs(Math.round(res.ganancia)) : '-'} hint={res.conCosto ? res.conCosto + ' pedidos con costo · cancelados: ' + (res.estados.CANCELADO || 0) : 'Pon costos en Juegos'} accent="bg-emerald-400/15 text-emerald-300" />
           </div>
 
-          <section className="rounded-3xl border border-white/10 bg-zinc-950/80 p-4">
+          <section className="rounded-2xl border border-white/10 bg-zinc-950/80 p-4">
             <h2 className="mb-4 text-sm font-bold uppercase tracking-wider text-white/60">Ventas por {group === 'day' ? 'dia' : 'mes'}</h2>
             <div className="flex h-44 items-end gap-[3px]">
               {series.map((s, i) => (
@@ -171,7 +171,7 @@ export default function Reportes() {
           </section>
 
           <div className="grid gap-4 lg:grid-cols-2">
-            <section className="rounded-3xl border border-white/10 bg-zinc-950/80 p-4">
+            <section className="rounded-2xl border border-white/10 bg-zinc-950/80 p-4">
               <h2 className="mb-3 text-sm font-bold uppercase tracking-wider text-white/60">Detalle por {group === 'day' ? 'dia' : 'mes'}</h2>
               <div className="max-h-96 overflow-y-auto">
                 <div className="grid grid-cols-3 border-b border-white/10 pb-2 text-[11px] font-bold uppercase text-white/40">
@@ -189,7 +189,7 @@ export default function Reportes() {
               </div>
             </section>
 
-            <section className="rounded-3xl border border-white/10 bg-zinc-950/80 p-4">
+            <section className="rounded-2xl border border-white/10 bg-zinc-950/80 p-4">
               <h2 className="mb-3 text-sm font-bold uppercase tracking-wider text-white/60">Ventas por juego</h2>
               {res.juegos.length === 0 && <p className="py-6 text-center text-sm text-white/40">Sin ventas en este rango</p>}
               <div className="space-y-3">

@@ -200,7 +200,7 @@ export default function Pedidos() {
       </div>
 
       {showF && (
-        <div className="mb-3 space-y-3 rounded-3xl border border-white/10 bg-zinc-950/80 p-4">
+        <div className="mb-3 space-y-3 rounded-2xl border border-white/10 bg-zinc-950/80 p-4">
           <div className="flex flex-wrap gap-2">
             {chips.map(([label, f, t]) => {
               const on = from === f && to === t;
@@ -285,10 +285,10 @@ export default function Pedidos() {
 
       {err && <div className="mb-4 rounded-2xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-200">{err}</div>}
 
-      {!ready && <div className="skeleton h-32 rounded-3xl" />}
+      {!ready && <div className="skeleton h-32 rounded-2xl" />}
 
       {ready && shown.length === 0 && (
-        <div className="grid place-items-center rounded-3xl border border-dashed border-white/10 py-16 text-white/40">
+        <div className="grid place-items-center rounded-2xl border border-dashed border-white/10 py-16 text-white/40">
           <MdInbox className="mb-2 text-5xl" />
           <p className="text-sm">No hay pedidos aquí.</p>
         </div>
@@ -300,7 +300,7 @@ export default function Pedidos() {
           const working = busy === o.id;
           const stale = o.status === 'PENDIENTE' && Date.now() - new Date(o.created_at).getTime() > 30 * 60 * 1000;
           return (
-            <div key={o.id} className="relative overflow-hidden rounded-3xl border border-white/10 bg-zinc-950/80 p-4 pl-5">
+            <div key={o.id} className="relative overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/80 p-4 pl-5">
               <span className={'absolute inset-y-0 left-0 w-1.5 ' + (stale ? 'bg-red-500' : st.bar)} />
               <div className="flex items-start justify-between gap-2">
                 <div>

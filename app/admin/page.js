@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { MdPendingActions, MdPaid, MdTrendingUp, MdDoneAll, MdArrowForward, MdSavings } from 'react-icons/md';
+import { MdPendingActions, MdPaid, MdTrendingUp, MdDoneAll, MdArrowForward } from 'react-icons/md';
 import { useAdmin } from '@/components/admin/AdminShell';
 import { Kpi, ST, bs, ago, pretty } from '@/components/admin/ui';
 
@@ -14,7 +14,7 @@ function dayLabel(day) {
 
 export default function Resumen() {
   const { data } = useAdmin();
-  if (!data) return <div className="skeleton h-40 rounded-3xl" />;
+  if (!data) return <div className="skeleton h-40 rounded-2xl" />;
 
   const max = Math.max(1, ...data.dias.map((d) => d.total));
   const total7 = data.dias.reduce((a, d) => a + d.total, 0);
@@ -24,21 +24,20 @@ export default function Resumen() {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Kpi icon={MdTrendingUp} label="Ventas hoy" value={bs(data.hoy.total)} hint={data.hoy.n + ' pedidos' + (gan.hoy == null ? '' : ' · ganancia ' + bs(gan.hoy))} accent="bg-emerald-400/15 text-emerald-300" />
+        <Kpi icon={MdDoneAll} label="Ventas del mes" value={bs(data.mes.total)} hint={data.mes.n + ' pedidos' + (gan.mes == null ? '' : ' · ganancia ' + bs(gan.mes))} accent="bg-white/10 text-white/70" />
         <Kpi icon={MdPendingActions} label="Pendientes" value={data.counts.PENDIENTE} hint="Esperando pago" accent="bg-yellow-300/15 text-yellow-300" />
         <Kpi icon={MdPaid} label="Por entregar" value={data.counts.PAGADO} hint="Pagados sin entregar" accent="bg-sky-400/15 text-sky-300" />
-        <Kpi icon={MdTrendingUp} label="Ventas hoy" value={bs(data.hoy.total)} hint={data.hoy.n + ' pedidos'} accent="bg-emerald-400/15 text-emerald-300" />
-        <Kpi icon={MdSavings} label="Ganancia hoy" value={gan.hoy == null ? '—' : bs(gan.hoy)} hint="Según costos cargados" accent="bg-emerald-400/15 text-emerald-300" />
-        <Kpi icon={MdDoneAll} label="Ventas del mes" value={bs(data.mes.total)} hint={data.mes.n + ' pedidos'} accent="bg-orange-400/15 text-orange-300" />
-        <Kpi icon={MdSavings} label="Ganancia del mes" value={gan.mes == null ? '—' : bs(gan.mes)} hint="Según costos cargados" accent="bg-orange-400/15 text-orange-300" />
       </div>
 
-      <section className="rounded-3xl border border-white/10 bg-zinc-950/80 p-4">
+      <section className="rounded-2xl border border-white/10 bg-zinc-950/80 p-4">
         <div className="mb-4 flex items-end justify-between">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-white/60">Ventas últimos 7 días</h2>
+          <h2 className="text-sm font-semibold text-white/70">Ventas últimos 7 días</h2>
           <span className="font-display text-xl font-bold">{bs(total7)}</span>
         </div>
-        <div className="flex h-40 items-end gap-2">
+        {total7 === 0 && <p className="mb-3 text-xs text-white/40">Aún no hay ventas en estos 7 días.</p>}
+        <div className="flex h-28 items-end gap-2">
           {data.dias.map((d, i) => {
             const last = i === data.dias.length - 1;
             return (
@@ -55,9 +54,9 @@ export default function Resumen() {
         </div>
       </section>
 
-      <section className="rounded-3xl border border-white/10 bg-zinc-950/80 p-4">
+      <section className="rounded-2xl border border-white/10 bg-zinc-950/80 p-4">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-white/60">Últimos pedidos</h2>
+          <h2 className="text-sm font-semibold text-white/70">Últimos pedidos</h2>
           <Link href="/admin/pedidos" className="flex items-center gap-1 text-xs font-bold text-yellow-300">
             Ver todos <MdArrowForward />
           </Link>
@@ -86,9 +85,9 @@ export default function Resumen() {
       </section>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <section className="rounded-3xl border border-white/10 bg-zinc-950/80 p-4">
+        <section className="rounded-2xl border border-white/10 bg-zinc-950/80 p-4">
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-white/60">Pendientes más antiguos</h2>
+            <h2 className="text-sm font-semibold text-white/70">Pendientes más antiguos</h2>
             <Link href="/admin/pedidos" className="flex items-center gap-1 text-xs font-bold text-yellow-300">
               Ver todos <MdArrowForward />
             </Link>
@@ -110,8 +109,8 @@ export default function Resumen() {
           </div>
         </section>
 
-        <section className="rounded-3xl border border-white/10 bg-zinc-950/80 p-4">
-          <h2 className="mb-3 text-sm font-bold uppercase tracking-wider text-white/60">Más vendidos (30 días)</h2>
+        <section className="rounded-2xl border border-white/10 bg-zinc-950/80 p-4">
+          <h2 className="mb-3 text-sm font-semibold text-white/70">Más vendidos (30 días)</h2>
           {data.top.length === 0 && <p className="py-6 text-center text-sm text-white/40">Aún no hay ventas</p>}
           <div className="space-y-3">
             {data.top.map((t) => (
