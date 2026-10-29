@@ -206,12 +206,12 @@ export default function AdminShell({ children }) {
       <div className="min-h-screen text-white md:pl-64">
         <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-white/10 bg-[#090e1c]/95 p-4 shadow-2xl shadow-black/30 backdrop-blur-xl md:flex">
           <div className="mb-8 flex items-center gap-3 border-b border-white/10 pb-6">
-            <div className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-cyan-300 to-blue-600 text-slate-950 shadow-lg shadow-cyan-500/20">
+            <div className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-[#00D9FF] to-[#007BFF] text-slate-950 shadow-lg shadow-cyan-500/20">
               <MdSportsEsports className="text-2xl" />
             </div>
             <div className="leading-tight">
               <div className="font-display text-lg font-bold uppercase tracking-wide">Recargas BO</div>
-              <div className="mt-1 text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-300/70">Admin Console</div>
+              <div className="mt-1 text-[10px] font-bold uppercase tracking-[0.2em] text-[#00D9FF]">Admin Console</div>
             </div>
           </div>
           <div className="mb-3 px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-white/35">Menú principal</div>
@@ -223,7 +223,7 @@ export default function AdminShell({ children }) {
                 className={
                   'flex items-center gap-3 rounded-xl border px-4 py-3 text-sm font-semibold transition-all duration-200 ' +
                   (active(href)
-                    ? 'border-cyan-400/25 bg-gradient-to-r from-cyan-400/20 to-blue-500/10 text-cyan-200 shadow-sm shadow-cyan-500/10'
+                    ? 'border-cyan-400/50 bg-gradient-to-r from-cyan-400/20 to-blue-500/10 text-[#7DEEFF] shadow-sm shadow-cyan-500/10'
                     : 'border-transparent text-slate-400 hover:border-white/10 hover:bg-white/5 hover:text-white')
                 }
               >
@@ -258,7 +258,7 @@ export default function AdminShell({ children }) {
         <header className="sticky top-0 z-20 border-b border-white/10 bg-[#090e1c]/90 shadow-lg shadow-black/10 backdrop-blur-xl">
           <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 md:px-7">
             <div className="min-w-0">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-300/65">Recargas BO / Administración</div>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#00D9FF]">Recargas BO / Administración</div>
               <h1 className="truncate text-lg font-bold tracking-tight text-white md:text-xl">{current[1]}</h1>
             </div>
             <div className="flex gap-2">
@@ -292,7 +292,7 @@ export default function AdminShell({ children }) {
           <Link
             href="/admin/pedidos"
             onClick={() => setAlertN(0)}
-            className="fixed inset-x-3 top-3 z-50 flex items-center gap-3 rounded-2xl bg-gradient-to-r from-cyan-300 to-blue-400 px-4 py-3 text-sm font-bold text-slate-950 shadow-xl shadow-cyan-500/30 md:left-[17rem]"
+            className="fixed inset-x-3 top-3 z-50 flex items-center gap-3 rounded-2xl bg-gradient-to-r from-[#00E5FF] to-[#009DFF] px-4 py-3 text-sm font-bold text-slate-950 shadow-xl shadow-cyan-500/30 md:left-[17rem]"
           >
             <MdNotificationsActive className="text-2xl" />
             {alertN === 1 ? 'Nuevo pedido pendiente' : alertN + ' pedidos nuevos pendientes'}

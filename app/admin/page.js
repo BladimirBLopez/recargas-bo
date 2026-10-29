@@ -24,7 +24,7 @@ export default function Resumen() {
 
   return (
     <div className="space-y-6">
-      <section className="relative overflow-hidden rounded-3xl border border-cyan-400/15 bg-gradient-to-r from-[#132541] via-[#101c33] to-[#0b1222] p-5 shadow-2xl shadow-black/10 md:p-7">
+      <section className="relative overflow-hidden rounded-3xl border border-cyan-400/40 bg-gradient-to-r from-[#123D64] via-[#102B4B] to-[#09192E] p-5 shadow-2xl shadow-black/10 md:p-7">
         <div className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-cyan-500/10 blur-3xl" />
         <div className="relative flex flex-wrap items-center justify-between gap-5">
           <div>
@@ -37,7 +37,7 @@ export default function Resumen() {
             </p>
           </div>
           <Link href="/" target="_blank" rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-xl border border-cyan-400/25 bg-cyan-400/10 px-4 py-3 text-sm font-bold text-cyan-200 transition hover:bg-cyan-400/20">
+            className="inline-flex items-center gap-2 rounded-xl border border-cyan-400/60 bg-cyan-400/20 px-4 py-3 text-sm font-bold text-[#7DEEFF] transition hover:bg-cyan-400/35">
             <MdStorefront className="text-xl" /> Ver tienda <MdArrowForward />
           </Link>
         </div>
@@ -50,10 +50,10 @@ export default function Resumen() {
         <Kpi icon={MdPaid} label="Por entregar" value={data.counts.PAGADO} hint="Pagados sin entregar" accent="bg-sky-400/15 text-sky-300" />
       </div>
 
-      <section className="rounded-2xl border border-white/10 bg-gradient-to-br from-[#141e32] to-[#0b1222] p-5 shadow-xl shadow-black/10 md:p-6">
+      <section className="rounded-2xl border border-white/10 bg-gradient-to-br from-[#142F50] to-[#0A192F] p-5 shadow-xl shadow-black/10 md:p-6">
         <div className="mb-5 flex items-end justify-between gap-3">
           <div>
-            <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.16em] text-cyan-300/70">Análisis comercial</div>
+            <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#00D9FF]">Análisis comercial</div>
             <h2 className="text-base font-bold text-white">Ventas últimos 7 días</h2>
           </div>
           <span className="font-display text-xl font-bold">{bs(total7)}</span>
@@ -66,7 +66,7 @@ export default function Resumen() {
               <div key={d.day} className="flex h-full flex-1 flex-col items-center justify-end gap-1">
                 <span className="text-[10px] text-white/50">{d.total ? Math.round(d.total) : ''}</span>
                 <div
-                  className={'w-full rounded-t-lg ' + (last ? 'bg-gradient-to-t from-blue-600 to-cyan-300 shadow-lg shadow-cyan-500/20' : 'bg-gradient-to-t from-slate-700 to-slate-500/60')}
+                  className={'w-full rounded-t-lg ' + (last ? 'bg-gradient-to-t from-[#007BFF] to-[#00E5FF] shadow-lg shadow-cyan-500/20' : 'bg-gradient-to-t from-slate-700 to-slate-500/60')}
                   style={{ height: Math.max(4, (d.total / max) * 100) + '%' }}
                 />
                 <span className={'text-[11px] font-semibold ' + (last ? 'text-yellow-300' : 'text-white/50')}>{dayLabel(d.day)}</span>
@@ -76,10 +76,10 @@ export default function Resumen() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-white/10 bg-gradient-to-br from-[#141e32] to-[#0b1222] p-5 shadow-xl shadow-black/10 md:p-6">
+      <section className="rounded-2xl border border-white/10 bg-gradient-to-br from-[#142F50] to-[#0A192F] p-5 shadow-xl shadow-black/10 md:p-6">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.16em] text-cyan-300/70">Actividad reciente</div>
+            <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#00D9FF]">Actividad reciente</div>
             <h2 className="text-base font-bold text-white">Últimos pedidos</h2>
           </div>
           <Link href="/admin/pedidos" className="flex items-center gap-1 text-xs font-bold text-yellow-300">
@@ -110,7 +110,7 @@ export default function Resumen() {
       </section>
 
       <div className="grid gap-5 lg:grid-cols-2">
-        <section className="rounded-2xl border border-white/10 bg-gradient-to-br from-[#141e32] to-[#0b1222] p-5 shadow-xl shadow-black/10 md:p-6">
+        <section className="rounded-2xl border border-white/10 bg-gradient-to-br from-[#142F50] to-[#0A192F] p-5 shadow-xl shadow-black/10 md:p-6">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-sm font-semibold text-white/70">Pendientes más antiguos</h2>
             <Link href="/admin/pedidos" className="flex items-center gap-1 text-xs font-bold text-yellow-300">
@@ -134,7 +134,7 @@ export default function Resumen() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-white/10 bg-gradient-to-br from-[#141e32] to-[#0b1222] p-5 shadow-xl shadow-black/10 md:p-6">
+        <section className="rounded-2xl border border-white/10 bg-gradient-to-br from-[#142F50] to-[#0A192F] p-5 shadow-xl shadow-black/10 md:p-6">
           <h2 className="mb-3 text-sm font-semibold text-white/70">Más vendidos (30 días)</h2>
           {data.top.length === 0 && <p className="py-6 text-center text-sm text-white/40">Aún no hay ventas</p>}
           <div className="space-y-3">
