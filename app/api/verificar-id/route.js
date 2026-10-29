@@ -123,7 +123,24 @@ export async function GET(request) {
     const nickname = data.nickname || (data.data && data.data.nickname) || (data.player && data.player.nickname) || '';
     const region = data.region || data.country || (data.data && (data.data.region || data.data.country)) || '';
     if (nickname) {
-      return json({ ok: true, code: 'SUCCESS', nickname: String(nickname), region: String(region || ''), debug: info });
+      const rawAvatar = data.img_url || data.data?.img_url || data.player?.img_url || '';
+      let avatar = '';
+
+      if (typeof rawAvatar === 'string') {
+        try {
+          const parsed = new URL(rawAvatar);
+          if (parsed.protocol === 'https:') avatar = parsed.href;
+        } catch (e) {}
+      }
+
+      return json({
+        ok: true,
+        code: 'SUCCESS',
+        nickname: String(nickname),
+        region: String(region || ''),
+        avatar,
+        debug: info,
+      });
     }
     const msg = String(data.message || data.error || data.errorMsg || '');
     return json({

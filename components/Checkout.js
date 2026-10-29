@@ -102,7 +102,7 @@ export default function Checkout({ game }) {
       try {
         const r = await fetch(`/api/verificar-id?game=${game.slug}&id=${id}`, { signal: ctrl.signal });
         const d = await r.json();
-        if (d.ok) setVerif({ state: 'ok', nickname: d.nickname, region: d.region });
+        if (d.ok) setVerif({ state: 'ok', nickname: d.nickname, region: d.region, avatar: d.avatar || '' });
         else if (d.code === 'INVALID_PLAYER') setVerif({ state: 'invalid' });
         else setVerif({ state: 'unknown' });
       } catch (e) {
@@ -196,9 +196,26 @@ export default function Checkout({ game }) {
             <div className="rounded-3xl border border-white/15 bg-black p-5">
               <div className="flex items-center gap-4">
                 <div
-                  className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${game.color} text-3xl`}
+                  className={`flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br ${game.color} text-3xl`}
                 >
-                  {game.emoji}
+                  {verif.avatar ? (
+                    <img
+                      src={verif.avatar}
+                      alt="Avatar del jugador"
+                      referrerPolicy="no-referrer"
+                      className="h-full w-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        e.currentTarget.parentElement?.querySelector('[data-avatar-fallback]')?.classList.remove('hidden');
+                      }}
+                    />
+                  ) : null}
+                  <span
+                    data-avatar-fallback
+                    className={verif.avatar ? 'hidden' : ''}
+                  >
+                    {game.emoji}
+                  </span>
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-xl font-bold text-white">{game.name}</p>
