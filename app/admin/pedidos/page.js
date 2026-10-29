@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   MdContentCopy, MdCheck, MdSearch, MdPendingActions, MdPaid, MdLocalShipping,
-  MdListAlt, MdClose, MdPerson, MdInbox, MdChatBubbleOutline, MdFilterList, MdCancel, MdReplay, MdFileDownload,
+  MdListAlt, MdClose, MdPerson, MdInbox, MdChatBubbleOutline, MdFilterList, MdCancel, MdReplay, MdFileDownload, MdExpandMore,
 } from 'react-icons/md';
 import { SITE_NAME } from '@/data/games';
 import { useAdmin } from '@/components/admin/AdminShell';
@@ -148,8 +148,8 @@ export default function Pedidos() {
   const shown = res.orders;
 
   return (
-    <div>
-      <div className="-mx-4 mb-3 flex gap-2 overflow-x-auto px-4 pb-1">
+    <div className="space-y-4">
+      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2 no-scrollbar">
         {TABS.map(([k, label, Icon]) => {
           const on = tab === k;
           const c = data?.counts;
@@ -173,7 +173,7 @@ export default function Pedidos() {
         })}
       </div>
 
-      <div className="mb-3 flex gap-2">
+      <div className="flex gap-2">
         <div className="relative flex-1">
           <MdSearch className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-xl text-white/40" />
           <input
@@ -268,7 +268,7 @@ export default function Pedidos() {
       )}
 
       {ready && (
-        <div className="mb-3 flex items-center justify-between text-xs text-white/50">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-[#10223B]/80 px-4 py-3 text-xs text-slate-300">
           <span className="flex items-center gap-3">
             {res.total} pedidos
             <button
@@ -295,37 +295,41 @@ export default function Pedidos() {
         </div>
       )}
 
-      <div className="divide-y divide-white/10 overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/80">
+      <div className="space-y-3">
         {shown.map((o) => {
           const st = ST[o.status] || ST.EXPIRADO;
           const working = busy === o.id;
           const stale = o.status === 'PENDIENTE' && Date.now() - new Date(o.created_at).getTime() > 30 * 60 * 1000;
           const isOpen = open === o.id;
           return (
-            <div key={o.id} className={stale ? 'bg-red-500/5' : ''}>
+            <div key={o.id} className={'overflow-hidden rounded-2xl border shadow-lg shadow-black/10 transition-colors duration-200 ' + (isOpen ? 'border-cyan-400/45 bg-[#112B49] ' : 'border-white/10 bg-gradient-to-r from-[#132640] to-[#0B192D] ') + (stale ? 'ring-1 ring-red-400/20' : '')}>
               <button
                 onClick={() => setOpen(isOpen ? null : o.id)}
-                className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-white/5"
+                className="flex w-full items-center gap-3 px-4 py-4 text-left transition hover:bg-cyan-400/5 active:bg-white/5 md:px-5"
               >
                 <span className={'h-2.5 w-2.5 shrink-0 rounded-full ' + (stale ? 'bg-red-500' : st.bar)} />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-sm font-semibold">{o.code}</span>
+                    <span className="font-mono text-sm font-bold tracking-wide text-white">{o.code}</span>
                     <span className="text-xs text-white/40">{ago(o.created_at)}</span>
                   </div>
-                  <div className="truncate text-xs text-white/60">{pretty(o.game_slug)} · {o.package_label}</div>
+                  <div className="mt-1 truncate text-xs text-slate-400">{pretty(o.game_slug)} · {o.package_label}</div>
                 </div>
                 <div className="shrink-0 text-right">
-                  <div className="text-sm font-semibold">{bs(o.price)}</div>
+                  <div className="text-base font-bold text-white">{bs(o.price)}</div>
                   <span className={'mt-0.5 inline-block rounded-full border px-2 py-0.5 text-[10px] font-semibold ' + (stale ? 'border-red-400/30 bg-red-400/10 text-red-300' : st.badge)}>
                     {stale ? 'Sin atender' : st.label}
                   </span>
                 </div>
+                <MdExpandMore className={
+                  'shrink-0 text-xl text-cyan-300 transition-transform ' +
+                  (isOpen ? 'rotate-180' : '')
+                } />
               </button>
 
               {isOpen && (
-                <div className="space-y-3 bg-white/[0.03] px-4 pb-4 pt-3">
-                  <div className="flex flex-wrap items-center gap-2 rounded-xl bg-white/5 px-3 py-2 text-sm">
+                <div className="space-y-3 border-t border-cyan-400/15 bg-[#09192E]/70 px-4 pb-4 pt-4 md:px-5">
+                  <div className="flex flex-wrap items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-sm">
                     <span className="text-white/50">ID</span>
                     <span className="font-mono font-semibold">{o.player_id}</span>
                     <button onClick={() => copy('id' + o.id, o.player_id)} className="ml-auto flex items-center gap-1 rounded-lg bg-white/10 px-2 py-1 text-xs active:scale-95">
@@ -358,7 +362,7 @@ export default function Pedidos() {
                       <button
                         disabled={working}
                         onClick={() => both(o)}
-                        className="col-span-2 rounded-xl bg-gradient-to-r from-yellow-300 to-orange-400 px-4 py-3 text-sm font-bold text-black disabled:opacity-50"
+                        className="col-span-2 rounded-xl bg-gradient-to-r from-[#00D9FF] to-[#007BFF] px-4 py-3 text-sm font-bold text-slate-950 shadow-lg shadow-cyan-500/15 disabled:opacity-50"
                       >
                         Pagado + entregado
                       </button>
