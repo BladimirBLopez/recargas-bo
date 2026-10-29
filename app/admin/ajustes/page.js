@@ -4,14 +4,14 @@ import { FaWhatsapp } from 'react-icons/fa';
 import { MdCampaign, MdQrCode2, MdVpnKey, MdCheckCircle, MdErrorOutline } from 'react-icons/md';
 import CatalogTabs from '@/components/admin/CatalogTabs';
 
-const card = 'rounded-2xl border border-white/10 bg-zinc-950/80 p-4';
-const input = 'mt-1 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:border-yellow-300/60';
-const btn = 'w-full rounded-xl bg-gradient-to-r from-yellow-300 to-orange-400 py-3 font-bold text-black shadow-lg shadow-orange-500/20 transition active:scale-95 disabled:opacity-40 disabled:shadow-none';
+const card = 'rounded-2xl border border-cyan-400/15 bg-gradient-to-br from-[#122B49] to-[#09192E] p-4 shadow-lg shadow-black/15';
+const input = 'mt-1 w-full rounded-xl border border-white/15 bg-[#081A2F]/70 px-4 py-3 text-white outline-none transition focus:border-cyan-400/70 focus:ring-1 focus:ring-cyan-400/20';
+const btn = 'w-full rounded-xl bg-gradient-to-r from-[#00D9FF] to-[#007BFF] py-3 font-bold text-slate-950 shadow-lg shadow-cyan-500/20 transition active:scale-95 disabled:opacity-40 disabled:shadow-none';
 
 function Head({ icon: Icon, title, hint }) {
   return (
     <div className="mb-3 flex items-center gap-3">
-      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-yellow-300/15 text-yellow-300">
+      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-cyan-400/15 text-cyan-300">
         <Icon className="text-xl" />
       </span>
       <div className="min-w-0">

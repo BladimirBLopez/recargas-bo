@@ -3,10 +3,10 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import CatalogTabs from '@/components/admin/CatalogTabs';
 
-const card = 'rounded-2xl border border-white/10 bg-zinc-950/80 p-5';
-const btn = 'w-full rounded-2xl bg-gradient-to-r from-yellow-300 to-orange-400 py-3 font-bold text-black shadow-lg shadow-orange-500/20 transition active:scale-95 disabled:opacity-50';
-const mini = 'rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-bold text-white/80 transition active:scale-95 disabled:opacity-40';
-const input = 'w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:border-yellow-300/60 disabled:opacity-50';
+const card = 'rounded-2xl border border-cyan-400/15 bg-gradient-to-br from-[#122B49] to-[#09192E] p-5 shadow-lg shadow-black/15';
+const btn = 'w-full rounded-2xl bg-gradient-to-r from-[#00D9FF] to-[#007BFF] py-3 font-bold text-slate-950 shadow-lg shadow-cyan-500/20 transition active:scale-95 disabled:opacity-50';
+const mini = 'rounded-xl border border-cyan-400/20 bg-[#163554]/70 px-3 py-2 text-xs font-bold text-slate-200 transition hover:border-cyan-400/50 hover:bg-[#1B4265] active:scale-95 disabled:opacity-40';
+const input = 'w-full rounded-2xl border border-white/15 bg-[#081A2F]/70 px-4 py-3 text-white outline-none transition focus:border-cyan-400/70 focus:ring-1 focus:ring-cyan-400/20 disabled:opacity-50';
 const ERR = {
   nombre_invalido: 'Escribe un nombre',
   existe: 'Ya existe un servicio con ese nombre',
