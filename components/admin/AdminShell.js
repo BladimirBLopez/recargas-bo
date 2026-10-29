@@ -50,6 +50,7 @@ export default function AdminShell({ children }) {
   const [alertN, setAlertN] = useState(0);
   const prevPend = useRef(null);
   const audioRef = useRef(null);
+  const reloadInFlight = useRef(null);
 
   useEffect(() => {
     try {
@@ -115,26 +116,37 @@ export default function AdminShell({ children }) {
     return () => clearTimeout(t);
   }, [alertN]);
 
-  const reload = useCallback(async () => {
-    setLoading(true);
-    try {
-      const r = await fetch('/api/admin/resumen', { cache: 'no-store' });
-      if (r.status === 401) {
-        setAuthed(false);
-      } else if (r.ok) {
-        const d = await r.json();
-        setNames(d.names);
-        setData(d);
-        setAuthed(true);
-      } else {
-        setAuthed((a) => (a === null ? false : a));
-        setErr('Error al cargar el resumen (' + r.status + ')');
-      }
-    } catch (e) {
-      setErr('Sin conexión');
-      setAuthed((a) => (a === null ? false : a));
+  const reload = useCallback(() => {
+    if (reloadInFlight.current) {
+      return reloadInFlight.current;
     }
-    setLoading(false);
+
+    const request = (async () => {
+      setLoading(true);
+      try {
+        const r = await fetch('/api/admin/resumen', { cache: 'no-store' });
+        if (r.status === 401) {
+          setAuthed(false);
+        } else if (r.ok) {
+          const d = await r.json();
+          setNames(d.names);
+          setData(d);
+          setAuthed(true);
+        } else {
+          setAuthed((a) => (a === null ? false : a));
+          setErr('Error al cargar el resumen (' + r.status + ')');
+        }
+      } catch (e) {
+        setErr('Sin conexión');
+        setAuthed((a) => (a === null ? false : a));
+      } finally {
+        setLoading(false);
+        reloadInFlight.current = null;
+      }
+    })();
+
+    reloadInFlight.current = request;
+    return request;
   }, []);
 
   useEffect(() => {
