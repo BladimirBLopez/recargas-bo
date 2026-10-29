@@ -43,7 +43,7 @@ export default function Reportes() {
         setErr('');
       } else setErr('Error al cargar el reporte (' + r.status + ')');
     } catch (e) {
-      setErr('Sin conexion');
+      setErr('Sin conexión');
     }
     setLoading(false);
   }, [from, to, game]);

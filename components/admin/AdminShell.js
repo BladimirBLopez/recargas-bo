@@ -111,7 +111,7 @@ export default function AdminShell({ children }) {
         setErr('Error al cargar el resumen (' + r.status + ')');
       }
     } catch (e) {
-      setErr('Sin conexion');
+      setErr('Sin conexión');
       setAuthed((a) => (a === null ? false : a));
     }
     setLoading(false);
@@ -145,7 +145,7 @@ export default function AdminShell({ children }) {
       else if (r.status === 500) setErr('Falta configurar ADMIN_PASSWORD en Vercel.');
       else setErr('Clave incorrecta');
     } catch (e) {
-      setErr('Sin conexion');
+      setErr('Sin conexión');
     }
   }
 

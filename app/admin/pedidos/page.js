@@ -26,7 +26,7 @@ function msg(o) {
     return hi + 'Tu recarga de ' + item + ' ya fue entregada. Pedido ' + o.code + '. Gracias por tu compra en ' + SITE_NAME + '!';
   if (o.status === 'PAGADO')
     return hi + 'Recibimos tu pago de ' + item + '. Estamos procesando tu recarga, en breve te avisamos. Pedido ' + o.code + '.';
-  return hi + 'Tu pedido ' + o.code + ' de ' + item + ' esta pendiente de pago. Cuando pagues, enviame el comprobante para entregarte tu recarga.';
+  return hi + 'Tu pedido ' + o.code + ' de ' + item + ' está pendiente de pago. Cuando pagues, envíame el comprobante para entregarte tu recarga.';
 }
 
 export default function Pedidos() {
@@ -64,7 +64,7 @@ export default function Pedidos() {
         setErr('');
       } else setErr('Error al cargar los pedidos (' + r.status + ')');
     } catch (e) {
-      setErr('Sin conexion');
+      setErr('Sin conexión');
     }
     setReady(true);
   }, [tab, game, from, to, qd, limit]);
@@ -100,7 +100,7 @@ export default function Pedidos() {
       await load();
       reload();
     } catch (e) {
-      setErr('Sin conexion');
+      setErr('Sin conexión');
     }
     setBusy(0);
   }
@@ -115,7 +115,7 @@ export default function Pedidos() {
       await load();
       reload();
     } catch (e) {
-      setErr('Sin conexion');
+      setErr('Sin conexión');
     }
     setBusy(0);
   }
@@ -130,7 +130,7 @@ export default function Pedidos() {
 
   const chips = [
     ['Hoy', boDate(0), boDate(0)],
-    ['7 dias', boDate(6), boDate(0)],
+    ['7 días', boDate(6), boDate(0)],
     ['Este mes', boDate(0).slice(0, 8) + '01', boDate(0)],
   ];
   const nFilters = (game ? 1 : 0) + (from || to ? 1 : 0);
@@ -167,7 +167,7 @@ export default function Pedidos() {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Codigo, ID o nickname"
+            placeholder="Código, ID o nickname"
             className="w-full rounded-2xl border border-white/10 bg-white/5 py-3 pl-11 pr-10 text-sm text-white outline-none focus:border-yellow-300/50"
           />
           {search && (
@@ -271,7 +271,7 @@ export default function Pedidos() {
       {ready && shown.length === 0 && (
         <div className="grid place-items-center rounded-3xl border border-dashed border-white/10 py-16 text-white/40">
           <MdInbox className="mb-2 text-5xl" />
-          <p className="text-sm">No hay pedidos aqui.</p>
+          <p className="text-sm">No hay pedidos aquí.</p>
         </div>
       )}
 
@@ -377,7 +377,7 @@ export default function Pedidos() {
           onClick={() => setLimit((l) => l + 30)}
           className="mt-4 w-full rounded-2xl border border-white/10 bg-white/5 py-3 text-sm font-bold text-white/80 active:scale-[0.99]"
         >
-          Cargar mas
+          Cargar más
         </button>
       )}
     </div>
