@@ -69,6 +69,10 @@ export default function Ajustes() {
         <span>Banners de la tienda</span>
         <span className="text-yellow-300">›</span>
       </Link>
+      <Link href="/admin/servicios" className={card + ' flex items-center justify-between font-bold'}>
+        <span>Servicios y portadas</span>
+        <span className="text-yellow-300">›</span>
+      </Link>
     </div>
   );
 }

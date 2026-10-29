@@ -1,3 +1,4 @@
+import { allGames } from '../../../../lib/games-state.js';
 import { games } from '../../../../data/games.js';
 import { sql } from '../../../../lib/db.js';
 import { isAdmin } from '../../../../lib/admin.js';
@@ -24,7 +25,7 @@ export async function PATCH(req) {
   } catch {
     return json({ error: 'json_invalido' }, 400);
   }
-  const ids = new Set(games.flatMap((g) => (g.packages || []).map((p) => p.id)));
+  const ids = new Set((await allGames()).flatMap((g) => (g.packages || []).map((p) => p.id)));
   const id = String(body?.id || '');
   if (!ids.has(id)) return json({ error: 'paquete_invalido' }, 400);
   try {

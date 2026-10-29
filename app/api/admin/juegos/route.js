@@ -1,7 +1,7 @@
 import { games } from '../../../../data/games.js';
 import { sql } from '../../../../lib/db.js';
 import { isAdmin } from '../../../../lib/admin.js';
-import { maintenanceMap, packageMap, applyPackages, noPackages } from '../../../../lib/games-state.js';
+import { allGames, maintenanceMap, packageMap, applyPackages, noPackages } from '../../../../lib/games-state.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -15,8 +15,9 @@ export async function GET(req) {
   try {
     const m = await maintenanceMap(true);
     const pm = await packageMap();
+    const list = await allGames();
     return json({
-      games: games.map((g) => ({
+      games: list.map((g) => ({
         slug: g.slug,
         name: g.name,
         emoji: g.emoji,
@@ -45,7 +46,7 @@ export async function PATCH(req) {
   } catch {
     return json({ error: 'json_invalido' }, 400);
   }
-  const game = games.find((g) => g.slug === body?.slug);
+  const game = (await allGames()).find((g) => g.slug === body?.slug);
   if (!game || typeof body?.maintenance !== 'boolean') return json({ error: 'datos_invalidos' }, 400);
   if (noPackages(game)) return json({ error: 'sin_paquetes' }, 400);
   try {

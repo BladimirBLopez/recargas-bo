@@ -1,20 +1,12 @@
 'use client';
 import { useState } from 'react';
 
-// Busca /games/<slug>.jpg (arte real) y si no existe usa /games/<slug>.svg (portada generada).
-const EXT = ['jpg', 'svg'];
-
+// Orden: foto de Cloudinary (game.image), /games/<slug>.jpg, /games/<slug>.svg, emoji.
 export default function GameImg({ game, className = '' }) {
+  const srcs = [...(game.image ? [game.image] : []), `/games/${game.slug}.jpg`, `/games/${game.slug}.svg`];
   const [i, setI] = useState(0);
-  if (i >= EXT.length) {
+  if (i >= srcs.length) {
     return <span className={`flex items-center justify-center ${className}`}>{game.emoji}</span>;
   }
-  return (
-    <img
-      src={`/games/${game.slug}.${EXT[i]}`}
-      alt={game.name}
-      onError={() => setI(i + 1)}
-      className={`object-cover ${className}`}
-    />
-  );
+  return <img src={srcs[i]} alt={game.name} onError={() => setI(i + 1)} className={`object-cover ${className}`} />;
 }

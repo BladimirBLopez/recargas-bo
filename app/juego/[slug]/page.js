@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const game = getGame(slug);
+  const game = (await getGames()).find((g) => g.slug === slug);
   return { title: game ? `Recargar ${game.name} en Bolivia` : 'Juego no encontrado' };
 }
 

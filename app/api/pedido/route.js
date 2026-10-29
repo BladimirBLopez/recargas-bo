@@ -1,7 +1,7 @@
 import { games } from '../../../data/games.js';
 import { sql } from '../../../lib/db.js';
 import { limited } from '../../../lib/ratelimit.js';
-import { maintenanceMap, packageMap, applyPackages } from '../../../lib/games-state.js';
+import { allGames, maintenanceMap, packageMap, applyPackages } from '../../../lib/games-state.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -28,7 +28,7 @@ export async function POST(req) {
     return json({ error: 'json_invalido' }, 400);
   }
 
-  const base = games.find((g) => g.slug === body?.slug);
+  const base = (await allGames()).find((g) => g.slug === body?.slug);
   const game = base ? applyPackages(base, await packageMap(), true) : null;
   const pkg = game?.packages.find((p) => p.id === body?.packageId);
   if (!game || !pkg || !pkg.active) return json({ error: 'pack_invalido' }, 400);

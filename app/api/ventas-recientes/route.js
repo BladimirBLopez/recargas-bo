@@ -1,3 +1,4 @@
+import { allGames } from '../../../lib/games-state.js';
 import { games } from '../../../data/games.js';
 import { sql } from '../../../lib/db.js';
 
@@ -18,9 +19,10 @@ export async function GET() {
       FROM orders
       WHERE status IN ('PAGADO', 'ENTREGADO') AND paid_at IS NOT NULL
       ORDER BY paid_at DESC LIMIT 10`;
+    const list = await allGames();
     const ventas = rows.map((r) => ({
       user: mask(r.nickname),
-      game: games.find((g) => g.slug === r.game_slug)?.name || 'Recarga',
+      game: list.find((g) => g.slug === r.game_slug)?.name || 'Recarga',
       pkg: r.package_label,
       price: r.price,
       ts: new Date(r.paid_at).toISOString(),
