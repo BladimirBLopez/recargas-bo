@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
-import { MdExpandMore, MdSave, MdRestartAlt } from 'react-icons/md';
+import { MdExpandMore, MdSave, MdRestartAlt, MdImage, MdSettings, MdInventory2 } from 'react-icons/md';
+import Link from 'next/link';
 
 function PackageRow({ p, onChanged, onError }) {
   const [price, setPrice] = useState(String(p.price));
@@ -102,6 +103,7 @@ export default function AdminGames() {
   const [busy, setBusy] = useState('');
   const [err, setErr] = useState('');
   const [open, setOpen] = useState('');
+  const [section, setSection] = useState('paquetes');
 
   const load = useCallback(async () => {
     try {
@@ -174,28 +176,88 @@ export default function AdminGames() {
                     {!g.canToggle && ' · sin paquetes'}
                   </div>
                 </div>
-                <button
-                  disabled={!g.canToggle || busy === g.slug}
-                  onClick={() => toggle(g)}
-                  className={'rounded-xl px-4 py-2 text-sm font-bold disabled:opacity-40 ' + (g.maintenance ? 'bg-emerald-400 text-black' : 'border border-red-400/30 bg-red-400/10 text-red-300')}
-                >
-                  {g.maintenance ? 'Activar' : 'Pausar'}
-                </button>
               </div>
-              {g.packages.length > 0 && (
-                <button
-                  onClick={() => setOpen(isOpen ? '' : g.slug)}
-                  className="mt-3 flex w-full items-center justify-between rounded-xl border border-cyan-400/20 bg-[#163554]/70 px-3 py-3 text-sm font-bold text-cyan-100 transition hover:border-cyan-400/50 hover:bg-[#1B4265]"
-                >
-                  <span>Paquetes y precios ({g.packages.length})</span>
-                  <MdExpandMore className={'text-xl transition ' + (isOpen ? 'rotate-180' : '')} />
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(isOpen ? '' : g.slug);
+                  setSection('paquetes');
+                }}
+                className="mt-3 flex w-full items-center justify-between rounded-xl border border-cyan-400/20 bg-[#163554]/70 px-3 py-3 text-sm font-bold text-cyan-100"
+              >
+                <span>Administrar juego</span>
+                <MdExpandMore className={'text-xl transition ' + (isOpen ? 'rotate-180' : '')} />
+              </button>
+
               {isOpen && (
-                <div className="mt-3 space-y-2">
-                  {g.packages.map((p) => (
-                    <PackageRow key={p.id} p={p} onChanged={load} onError={setErr} />
-                  ))}
+                <div className="mt-3 space-y-3">
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      ['paquetes', 'Paquetes', MdInventory2],
+                      ['estado', 'Estado', MdSettings],
+                      ['banner', 'Banner', MdImage],
+                    ].map(([id, label, Icon]) => (
+                      <button
+                        key={id}
+                        type="button"
+                        onClick={() => setSection(id)}
+                        className={
+                          'flex flex-col items-center justify-center gap-1.5 rounded-xl border px-2 py-3 text-xs font-bold ' +
+                          (section === id
+                            ? 'border-cyan-400/50 bg-cyan-400/15 text-cyan-200'
+                            : 'border-white/10 bg-[#102B49] text-slate-400')
+                        }
+                      >
+                        <Icon className="text-xl" />
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {section === 'paquetes' && (
+                    <div className="space-y-2">
+                      <div className="text-xs font-semibold text-slate-400">
+                        {g.packages.length} paquetes disponibles
+                      </div>
+                      {g.packages.map((p) => (
+                        <PackageRow key={p.id} p={p} onChanged={load} onError={setErr} />
+                      ))}
+                    </div>
+                  )}
+
+                  {section === 'estado' && (
+                    <div className="rounded-xl border border-white/10 bg-[#102B49] p-4">
+                      <div className="text-sm font-bold text-white">Estado del juego</div>
+                      <p className="mt-2 text-xs text-slate-400">
+                        {g.maintenance
+                          ? 'El juego está en mantenimiento.'
+                          : 'El juego está disponible para recibir pedidos.'}
+                      </p>
+                      <button
+                        type="button"
+                        disabled={!g.canToggle || busy === g.slug}
+                        onClick={() => toggle(g)}
+                        className="mt-3 rounded-xl border border-cyan-400/30 bg-[#163554] px-4 py-2.5 text-sm font-bold text-cyan-200 disabled:opacity-40"
+                      >
+                        {g.maintenance ? 'Activar juego' : 'Pausar juego'}
+                      </button>
+                    </div>
+                  )}
+
+                  {section === 'banner' && (
+                    <div className="rounded-xl border border-white/10 bg-[#102B49] p-4">
+                      <div className="text-sm font-bold text-white">Banner personalizado</div>
+                      <p className="mt-2 text-xs text-slate-400">
+                        Personaliza la imagen y los textos de este juego.
+                      </p>
+                      <Link
+                        href="/admin/detalle-banners"
+                        className="mt-3 inline-flex rounded-xl bg-cyan-400 px-4 py-2.5 text-sm font-extrabold text-slate-950"
+                      >
+                        Editar banner
+                      </Link>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
