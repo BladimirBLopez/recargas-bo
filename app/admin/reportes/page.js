@@ -68,7 +68,7 @@ export default function Reportes() {
 
   const [pa, pb] = prevMonth();
   const chips = [
-    ['7 dias', boDate(6), boDate(0)],
+    ['7 días', boDate(6), boDate(0)],
     ['30 dias', boDate(29), boDate(0)],
     ['Este mes', boDate(0).slice(0, 8) + '01', boDate(0)],
     ['Mes anterior', pa, pb],
