@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 :root {
-  --accent: 19 160 175;
-  --accent2: 14 116 144;
-  --accent-lt: 103 232 249;
+  --accent: 0 200 255;
+  --accent2: 0 120 255;
+  --accent-lt: 125 235 255;
 }
 
 html {
@@ -15,10 +15,10 @@ html {
 
 body {
   background:
-    radial-gradient(90% 45% at 50% 0%, rgb(var(--accent) / 0.22), transparent 70%),
-    radial-gradient(70% 40% at 100% 55%, rgb(var(--accent) / 0.1), transparent 70%),
-    radial-gradient(60% 35% at 0% 85%, rgb(var(--accent) / 0.07), transparent 70%),
-    #08080c;
+    radial-gradient(90% 45% at 50% 0%, rgb(var(--accent) / 0.34), transparent 70%),
+    radial-gradient(70% 40% at 100% 55%, rgb(var(--accent) / 0.18), transparent 70%),
+    radial-gradient(60% 35% at 0% 85%, rgb(var(--accent) / 0.12), transparent 70%),
+    #050810;
   background-attachment: fixed;
   color: #f1f1f5;
   -webkit-font-smoothing: antialiased;

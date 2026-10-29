@@ -1,5 +1,5 @@
 html { color-scheme: dark; }
-html[data-theme='light'] { color-scheme: light; --accent: 14 138 152; --accent2: 21 94 117; --accent-lt: 14 116 144; }
+html[data-theme='light'] { color-scheme: light; --accent: 0 132 230; --accent2: 0 98 210; --accent-lt: 0 100 200; }
 
 html[data-theme='light'] body {
   background:
@@ -89,3 +89,7 @@ html[data-theme='light'] [class*='bg-gradient-to-br'] [class*='text-white/'] { c
 html[data-theme='light'] .bg-green-500.text-white,
 html[data-theme='light'] .bg-red-500.text-white { color: #ffffff; }
 html[data-theme='light'] input[type='date'] { color-scheme: light; }
+
+/* Botones con degradado de acento: texto blanco sobre el azul del modo claro */
+html[data-theme='light'] [class*='from-yellow-300'].text-black,
+html[data-theme='light'] .bg-yellow-300.text-black { color: #ffffff; }
