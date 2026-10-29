@@ -7,10 +7,10 @@ import {
 } from 'react-icons/md';
 
 const TABS = [
-  ['/admin/ajustes', 'General', MdTune],
-  ['/admin/juegos', 'Precios', MdSell],
+  ['/admin/juegos', 'Juegos', MdSell],
   ['/admin/servicios', 'Servicios', MdImage],
-  ['/admin/banners', 'Banners', MdViewCarousel],
+  ['/admin/banners', 'Portada', MdViewCarousel],
+  ['/admin/detalle-banners', 'Por juego', MdViewCarousel],
 ];
 
 export default function CatalogTabs() {
@@ -26,10 +26,10 @@ export default function CatalogTabs() {
           </div>
           <div className="min-w-0">
             <h2 className="text-lg font-extrabold tracking-tight text-white">
-              Centro de configuración
+              Centro de administración
             </h2>
             <p className="mt-1 text-xs leading-relaxed text-slate-300">
-              Administra tu tienda, precios, servicios e imágenes.
+              Gestiona juegos, precios, servicios y publicidad desde un solo lugar.
             </p>
           </div>
         </div>

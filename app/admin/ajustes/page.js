@@ -2,7 +2,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { FaWhatsapp } from 'react-icons/fa';
 import { MdCampaign, MdQrCode2, MdVpnKey, MdCheckCircle, MdErrorOutline } from 'react-icons/md';
-import CatalogTabs from '@/components/admin/CatalogTabs';
 
 const card = 'rounded-2xl border border-cyan-400/15 bg-gradient-to-br from-[#122B49] to-[#09192E] p-4 shadow-lg shadow-black/15';
 const input = 'mt-1 w-full rounded-xl border border-white/15 bg-[#081A2F]/70 px-4 py-3 text-white outline-none transition focus:border-cyan-400/70 focus:ring-1 focus:ring-cyan-400/20';
@@ -197,7 +196,14 @@ export default function Ajustes() {
 
   return (
     <div className="space-y-4 pb-24">
-      <CatalogTabs />
+      <div className="rounded-2xl border border-cyan-400/20 bg-gradient-to-r from-[#123D64] to-[#09192E] p-5">
+        <h1 className="text-xl font-extrabold text-white">
+          Configuración de la tienda
+        </h1>
+        <p className="mt-1 text-sm text-slate-300">
+          Administra los ajustes generales y datos de atención.
+        </p>
+      </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         <div className={card}>

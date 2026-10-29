@@ -4,6 +4,7 @@ import Link from 'next/link';
 import ThemeToggle from '@/components/ThemeToggle';
 import { setNames } from '@/components/admin/ui';
 import { usePathname } from 'next/navigation';
+import { MdMenu, MdClose } from 'react-icons/md';
 import { MdDashboard, MdReceiptLong, MdSportsEsports, MdLogout, MdRefresh, MdLock, MdBarChart, MdNotificationsActive, MdNotificationsOff, MdSettings, MdOpenInNew, MdCircle } from 'react-icons/md';
 
 const Ctx = createContext({ data: null, reload: () => {}, loading: false });
@@ -12,18 +13,38 @@ export function useAdmin() {
 }
 
 const NAV = [
-  ['/admin', 'Dashboard', MdDashboard],
+  ['/admin', 'Inicio', MdDashboard],
   ['/admin/pedidos', 'Pedidos', MdReceiptLong],
   ['/admin/reportes', 'Reportes', MdBarChart],
-  ['/admin/ajustes', 'Ajustes', MdSettings],
+  ['/admin/juegos', 'Juegos y precios', MdSportsEsports],
+  ['/admin/servicios', 'Servicios', MdSportsEsports],
+  ['/admin/banners', 'Banners de portada', MdSettings],
+  ['/admin/detalle-banners', 'Banners de juegos', MdSettings],
+  ['/admin/ajustes', 'Configuración', MdSettings],
+];
+
+const NAV_GROUPS = [
+  { title: 'PRINCIPAL', items: NAV.slice(0, 3) },
+  { title: 'CATÁLOGO', items: NAV.slice(3, 5) },
+  { title: 'CONTENIDO', items: NAV.slice(5, 7) },
+  { title: 'SISTEMA', items: NAV.slice(7) },
+];
+
+const MOBILE_NAV = [
+  NAV[0],
+  NAV[1],
+  NAV[3],
+  NAV[7],
 ];
 
 export default function AdminShell({ children }) {
   const path = usePathname() || '/admin';
+  useEffect(() => { setMobileOpen(false); }, [path]);
   const [authed, setAuthed] = useState(null);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [pw, setPw] = useState('');
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [err, setErr] = useState('');
   const [sound, setSound] = useState(false);
   const [alertN, setAlertN] = useState(0);
@@ -195,9 +216,10 @@ export default function AdminShell({ children }) {
     );
   }
 
-  const CAT = ['/admin/ajustes', '/admin/juegos', '/admin/servicios', '/admin/banners'];
   const active = (href) =>
-    href === '/admin' ? path === '/admin' : href === '/admin/ajustes' ? CAT.some((p) => path.startsWith(p)) : path.startsWith(href);
+    href === '/admin'
+      ? path === '/admin'
+      : path === href || path.startsWith(href + '/');
   const current = NAV.find(([h]) => active(h)) || NAV[0];
   const pending = data?.counts?.PENDIENTE || 0;
 
@@ -214,25 +236,34 @@ export default function AdminShell({ children }) {
               <div className="mt-1 text-[10px] font-bold uppercase tracking-[0.2em] text-[#00D9FF]">Admin Console</div>
             </div>
           </div>
-          <div className="mb-3 px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-white/35">Menú principal</div>
-          <nav className="space-y-1.5">
-            {NAV.map(([href, label, Icon]) => (
-              <Link
-                key={href}
-                href={href}
-                className={
-                  'flex items-center gap-3 rounded-xl border px-4 py-3 text-sm font-semibold transition-all duration-200 ' +
-                  (active(href)
-                    ? 'border-cyan-400/50 bg-gradient-to-r from-cyan-400/20 to-blue-500/10 text-[#7DEEFF] shadow-sm shadow-cyan-500/10'
-                    : 'border-transparent text-slate-400 hover:border-white/10 hover:bg-white/5 hover:text-white')
-                }
-              >
-                <Icon className="text-xl" />
-                {label}
-                {href === '/admin/pedidos' && pending > 0 && (
-                  <span className="ml-auto rounded-full bg-red-500 px-2 text-xs text-white">{pending}</span>
-                )}
-              </Link>
+          <nav aria-label="Navegación administrativa" className="min-h-0 flex-1 space-y-5 overflow-y-auto pb-4">
+            {NAV_GROUPS.map((group) => (
+              <div key={group.title}>
+                <div className="mb-2 px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-white/35">
+                  {group.title}
+                </div>
+                <div className="space-y-1">
+                  {group.items.map(([href, label, Icon]) => (
+                    <Link
+                      key={href}
+                      href={href}
+                      aria-current={active(href) ? 'page' : undefined}
+                      className={
+                        'flex items-center gap-3 rounded-xl border px-3 py-2.5 text-sm font-semibold transition ' +
+                        (active(href)
+                          ? 'border-cyan-400/50 bg-cyan-400/15 text-cyan-200'
+                          : 'border-transparent text-slate-400 hover:bg-white/5 hover:text-white')
+                      }
+                    >
+                      <Icon className="shrink-0 text-xl" />
+                      <span className="min-w-0 flex-1">{label}</span>
+                      {href === '/admin/pedidos' && pending > 0 && (
+                        <span className="rounded-full bg-red-500 px-2 text-xs text-white">{pending}</span>
+                      )}
+                    </Link>
+                  ))}
+                </div>
+              </div>
             ))}
           </nav>
           <div className="mt-auto space-y-3 border-t border-white/10 pt-4">
@@ -263,6 +294,16 @@ export default function AdminShell({ children }) {
             </div>
             <div className="flex shrink-0 gap-1.5 sm:gap-2">
               <button
+                type="button"
+                onClick={() => setMobileOpen((v) => !v)}
+                aria-label={mobileOpen ? 'Cerrar menú' : 'Abrir menú'}
+                aria-expanded={mobileOpen}
+                aria-controls="admin-mobile-menu"
+                className="grid h-10 w-10 place-items-center rounded-xl border border-cyan-400/20 bg-[#163554]/70 text-cyan-100 md:hidden"
+              >
+                {mobileOpen ? <MdClose className="text-2xl" /> : <MdMenu className="text-2xl" />}
+              </button>
+              <button
                 onClick={toggleSound}
                 aria-label={sound ? 'Apagar sonido de avisos' : 'Activar sonido de avisos'}
                 className={'grid h-10 w-10 shrink-0 place-items-center rounded-xl border transition active:scale-95 ' + (sound ? 'border-cyan-400/40 bg-cyan-400/10 text-[#00D9FF]' : 'border-white/10 bg-white/5 text-slate-400')}
@@ -288,6 +329,42 @@ export default function AdminShell({ children }) {
           </div>
         </header>
 
+        {mobileOpen && (
+          <nav
+            id="admin-mobile-menu"
+            aria-label="Menú administrativo móvil"
+            className="fixed inset-x-3 top-[76px] z-50 max-h-[70vh] overflow-y-auto rounded-2xl border border-cyan-400/20 bg-[#09192E] p-4 shadow-2xl shadow-black/60 md:hidden"
+          >
+            {NAV_GROUPS.map((group) => (
+              <div key={group.title} className="mb-4 last:mb-0">
+                <div className="mb-2 px-3 text-[10px] font-bold tracking-widest text-cyan-300/70">
+                  {group.title}
+                </div>
+                {group.items.map(([href, label, Icon]) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    onClick={() => setMobileOpen(false)}
+                    aria-current={active(href) ? 'page' : undefined}
+                    className={
+                      'flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold ' +
+                      (active(href)
+                        ? 'bg-cyan-400/15 text-cyan-200'
+                        : 'text-slate-300 hover:bg-white/5')
+                    }
+                  >
+                    <Icon className="text-xl" />
+                    <span className="flex-1">{label}</span>
+                    {href === '/admin/pedidos' && pending > 0 && (
+                      <span className="rounded-full bg-red-500 px-2 text-xs text-white">{pending}</span>
+                    )}
+                  </Link>
+                ))}
+              </div>
+            ))}
+          </nav>
+        )}
+
         {alertN > 0 && (
           <Link
             href="/admin/pedidos"
@@ -302,7 +379,7 @@ export default function AdminShell({ children }) {
         <main className="mx-auto max-w-7xl px-4 pb-28 pt-6 md:px-7 md:pb-10 md:pt-8">{children}</main>
 
         <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-cyan-400/20 bg-[#09192E]/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_rgba(0,0,0,0.3)] backdrop-blur-xl md:hidden">
-          {NAV.map(([href, label, Icon]) => (
+          {MOBILE_NAV.map(([href, label, Icon]) => (
             <Link
               key={href}
               href={href}
