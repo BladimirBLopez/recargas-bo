@@ -1,8 +1,8 @@
 'use client';
 import Link from 'next/link';
-import { MdPendingActions, MdPaid, MdTrendingUp, MdDoneAll, MdArrowForward } from 'react-icons/md';
+import { MdPendingActions, MdPaid, MdTrendingUp, MdDoneAll, MdArrowForward, MdSavings } from 'react-icons/md';
 import { useAdmin } from '@/components/admin/AdminShell';
-import { Kpi, bs, ago, pretty } from '@/components/admin/ui';
+import { Kpi, ST, bs, ago, pretty } from '@/components/admin/ui';
 
 function dayLabel(day) {
   try {
@@ -19,14 +19,18 @@ export default function Resumen() {
   const max = Math.max(1, ...data.dias.map((d) => d.total));
   const total7 = data.dias.reduce((a, d) => a + d.total, 0);
   const topMax = Math.max(1, ...data.top.map((t) => t.total));
+  const gan = data.ganancia || {};
+  const recientes = data.recientes || [];
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
         <Kpi icon={MdPendingActions} label="Pendientes" value={data.counts.PENDIENTE} hint="Esperando pago" accent="bg-yellow-300/15 text-yellow-300" />
         <Kpi icon={MdPaid} label="Por entregar" value={data.counts.PAGADO} hint="Pagados sin entregar" accent="bg-sky-400/15 text-sky-300" />
         <Kpi icon={MdTrendingUp} label="Ventas hoy" value={bs(data.hoy.total)} hint={data.hoy.n + ' pedidos'} accent="bg-emerald-400/15 text-emerald-300" />
+        <Kpi icon={MdSavings} label="Ganancia hoy" value={gan.hoy == null ? '—' : bs(gan.hoy)} hint="Según costos cargados" accent="bg-emerald-400/15 text-emerald-300" />
         <Kpi icon={MdDoneAll} label="Ventas del mes" value={bs(data.mes.total)} hint={data.mes.n + ' pedidos'} accent="bg-orange-400/15 text-orange-300" />
+        <Kpi icon={MdSavings} label="Ganancia del mes" value={gan.mes == null ? '—' : bs(gan.mes)} hint="Según costos cargados" accent="bg-orange-400/15 text-orange-300" />
       </div>
 
       <section className="rounded-3xl border border-white/10 bg-zinc-950/80 p-4">
@@ -45,6 +49,36 @@ export default function Resumen() {
                   style={{ height: Math.max(4, (d.total / max) * 100) + '%' }}
                 />
                 <span className={'text-[11px] font-semibold ' + (last ? 'text-yellow-300' : 'text-white/50')}>{dayLabel(d.day)}</span>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="rounded-3xl border border-white/10 bg-zinc-950/80 p-4">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-white/60">Últimos pedidos</h2>
+          <Link href="/admin/pedidos" className="flex items-center gap-1 text-xs font-bold text-yellow-300">
+            Ver todos <MdArrowForward />
+          </Link>
+        </div>
+        {recientes.length === 0 && <p className="py-6 text-center text-sm text-white/40">Aún no hay pedidos</p>}
+        <div className="space-y-2">
+          {recientes.map((o) => {
+            const st = ST[o.status] || ST.EXPIRADO;
+            return (
+              <div key={o.id} className="flex items-center justify-between gap-3 rounded-2xl bg-white/5 px-3 py-2.5">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-sm font-bold text-yellow-300">{o.code}</span>
+                    <span className={'rounded-full border px-2 py-0.5 text-[10px] font-bold ' + st.badge}>{st.label}</span>
+                  </div>
+                  <div className="truncate text-xs text-white/60">{pretty(o.game_slug)} · {o.package_label}</div>
+                </div>
+                <div className="shrink-0 text-right">
+                  <div className="text-sm font-bold">{bs(o.price)}</div>
+                  <div className="text-[11px] text-white/40">{ago(o.created_at)}</div>
+                </div>
               </div>
             );
           })}

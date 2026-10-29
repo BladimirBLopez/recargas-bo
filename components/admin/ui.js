@@ -20,7 +20,7 @@ export function ago(d) {
   if (s < 86400) return 'hace ' + Math.floor(s / 3600) + ' h';
   return 'hace ' + Math.floor(s / 86400) + ' d';
 }
-export function pretty(slug) {
+function prettyBase(slug) {
   return String(slug || '').replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 }
 export function bs(n) {
@@ -40,4 +40,12 @@ export function Kpi({ icon: Icon, label, value, hint, accent }) {
       {hint && <div className="mt-1 text-xs text-white/40">{hint}</div>}
     </div>
   );
+}
+
+let NAMES = {};
+export function setNames(n) {
+  NAMES = n && typeof n === 'object' ? n : {};
+}
+export function pretty(slug) {
+  return NAMES[slug] || prettyBase(slug);
 }

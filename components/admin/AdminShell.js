@@ -2,6 +2,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import ThemeToggle from '@/components/ThemeToggle';
+import { setNames } from '@/components/admin/ui';
 import { usePathname } from 'next/navigation';
 import { MdDashboard, MdReceiptLong, MdSportsEsports, MdLogout, MdRefresh, MdLock, MdBarChart, MdNotificationsActive, MdNotificationsOff, MdSettings } from 'react-icons/md';
 
@@ -101,7 +102,9 @@ export default function AdminShell({ children }) {
       if (r.status === 401) {
         setAuthed(false);
       } else if (r.ok) {
-        setData(await r.json());
+        const d = await r.json();
+        setNames(d.names);
+        setData(d);
         setAuthed(true);
       } else {
         setAuthed((a) => (a === null ? false : a));
