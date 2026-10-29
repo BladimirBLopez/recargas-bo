@@ -11,7 +11,7 @@ function json(body, status = 200) {
 }
 
 export async function POST(req) {
-  if (!isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
+  if (!await isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
   const c = cldConfig();
   if (!c) return json({ error: 'cloudinary_no_configurado' }, 500);
   let body = null;

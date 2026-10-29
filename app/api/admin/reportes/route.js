@@ -22,7 +22,7 @@ function cell(v) {
 }
 
 export async function GET(req) {
-  if (!isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
+  if (!await isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
   const sp = new URL(req.url).searchParams;
   const today = new Date(Date.now() - 4 * 3600 * 1000).toISOString().slice(0, 10);
   let from = /^\d{4}-\d{2}-\d{2}$/.test(sp.get('from') || '') ? sp.get('from') : addDays(today, -29);

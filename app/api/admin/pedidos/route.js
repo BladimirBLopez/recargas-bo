@@ -26,7 +26,7 @@ function cell(v) {
 const bo = (d) => (d ? new Date(new Date(d).getTime() - 4 * 3600 * 1000).toISOString().slice(0, 16).replace('T', ' ') : '');
 
 export async function GET(req) {
-  if (!isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
+  if (!await isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
   const sp = new URL(req.url).searchParams;
   const st = sp.get('status');
   const status = STATUSES.includes(st) ? st : null;
@@ -108,7 +108,7 @@ export async function GET(req) {
 }
 
 export async function PATCH(req) {
-  if (!isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
+  if (!await isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
   let body;
   try {
     body = await req.json();

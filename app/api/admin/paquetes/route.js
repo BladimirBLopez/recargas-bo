@@ -18,7 +18,7 @@ function num(v, min, max) {
 }
 
 export async function PATCH(req) {
-  if (!isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
+  if (!await isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
   let body;
   try {
     body = await req.json();

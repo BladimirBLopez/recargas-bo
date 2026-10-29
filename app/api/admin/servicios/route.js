@@ -44,7 +44,7 @@ function cleanPackages(list, slug) {
 }
 
 export async function GET(req) {
-  if (!isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
+  if (!await isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
   try {
     const [list, im] = await Promise.all([allGames(), imageMap()]);
     return json({
@@ -67,7 +67,7 @@ export async function GET(req) {
 }
 
 export async function POST(req) {
-  if (!isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
+  if (!await isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
   const body = await readBody(req);
   if (!body) return json({ error: 'json_invalido' }, 400);
   const name = String(body.name || '').trim().slice(0, 40);
@@ -90,7 +90,7 @@ export async function POST(req) {
 }
 
 export async function PATCH(req) {
-  if (!isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
+  if (!await isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
   const body = await readBody(req);
   const slug = String(body?.slug || '');
   if (!body || !slug) return json({ error: 'datos_invalidos' }, 400);
@@ -131,7 +131,7 @@ export async function PATCH(req) {
 }
 
 export async function DELETE(req) {
-  if (!isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
+  if (!await isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
   const body = await readBody(req);
   const slug = String(body?.slug || '');
   if (!body || !slug) return json({ error: 'datos_invalidos' }, 400);

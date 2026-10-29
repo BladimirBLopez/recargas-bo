@@ -34,12 +34,12 @@ function json(body, status = 200) {
 }
 
 export async function GET(req) {
-  if (!isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
+  if (!await isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
   return json(await getSettings());
 }
 
 export async function PATCH(req) {
-  if (!isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
+  if (!await isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
   let body;
   try {
     body = await req.json();

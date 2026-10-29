@@ -20,7 +20,7 @@ async function readBody(req) {
 }
 
 export async function GET(req) {
-  if (!isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
+  if (!await isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
   try {
     const rows = await sql()`SELECT id, url, position, active FROM banners ORDER BY position, id`;
     return json({ banners: rows.map(view) });
@@ -31,7 +31,7 @@ export async function GET(req) {
 }
 
 export async function POST(req) {
-  if (!isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
+  if (!await isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
   const body = await readBody(req);
   if (!body) return json({ error: 'json_invalido' }, 400);
   const c = cldConfig();
@@ -53,7 +53,7 @@ export async function POST(req) {
 }
 
 export async function PATCH(req) {
-  if (!isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
+  if (!await isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
   const body = await readBody(req);
   const id = Number(body?.id);
   if (!body || !Number.isInteger(id)) return json({ error: 'datos_invalidos' }, 400);
@@ -81,7 +81,7 @@ export async function PATCH(req) {
 }
 
 export async function DELETE(req) {
-  if (!isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
+  if (!await isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
   const body = await readBody(req);
   const id = Number(body?.id);
   if (!body || !Number.isInteger(id)) return json({ error: 'datos_invalidos' }, 400);

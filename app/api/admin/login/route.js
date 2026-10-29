@@ -1,4 +1,4 @@
-import { checkPassword, makeToken, COOKIE, COOKIE_MAX_AGE } from '../../../../lib/admin.js';
+import { loginToken, COOKIE, COOKIE_MAX_AGE } from '../../../../lib/admin.js';
 
 import { limited } from '../../../../lib/ratelimit.js';
 
@@ -20,10 +20,18 @@ export async function POST(req) {
   } catch {
     return json({ error: 'json_invalido' }, 400);
   }
-  if (!checkPassword(body?.password)) return json({ error: 'clave_incorrecta' }, 401);
-  const cookie =
-    COOKIE + '=' + makeToken() + '; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=' + COOKIE_MAX_AGE;
-  return json({ ok: true }, 200, { 'Set-Cookie': cookie });
+  try {
+    const token = await loginToken(body?.password);
+    if (!token) {
+      return json({ error: 'clave_incorrecta' }, 401);
+    }
+    const cookie =
+      COOKIE + '=' + token + '; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=' + COOKIE_MAX_AGE;
+    return json({ ok: true }, 200, { 'Set-Cookie': cookie });
+  } catch (e) {
+    console.error('Login admin:', e?.code || e?.message || 'error');
+    return json({ error: 'servidor' }, 503);
+  }
 }
 
 export async function DELETE() {

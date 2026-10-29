@@ -33,6 +33,11 @@ export default function Ajustes() {
   const [qrBusy, setQrBusy] = useState(false);
   const [qrMsg, setQrMsg] = useState('');
   const qrFile = useRef(null);
+  const [currentPw, setCurrentPw] = useState('');
+  const [nextPw, setNextPw] = useState('');
+  const [confirmPw, setConfirmPw] = useState('');
+  const [pwBusy, setPwBusy] = useState(false);
+  const [pwMsg, setPwMsg] = useState('');
 
   useEffect(() => {
     fetch('/api/admin/ajustes', { cache: 'no-store' })
@@ -116,6 +121,46 @@ export default function Ajustes() {
       setQrMsg(err.message || 'Error');
     } finally {
       setQrBusy(false);
+    }
+  };
+
+  const changePw = async (e) => {
+    e.preventDefault();
+    setPwMsg('');
+    if (nextPw.length < 12) {
+      setPwMsg('La nueva contraseña debe tener al menos 12 caracteres');
+      return;
+    }
+    if (nextPw !== confirmPw) {
+      setPwMsg('Las contraseñas nuevas no coinciden');
+      return;
+    }
+    setPwBusy(true);
+    try {
+      const r = await fetch('/api/admin/clave', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ current: currentPw, next: nextPw }),
+      });
+      const d = await r.json();
+      if (!r.ok) {
+        const errors = {
+          clave_actual_incorrecta: 'La contraseña actual es incorrecta',
+          clave_repetida: 'La nueva contraseña debe ser diferente',
+          longitud_invalida: 'Utiliza entre 12 y 128 caracteres',
+          cambio_simultaneo: 'La contraseña cambió. Vuelve a iniciar sesión',
+          no_autorizado: 'Tu sesión expiró. Vuelve a iniciar sesión',
+        };
+        throw new Error(errors[d.error] || 'No se pudo cambiar la contraseña');
+      }
+      setCurrentPw('');
+      setNextPw('');
+      setConfirmPw('');
+      window.location.assign('/admin');
+    } catch (err) {
+      setPwMsg(err.message || 'Error de conexión');
+    } finally {
+      setPwBusy(false);
     }
   };
 
@@ -248,13 +293,36 @@ export default function Ajustes() {
         </p>
       </div>
 
-      <div className={card + ' opacity-70'}>
-        <Head icon={MdVpnKey} title="Próximamente" hint="Aún no disponible" />
-        <ul className="space-y-2 text-sm text-white/70">
-          <li className="flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2">
-            <MdVpnKey className="text-lg" /> Cambiar la clave del admin
-          </li>
-        </ul>
+      <div className={card}>
+        <Head icon={MdVpnKey} title="Seguridad — contraseña del administrador"
+          hint="Al cambiarla se cerrarán las sesiones anteriores" />
+        <form onSubmit={changePw} className="space-y-3">
+          <label className="block text-sm text-white/70">
+            Contraseña actual
+            <input type="password" autoComplete="current-password"
+              className={input} value={currentPw}
+              onChange={(e) => setCurrentPw(e.target.value)}
+              required disabled={pwBusy} />
+          </label>
+          <label className="block text-sm text-white/70">
+            Nueva contraseña (mínimo 12 caracteres)
+            <input type="password" autoComplete="new-password"
+              className={input} value={nextPw} minLength={12} maxLength={128}
+              onChange={(e) => setNextPw(e.target.value)}
+              required disabled={pwBusy} />
+          </label>
+          <label className="block text-sm text-white/70">
+            Confirmar nueva contraseña
+            <input type="password" autoComplete="new-password"
+              className={input} value={confirmPw} minLength={12} maxLength={128}
+              onChange={(e) => setConfirmPw(e.target.value)}
+              required disabled={pwBusy} />
+          </label>
+          <button type="submit" className={btn} disabled={pwBusy}>
+            {pwBusy ? 'Actualizando…' : 'Cambiar contraseña'}
+          </button>
+          {pwMsg && <p role="alert" className="text-center text-sm text-red-300">{pwMsg}</p>}
+        </form>
       </div>
     </div>
   );

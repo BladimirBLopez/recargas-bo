@@ -10,7 +10,7 @@ function json(body, status = 200) {
 }
 
 export async function GET(req) {
-  if (!isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
+  if (!await isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
   try {
     const q = sql();
     const [cnt, hoy, mes, dias, top, pend, rec, list] = await Promise.all([
