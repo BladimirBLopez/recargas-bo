@@ -84,7 +84,6 @@ export default function AdminBanners() {
       <CatalogTabs />
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Banners</h1>
-        <Link href="/admin/ajustes" className="text-sm font-bold text-white/60">‹ Ajustes</Link>
       </div>
       <div className={card}>
         <p className="text-sm text-white/60">

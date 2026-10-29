@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import CatalogTabs from '@/components/admin/CatalogTabs';
 
 const card = 'rounded-2xl border border-white/10 bg-zinc-950/80 p-5';
 const input = 'mt-1 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:border-yellow-300/60';
@@ -49,6 +50,7 @@ export default function Ajustes() {
 
   return (
     <div className="space-y-5 pb-24">
+      <CatalogTabs />
       <h1 className="font-display text-3xl font-extrabold uppercase italic">Ajustes</h1>
       <div className={card}>
         <label className="block text-sm font-semibold text-white/70">
@@ -65,14 +67,6 @@ export default function Ajustes() {
         </button>
         {msg && <p className="mt-3 text-center text-sm text-white/70">{msg}</p>}
       </div>
-      <Link href="/admin/banners" className={card + ' flex items-center justify-between font-bold'}>
-        <span>Banners de la tienda</span>
-        <span className="text-yellow-300">›</span>
-      </Link>
-      <Link href="/admin/servicios" className={card + ' flex items-center justify-between font-bold'}>
-        <span>Servicios y portadas</span>
-        <span className="text-yellow-300">›</span>
-      </Link>
     </div>
   );
 }

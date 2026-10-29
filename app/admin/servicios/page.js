@@ -146,7 +146,6 @@ export default function AdminServicios() {
       <CatalogTabs />
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Servicios</h1>
-        <Link href="/admin/ajustes" className="text-sm font-bold text-white/60">‹ Ajustes</Link>
       </div>
 
       <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onFile} />

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const TABS = [
+  ['/admin/ajustes', 'General'],
   ['/admin/juegos', 'Precios y estado'],
   ['/admin/servicios', 'Servicios y fotos'],
   ['/admin/banners', 'Banners'],

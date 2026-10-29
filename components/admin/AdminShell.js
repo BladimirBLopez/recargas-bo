@@ -15,7 +15,6 @@ const NAV = [
   ['/admin', 'Resumen', MdDashboard],
   ['/admin/pedidos', 'Pedidos', MdReceiptLong],
   ['/admin/reportes', 'Reportes', MdBarChart],
-  ['/admin/juegos', 'Catálogo', MdSportsEsports],
   ['/admin/ajustes', 'Ajustes', MdSettings],
 ];
 
@@ -196,9 +195,9 @@ export default function AdminShell({ children }) {
     );
   }
 
-  const CAT = ['/admin/juegos', '/admin/servicios', '/admin/banners'];
+  const CAT = ['/admin/ajustes', '/admin/juegos', '/admin/servicios', '/admin/banners'];
   const active = (href) =>
-    href === '/admin' ? path === '/admin' : href === '/admin/juegos' ? CAT.some((p) => path.startsWith(p)) : path.startsWith(href);
+    href === '/admin' ? path === '/admin' : href === '/admin/ajustes' ? CAT.some((p) => path.startsWith(p)) : path.startsWith(href);
   const current = NAV.find(([h]) => active(h)) || NAV[0];
   const pending = data?.counts?.PENDIENTE || 0;
 
@@ -286,7 +285,7 @@ export default function AdminShell({ children }) {
         )}
         <main className="mx-auto max-w-5xl px-4 pb-28 pt-4 md:pb-8">{children}</main>
 
-        <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-white/10 bg-black/90 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
+        <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-white/10 bg-black/90 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
           {NAV.map(([href, label, Icon]) => (
             <Link
               key={href}
