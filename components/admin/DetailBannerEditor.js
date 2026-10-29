@@ -18,10 +18,10 @@ const input =
 const button =
   'rounded-xl border border-cyan-400/30 bg-[#163554] px-4 py-3 text-sm font-bold text-white disabled:opacity-40';
 
-export default function DetailBannerEditor() {
+export default function DetailBannerEditor({ gameSlug = null }) {
   const [games, setGames] = useState([]);
   const [banners, setBanners] = useState([]);
-  const [slug, setSlug] = useState('');
+  const [slug, setSlug] = useState(gameSlug || '');
   const [form, setForm] = useState(DEFAULTS);
   const [image, setImage] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -60,7 +60,7 @@ export default function DetailBannerEditor() {
 
     setGames(gd.games || []);
     setBanners(bd.banners || []);
-    setSlug((current) => current || gd.games?.[0]?.slug || '');
+    setSlug((current) => gameSlug || current || gd.games?.[0]?.slug || '');
   }
 
   useEffect(() => {
@@ -69,8 +69,9 @@ export default function DetailBannerEditor() {
       .finally(() => setLoading(false));
   }, []);
 
-  const selected = games.find((g) => g.slug === slug);
-  const saved = banners.find((b) => b.slug === slug);
+  const effectiveSlug = gameSlug || slug;
+  const selected = games.find((g) => g.slug === effectiveSlug);
+  const saved = banners.find((b) => b.slug === effectiveSlug);
 
   useEffect(() => {
     setForm({
@@ -82,7 +83,7 @@ export default function DetailBannerEditor() {
     });
     setImage(null);
     setMsg('');
-  }, [slug, banners]);
+  }, [effectiveSlug, banners]);
 
   function change(key, value) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -127,13 +128,13 @@ export default function DetailBannerEditor() {
   }
 
   async function save() {
-    if (!slug || busy) return;
+    if (!effectiveSlug || busy) return;
 
     setBusy(true);
     setMsg('Guardando…');
 
     try {
-      const payload = { slug, ...form };
+      const payload = { slug: effectiveSlug, ...form };
 
       if (image) {
         payload.image = await upload(image);
@@ -161,7 +162,7 @@ export default function DetailBannerEditor() {
   }
 
   async function reset() {
-    if (!slug || busy) return;
+    if (!effectiveSlug || busy) return;
 
     if (!window.confirm('¿Restablecer el banner de este juego?')) {
       return;
@@ -173,7 +174,7 @@ export default function DetailBannerEditor() {
       const r = await fetch('/api/admin/detalle-banners', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug }),
+        body: JSON.stringify({ slug: effectiveSlug }),
       });
 
       if (!r.ok) throw new Error('No se pudo restablecer.');
@@ -192,8 +193,8 @@ export default function DetailBannerEditor() {
   }
 
   return (
-    <div className="space-y-5 pb-24">
-      <div className="flex items-center justify-between gap-3">
+    <div className={gameSlug ? "space-y-4" : "space-y-5 pb-24"}>
+      {!gameSlug && <div className="flex items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-extrabold text-white">
             Banners de detalle
@@ -206,9 +207,9 @@ export default function DetailBannerEditor() {
         <Link href="/admin/juegos" className={button}>
           Volver
         </Link>
-      </div>
+        </div>}
 
-      <div className="rounded-2xl border border-cyan-400/20 bg-[#102B49] p-4">
+        {!gameSlug && <div className="rounded-2xl border border-cyan-400/20 bg-[#102B49] p-4">
         <label className="mb-2 block text-sm font-bold text-cyan-200">
           Selecciona un juego o servicio
         </label>
@@ -225,9 +226,9 @@ export default function DetailBannerEditor() {
             </option>
           ))}
         </select>
-      </div>
+        </div>}
 
-      {selected && (
+        {selected && (
         <>
           <div className="space-y-3 rounded-2xl border border-cyan-400/20 bg-[#102B49] p-4">
             <h2 className="flex items-center gap-2 font-bold text-white">

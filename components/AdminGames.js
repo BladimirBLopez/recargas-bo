@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
 import { MdExpandMore, MdSave, MdRestartAlt, MdImage, MdSettings, MdInventory2 } from 'react-icons/md';
-import Link from 'next/link';
+import DetailBannerEditor from './admin/DetailBannerEditor';
 
 function PackageRow({ p, onChanged, onError }) {
   const [price, setPrice] = useState(String(p.price));
@@ -250,12 +250,12 @@ export default function AdminGames() {
                       <p className="mt-2 text-xs text-slate-400">
                         Personaliza la imagen y los textos de este juego.
                       </p>
-                      <Link
-                        href="/admin/detalle-banners"
-                        className="mt-3 inline-flex rounded-xl bg-cyan-400 px-4 py-2.5 text-sm font-extrabold text-slate-950"
-                      >
-                        Editar banner
-                      </Link>
+                      <div className="mt-4">
+                        <DetailBannerEditor
+                          key={g.slug}
+                          gameSlug={g.slug}
+                        />
+                      </div>
                     </div>
                   )}
                 </div>
