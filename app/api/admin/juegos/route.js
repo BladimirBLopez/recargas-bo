@@ -22,6 +22,7 @@ export async function GET(req) {
       games: list.map((g) => ({
         slug: g.slug,
         name: g.name,
+        kind: g.kind || null,
         emoji: g.emoji,
         image: im.has(g.slug) ? thumb(im.get(g.slug), 200) : null,
         canToggle: !noPackages(g),
