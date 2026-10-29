@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   MdContentCopy, MdCheck, MdSearch, MdPendingActions, MdPaid, MdLocalShipping,
-  MdListAlt, MdClose, MdPerson, MdInbox, MdChatBubbleOutline, MdFilterList,
+  MdListAlt, MdClose, MdPerson, MdInbox, MdChatBubbleOutline, MdFilterList, MdCancel, MdReplay, MdFileDownload,
 } from 'react-icons/md';
 import { SITE_NAME } from '@/data/games';
 import { useAdmin } from '@/components/admin/AdminShell';
@@ -12,6 +12,7 @@ const TABS = [
   ['PENDIENTE', 'Pendientes', MdPendingActions],
   ['PAGADO', 'Por entregar', MdPaid],
   ['ENTREGADO', 'Entregados', MdLocalShipping],
+  ['cerrados', 'Cancelados', MdCancel],
   ['todos', 'Todos', MdListAlt],
 ];
 
@@ -128,6 +129,15 @@ export default function Pedidos() {
     } catch (e) {}
   }
 
+  function exportCsv() {
+    const p = new URLSearchParams({ status: tab, format: 'csv' });
+    if (game) p.set('game', game);
+    if (from) p.set('from', from);
+    if (to) p.set('to', to);
+    if (qd) p.set('q', qd);
+    window.location.href = '/api/admin/pedidos?' + p.toString();
+  }
+
   const chips = [
     ['Hoy', boDate(0), boDate(0)],
     ['7 días', boDate(6), boDate(0)],
@@ -141,7 +151,8 @@ export default function Pedidos() {
       <div className="-mx-4 mb-3 flex gap-2 overflow-x-auto px-4 pb-1">
         {TABS.map(([k, label, Icon]) => {
           const on = tab === k;
-          const n = data?.counts?.[k];
+          const c = data?.counts;
+          const n = k === 'cerrados' ? (c ? (c.CANCELADO || 0) + (c.EXPIRADO || 0) : undefined) : c?.[k];
           return (
             <button
               key={k}
@@ -257,7 +268,15 @@ export default function Pedidos() {
 
       {ready && (
         <div className="mb-3 flex items-center justify-between text-xs text-white/50">
-          <span>{res.total} pedidos</span>
+          <span className="flex items-center gap-3">
+            {res.total} pedidos
+            <button
+              onClick={exportCsv}
+              className="flex items-center gap-1 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs font-bold text-white/80 active:scale-95"
+            >
+              <MdFileDownload className="text-base" /> CSV
+            </button>
+          </span>
           <span>
             Vendido: <b className="text-emerald-300">{bs(res.vendido)}</b>
           </span>
@@ -348,6 +367,15 @@ export default function Pedidos() {
                     Cancelar
                   </button>
                 </div>
+              )}
+              {(o.status === 'CANCELADO' || o.status === 'EXPIRADO') && (
+                <button
+                  disabled={working}
+                  onClick={() => change(o, 'PENDIENTE')}
+                  className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-2xl border border-white/10 bg-white/5 px-3 py-3 text-sm font-bold text-white/80 disabled:opacity-50"
+                >
+                  <MdReplay className="text-lg" /> Reabrir pedido
+                </button>
               )}
               {o.status === 'PAGADO' && (
                 <div className="mt-3 grid grid-cols-2 gap-2">
