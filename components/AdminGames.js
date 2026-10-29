@@ -39,14 +39,14 @@ function PackageRow({ p, onChanged, onError }) {
   }
 
   const inp =
-    'mt-1 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-yellow-300/50';
+    'mt-1 w-full rounded-xl border border-white/15 bg-[#081A2F]/80 px-3 py-2.5 text-sm font-semibold text-white outline-none transition focus:border-cyan-400/70 focus:ring-1 focus:ring-cyan-400/20';
 
   return (
-    <div className={'rounded-2xl border p-3 ' + (active ? 'border-white/10 bg-white/5' : 'border-red-400/20 bg-red-400/5')}>
+    <div className={'rounded-2xl border p-3.5 transition-colors ' + (active ? 'border-cyan-400/15 bg-[#102B49]/80' : 'border-red-400/25 bg-red-400/5')}>
       <div className="flex items-center justify-between gap-2">
         <div className="min-w-0">
-          <div className="truncate text-sm font-bold">{p.label}</div>
-          <div className="text-[11px] text-white/40">Base: Bs {p.basePrice}</div>
+          <div className="truncate text-sm font-extrabold text-white">{p.label}</div>
+          <div className="text-[11px] text-slate-400">Base: Bs {p.basePrice}</div>
         </div>
         <button
           onClick={() => setActive((v) => !v)}
@@ -55,7 +55,7 @@ function PackageRow({ p, onChanged, onError }) {
           {active ? 'Activo' : 'Pausado'}
         </button>
       </div>
-      <div className="mt-2 grid grid-cols-2 gap-2">
+      <div className="mt-3 grid grid-cols-2 gap-3">
         <label className="text-[11px] text-white/50">
           Precio (Bs)
           <input type="number" inputMode="decimal" min="0" step="0.5" value={price} onChange={(e) => setPrice(e.target.value)} className={inp} />
@@ -77,7 +77,7 @@ function PackageRow({ p, onChanged, onError }) {
             <button
               disabled={busy}
               onClick={() => send({ price: price === '' ? null : Number(price), cost: cost === '' ? null : Number(cost), active })}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-yellow-300 to-orange-400 py-2 text-sm font-bold text-black disabled:opacity-50"
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#00D9FF] to-[#007BFF] py-2.5 text-sm font-extrabold text-slate-950 shadow-md shadow-cyan-500/15 transition active:scale-95 disabled:opacity-50"
             >
               <MdSave className="text-lg" /> Guardar
             </button>
@@ -86,7 +86,7 @@ function PackageRow({ p, onChanged, onError }) {
             <button
               disabled={busy}
               onClick={() => send({ reset: true })}
-              className="flex items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-bold text-white/70 disabled:opacity-50"
+              className="flex items-center justify-center gap-1.5 rounded-xl border border-cyan-400/20 bg-[#163554] px-3 py-2 text-xs font-bold text-slate-200 transition active:scale-95 disabled:opacity-50"
             >
               <MdRestartAlt className="text-lg" /> Restablecer
             </button>
@@ -151,23 +151,23 @@ export default function AdminGames() {
 
   return (
     <div>
-      <div className="mb-3 text-sm text-white/50">
+      <div className="mb-4 rounded-xl border border-cyan-400/15 bg-[#102B49]/70 px-4 py-3 text-sm font-semibold text-slate-300">
         {activos} activos · {list.length - activos} en mantenimiento
       </div>
       {err && <div className="mb-3 rounded-2xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-200">{err}</div>}
-      <div className="grid items-start gap-3 lg:grid-cols-2">
+      <div className="grid items-start gap-4 lg:grid-cols-2">
         {list.map((g) => {
           const isOpen = open === g.slug;
           return (
-            <div key={g.slug} className="rounded-2xl border border-white/10 bg-zinc-950/80 p-4">
+            <div key={g.slug} className="rounded-2xl border border-cyan-400/15 bg-gradient-to-br from-[#122B49] to-[#09192E] p-4 shadow-lg shadow-black/15 transition-colors hover:border-cyan-400/30">
               <div className="flex items-center gap-3">
                 {g.image ? (
-                  <img src={g.image} alt="" className="h-14 w-11 shrink-0 rounded-lg object-cover" />
+                  <img src={g.image} alt="" className="h-14 w-11 shrink-0 rounded-xl border border-white/10 object-cover" />
                 ) : (
-                  <span className="grid h-14 w-11 shrink-0 place-items-center rounded-lg bg-white/5 text-2xl">{g.emoji}</span>
+                  <span className="grid h-14 w-11 shrink-0 place-items-center rounded-xl border border-cyan-400/15 bg-[#163554] text-2xl">{g.emoji}</span>
                 )}
                 <div className="min-w-0 flex-1">
-                  <div className="truncate font-bold">{g.name}</div>
+                  <div className="truncate font-extrabold text-white">{g.name}</div>
                   <div className={'mt-0.5 flex items-center gap-1.5 text-xs font-semibold ' + (g.maintenance ? 'text-red-300' : 'text-emerald-300')}>
                     <span className={'h-1.5 w-1.5 rounded-full ' + (g.maintenance ? 'bg-red-400' : 'bg-emerald-400')} />
                     {g.maintenance ? 'En mantenimiento' : 'Activo'}
@@ -185,7 +185,7 @@ export default function AdminGames() {
               {g.packages.length > 0 && (
                 <button
                   onClick={() => setOpen(isOpen ? '' : g.slug)}
-                  className="mt-3 flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-bold text-white/80"
+                  className="mt-3 flex w-full items-center justify-between rounded-xl border border-cyan-400/20 bg-[#163554]/70 px-3 py-3 text-sm font-bold text-cyan-100 transition hover:border-cyan-400/50 hover:bg-[#1B4265]"
                 >
                   <span>Paquetes y precios ({g.packages.length})</span>
                   <MdExpandMore className={'text-xl transition ' + (isOpen ? 'rotate-180' : '')} />
