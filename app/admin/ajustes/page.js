@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FaWhatsapp } from 'react-icons/fa';
 import { MdCampaign, MdQrCode2, MdVpnKey, MdCheckCircle, MdErrorOutline } from 'react-icons/md';
 import CatalogTabs from '@/components/admin/CatalogTabs';
@@ -29,6 +29,10 @@ export default function Ajustes() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState(null);
+  const [qr, setQr] = useState('/qr-pago.png');
+  const [qrBusy, setQrBusy] = useState(false);
+  const [qrMsg, setQrMsg] = useState('');
+  const qrFile = useRef(null);
 
   useEffect(() => {
     fetch('/api/admin/ajustes', { cache: 'no-store' })
@@ -36,11 +40,84 @@ export default function Ajustes() {
       .then((d) => {
         setWa(d.whatsapp || '');
         setNotice(d.notice || '');
+        setQr(d.payment_qr || '/qr-pago.png');
         setOrig({ wa: d.whatsapp || '', notice: d.notice || '' });
       })
       .catch(() => setMsg({ ok: false, t: 'No se pudo cargar' }))
       .finally(() => setLoading(false));
   }, []);
+
+  const saveQr = async (url) => {
+    const r = await fetch('/api/admin/ajustes', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'payment_qr', payment_qr: url }),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'No se pudo guardar');
+    setQr(d.payment_qr);
+  };
+
+  const uploadQr = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    if (!['image/png', 'image/jpeg'].includes(file.type)) {
+      setQrMsg('Solo PNG o JPG');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setQrMsg('Máximo 5 MB');
+      return;
+    }
+    setQrBusy(true);
+    setQrMsg('Subiendo QR…');
+    try {
+      const s = await fetch('/api/admin/subir', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ folder: 'payments' }),
+      });
+      const sd = await s.json();
+      if (!s.ok) throw new Error(sd.error || 'Error al autorizar subida');
+
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('api_key', sd.apiKey);
+      fd.append('timestamp', sd.timestamp);
+      fd.append('asset_folder', sd.folder);
+      fd.append('public_id_prefix', sd.folder);
+      fd.append('signature', sd.signature);
+
+      const u = await fetch(
+        'https://api.cloudinary.com/v1_1/' + sd.cloudName + '/image/upload',
+        { method: 'POST', body: fd }
+      );
+      const ud = await u.json();
+      if (!u.ok) throw new Error(ud.error?.message || 'Error al subir QR');
+
+      await saveQr(ud.secure_url);
+      setQrMsg('QR guardado correctamente');
+    } catch (err) {
+      setQrMsg(err.message || 'Error al subir QR');
+    } finally {
+      setQrBusy(false);
+    }
+  };
+
+  const restoreQr = async () => {
+    if (!confirm('¿Restaurar el QR original?')) return;
+    setQrBusy(true);
+    setQrMsg('');
+    try {
+      await saveQr('/qr-pago.png');
+      setQrMsg('QR original restaurado');
+    } catch (err) {
+      setQrMsg(err.message || 'Error');
+    } finally {
+      setQrBusy(false);
+    }
+  };
 
   const dirty = wa !== orig.wa || notice !== orig.notice;
   const waClean = wa.replace(/\D/g, '');
@@ -139,12 +216,41 @@ export default function Ajustes() {
         )}
       </div>
 
+      <div className={card}>
+        <Head icon={MdQrCode2} title="Pagos — QR de cobro" hint="Imagen utilizada para recibir pagos" />
+        <div className="mx-auto mb-4 w-52 rounded-xl bg-white p-3">
+          <img src={qr} alt="QR de cobro actual" className="w-full" />
+        </div>
+        <input
+          ref={qrFile}
+          type="file"
+          accept="image/png,image/jpeg"
+          className="hidden"
+          onChange={uploadQr}
+        />
+        <button
+          className={btn}
+          disabled={qrBusy || loading}
+          onClick={() => qrFile.current?.click()}
+        >
+          {qrBusy ? 'Procesando…' : 'Subir o cambiar QR'}
+        </button>
+        <button
+          className="mt-3 w-full rounded-xl border border-white/20 py-3 text-sm font-semibold disabled:opacity-40"
+          disabled={qrBusy || loading || qr === '/qr-pago.png'}
+          onClick={restoreQr}
+        >
+          Restaurar QR original
+        </button>
+        {qrMsg && <p className="mt-3 text-center text-sm" role="status">{qrMsg}</p>}
+        <p className="mt-2 text-center text-xs text-white/50">
+          PNG o JPG, máximo 5 MB. Los QR anteriores se conservan en Cloudinary.
+        </p>
+      </div>
+
       <div className={card + ' opacity-70'}>
-        <Head icon={MdQrCode2} title="Próximamente" hint="Aún no disponible" />
+        <Head icon={MdVpnKey} title="Próximamente" hint="Aún no disponible" />
         <ul className="space-y-2 text-sm text-white/70">
-          <li className="flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2">
-            <MdQrCode2 className="text-lg" /> Cambiar el QR de pago
-          </li>
           <li className="flex items-center gap-2 rounded-xl bg-white/5 px-3 py-2">
             <MdVpnKey className="text-lg" /> Cambiar la clave del admin
           </li>

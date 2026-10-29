@@ -163,7 +163,8 @@ export default function OrderPay({ order, onBack }) {
     onBack();
   };
 
-  const { whatsapp } = useSettings();
+  const { whatsapp, payment_qr } = useSettings();
+  const qrUrl = payment_qr || '/qr-pago.png';
   const wa = (text) => `https://wa.me/${whatsapp}?text=${encodeURIComponent(text)}`;
   const proofMsg = [
     `Hola, te envío mi comprobante del pedido ${order.code}`,
@@ -294,9 +295,9 @@ export default function OrderPay({ order, onBack }) {
                 <li>Vuelve a esta página para enviar tu comprobante.</li>
               </ol>
               <div className="mx-auto w-64 max-w-full rounded-2xl bg-white p-3 shadow-[0_0_40px_-8px_rgb(var(--accent)/0.7)]">
-                <img src="/qr-pago.png" alt="QR de pago" className="h-auto w-full" />
+                <img src={qrUrl} alt="QR de pago" className="h-auto w-full" onError={(e) => { if (!e.currentTarget.src.endsWith("/qr-pago.png")) e.currentTarget.src = "/qr-pago.png"; }} />
               </div>
-              <a href="/qr-pago.png" download="qr-pago.png" className={btnMain}>
+              <a href="/api/pago/qr" download="qr-pago.png" className={btnMain}>
                 <MdFileDownload size={22} /> Descargar QR
               </a>
               <p className="text-center text-xs text-white/40">

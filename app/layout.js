@@ -6,6 +6,8 @@ import ShopFrame from '@/components/ShopFrame';
 import { SettingsProvider } from '@/components/SettingsProvider';
 import { getSettings } from '@/lib/settings';
 
+export const dynamic = 'force-dynamic';
+
 const font = Poppins({ subsets: ['latin'], weight: ['400', '600', '700', '800', '900'], style: ['normal', 'italic'] });
 const display = Barlow_Condensed({ subsets: ['latin'], weight: ['500', '600', '700', '800'], style: ['normal', 'italic'], variable: '--font-display' });
 
