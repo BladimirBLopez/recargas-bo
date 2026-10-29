@@ -10,7 +10,6 @@ const TABS = [
   ['/admin/juegos', 'Juegos', MdSell],
   ['/admin/servicios', 'Servicios', MdImage],
   ['/admin/banners', 'Portada', MdViewCarousel],
-  ['/admin/detalle-banners', 'Por juego', MdViewCarousel],
 ];
 
 export default function CatalogTabs() {
