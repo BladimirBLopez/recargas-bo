@@ -2,6 +2,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { MdExpandMore, MdSave, MdRestartAlt, MdImage, MdSettings, MdInventory2 } from 'react-icons/md';
 import DetailBannerEditor from './admin/DetailBannerEditor';
+import GameProfileImageEditor from './admin/GameProfileImageEditor';
 
 function PackageRow({ p, onChanged, onError }) {
   const [price, setPrice] = useState(String(p.price));
@@ -195,7 +196,7 @@ export default function AdminGames() {
                     {[
                       ['paquetes', 'Paquetes', MdInventory2],
                       ['estado', 'Estado', MdSettings],
-                      ['banner', 'Banner', MdImage],
+                      ['banner', 'Imágenes', MdImage],
                     ].map(([id, label, Icon]) => (
                       <button
                         key={id}
@@ -246,11 +247,25 @@ export default function AdminGames() {
 
                   {section === 'banner' && (
                     <div className="rounded-xl border border-white/10 bg-[#102B49] p-4">
-                      <div className="text-sm font-bold text-white">Banner personalizado</div>
+                      <div className="text-sm font-bold text-white">Imágenes del juego</div>
                       <p className="mt-2 text-xs text-slate-400">
-                        Personaliza la imagen y los textos de este juego.
+                        Cambia la foto de perfil y la portada por separado.
                       </p>
                       <div className="mt-4">
+                        <GameProfileImageEditor
+                          gameSlug={g.slug}
+                          image={g.image}
+                          onSaved={load}
+                        />
+                      </div>
+
+                      <div className="mt-5 border-t border-white/10 pt-5">
+                        <h3 className="mb-2 text-sm font-bold text-white">
+                          Portada del juego
+                        </h3>
+                        <p className="mb-4 text-xs text-slate-400">
+                          Imagen panorámica independiente de la foto de perfil.
+                        </p>
                         <DetailBannerEditor
                           key={g.slug}
                           gameSlug={g.slug}
