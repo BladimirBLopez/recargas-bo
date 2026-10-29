@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 const card = 'rounded-3xl border border-white/10 bg-zinc-950/80 p-5';
 const input = 'mt-1 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:border-yellow-300/60';
@@ -64,6 +65,10 @@ export default function Ajustes() {
         </button>
         {msg && <p className="mt-3 text-center text-sm text-white/70">{msg}</p>}
       </div>
+      <Link href="/admin/banners" className={card + ' flex items-center justify-between font-bold'}>
+        <span>Banners de la tienda</span>
+        <span className="text-yellow-300">›</span>
+      </Link>
     </div>
   );
 }

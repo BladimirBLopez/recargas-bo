@@ -4,9 +4,8 @@ import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
 import { MdQrCode2 as QrCode, MdFlashOn as Zap, MdHeadsetMic as Headset } from 'react-icons/md';
 
-// Para usar tus propias imágenes: pon los archivos en public/banners/ (1.jpg, 2.jpg, 3.jpg).
-// Si la imagen no existe se muestra el diseño de texto.
-const slides = [
+// Ejemplos: se usan solo si no hay banners cargados en /admin/banners.
+const defaults = [
   { img: '/banners/1.jpg', icon: Zap, kicker: 'Tus recargas rápidas', title: '¡Diamantes y pases!', cta: '¡Compra ya!' },
   { img: '/banners/2.jpg', icon: QrCode, kicker: 'Paga con QR', title: 'Tu banco, sin complicarte', cta: 'Recarga aquí' },
   { img: '/banners/3.jpg', icon: Headset, kicker: 'Soporte real', title: 'Te atendemos por WhatsApp', cta: 'Escríbenos' },
@@ -15,14 +14,15 @@ const slides = [
 function Slide({ s }) {
   const [fail, setFail] = useState(false);
   const [svg, setSvg] = useState(false);
-  const Icon = s.icon;
+  const Icon = s.icon || Zap;
+  const local = s.img.startsWith('/');
   return (
     <div className="glow-pulse relative aspect-[8/3] overflow-hidden rounded-3xl border-2 border-yellow-300 bg-black">
       {!fail && (
         <img
-          src={svg ? s.img.replace('.jpg', '.svg') : s.img}
-          alt={s.title}
-          onError={() => (svg ? setFail(true) : setSvg(true))}
+          src={svg ? s.img.replace(/\.jpg$/, '.svg') : s.img}
+          alt={s.title || 'Promoción'}
+          onError={() => (svg || !local ? setFail(true) : setSvg(true))}
           className="absolute inset-0 h-full w-full object-cover"
         />
       )}
@@ -35,9 +35,11 @@ function Slide({ s }) {
             <h1 className="font-display text-2xl font-extrabold uppercase italic leading-none sm:text-5xl">
               {s.title}
             </h1>
-            <span className="mt-2 inline-block -skew-x-12 rounded bg-white px-2.5 py-0.5 font-display text-xs font-bold uppercase italic text-black">
-              {s.cta}
-            </span>
+            {s.cta && (
+              <span className="mt-2 inline-block -skew-x-12 rounded bg-white px-2.5 py-0.5 font-display text-xs font-bold uppercase italic text-black">
+                {s.cta}
+              </span>
+            )}
           </div>
           <Icon className="shrink-0 text-yellow-300/40" size={56} />
         </div>
@@ -47,8 +49,24 @@ function Slide({ s }) {
 }
 
 export default function Banner() {
+  const [slides, setSlides] = useState(null);
   const [ref, api] = useEmblaCarousel({ loop: true, align: 'center' }, [Autoplay({ delay: 4000 })]);
   const [idx, setIdx] = useState(0);
+
+  useEffect(() => {
+    let alive = true;
+    fetch('/api/banners', { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((d) => {
+        if (!alive) return;
+        const list = Array.isArray(d.banners) ? d.banners : [];
+        setSlides(list.length ? list.map((b) => ({ img: b.url, title: 'Promoción' })) : defaults);
+      })
+      .catch(() => alive && setSlides(defaults));
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (!api) return;
@@ -57,6 +75,8 @@ export default function Banner() {
     onSelect();
     return () => api.off('select', onSelect);
   }, [api]);
+
+  if (!slides) return <div className="aspect-[8/3] w-full animate-pulse rounded-3xl bg-white/5" />;
 
   return (
     <div>
