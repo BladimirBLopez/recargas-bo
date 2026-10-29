@@ -1,7 +1,8 @@
 import { games } from '../../../../data/games.js';
 import { sql } from '../../../../lib/db.js';
+import { thumb } from '../../../../lib/cloudinary.js';
 import { isAdmin } from '../../../../lib/admin.js';
-import { allGames, maintenanceMap, packageMap, applyPackages, noPackages } from '../../../../lib/games-state.js';
+import { allGames, imageMap, maintenanceMap, packageMap, applyPackages, noPackages } from '../../../../lib/games-state.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -16,11 +17,13 @@ export async function GET(req) {
     const m = await maintenanceMap(true);
     const pm = await packageMap();
     const list = await allGames();
+    const im = await imageMap();
     return json({
       games: list.map((g) => ({
         slug: g.slug,
         name: g.name,
         emoji: g.emoji,
+        image: im.has(g.slug) ? thumb(im.get(g.slug), 200) : null,
         canToggle: !noPackages(g),
         maintenance: noPackages(g) ? true : m.has(g.slug) ? m.get(g.slug) : Boolean(g.maintenance),
         packages: applyPackages(g, pm, true).packages.map((p) => ({

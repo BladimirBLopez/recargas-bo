@@ -33,7 +33,7 @@ function PackageRow({ p, onChanged, onError }) {
       if (!r.ok) onError('No se pudo guardar (' + r.status + '). ¿Creaste la tabla en Neon?');
       else await onChanged();
     } catch (e) {
-      onError('Sin conexion');
+      onError('Sin conexión');
     }
     setBusy(false);
   }
@@ -114,7 +114,7 @@ export default function AdminGames() {
       setList(d.games || []);
       setErr('');
     } catch (e) {
-      setErr('Sin conexion');
+      setErr('Sin conexión');
     }
   }, []);
 
@@ -134,7 +134,7 @@ export default function AdminGames() {
       if (!r.ok) setErr('No se pudo cambiar (' + r.status + ')');
       await load();
     } catch (e) {
-      setErr('Sin conexion');
+      setErr('Sin conexión');
     }
     setBusy('');
   }
@@ -161,7 +161,11 @@ export default function AdminGames() {
           return (
             <div key={g.slug} className="rounded-2xl border border-white/10 bg-zinc-950/80 p-4">
               <div className="flex items-center gap-3">
-                <span className="grid h-12 w-12 place-items-center rounded-2xl bg-white/5 text-2xl">{g.emoji}</span>
+                {g.image ? (
+                  <img src={g.image} alt="" className="h-14 w-11 shrink-0 rounded-lg object-cover" />
+                ) : (
+                  <span className="grid h-14 w-11 shrink-0 place-items-center rounded-lg bg-white/5 text-2xl">{g.emoji}</span>
+                )}
                 <div className="min-w-0 flex-1">
                   <div className="truncate font-bold">{g.name}</div>
                   <div className={'mt-0.5 flex items-center gap-1.5 text-xs font-semibold ' + (g.maintenance ? 'text-red-300' : 'text-emerald-300')}>
@@ -173,7 +177,7 @@ export default function AdminGames() {
                 <button
                   disabled={!g.canToggle || busy === g.slug}
                   onClick={() => toggle(g)}
-                  className={'rounded-2xl px-4 py-2 text-sm font-bold disabled:opacity-40 ' + (g.maintenance ? 'bg-emerald-400 text-black' : 'border border-red-400/30 bg-red-400/10 text-red-300')}
+                  className={'rounded-xl px-4 py-2 text-sm font-bold disabled:opacity-40 ' + (g.maintenance ? 'bg-emerald-400 text-black' : 'border border-red-400/30 bg-red-400/10 text-red-300')}
                 >
                   {g.maintenance ? 'Activar' : 'Pausar'}
                 </button>
