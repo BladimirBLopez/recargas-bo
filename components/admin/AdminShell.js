@@ -255,32 +255,32 @@ export default function AdminShell({ children }) {
           </div>
         </aside>
 
-        <header className="sticky top-0 z-20 border-b border-white/10 bg-[#090e1c]/90 shadow-lg shadow-black/10 backdrop-blur-xl">
-          <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 md:px-7">
+        <header className="sticky top-0 z-20 border-b border-cyan-400/15 bg-[#09192E]/95 shadow-lg shadow-black/10 backdrop-blur-xl">
+          <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-3 sm:px-4 md:gap-3 md:px-7">
             <div className="min-w-0">
               <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#00D9FF]">Recargas BO / Administración</div>
               <h1 className="truncate text-lg font-bold tracking-tight text-white md:text-xl">{current[1]}</h1>
             </div>
-            <div className="flex gap-2">
+            <div className="flex shrink-0 gap-1.5 sm:gap-2">
               <button
                 onClick={toggleSound}
                 aria-label={sound ? 'Apagar sonido de avisos' : 'Activar sonido de avisos'}
-                className={'grid h-10 w-10 place-items-center rounded-xl border active:scale-95 ' + (sound ? 'border-yellow-300/40 bg-yellow-300/10 text-yellow-300' : 'border-white/10 bg-white/5 text-white/60')}
+                className={'grid h-10 w-10 shrink-0 place-items-center rounded-xl border transition active:scale-95 ' + (sound ? 'border-cyan-400/40 bg-cyan-400/10 text-[#00D9FF]' : 'border-white/10 bg-white/5 text-slate-400')}
               >
                 {sound ? <MdNotificationsActive className="text-xl" /> : <MdNotificationsOff className="text-xl" />}
               </button>
-              <ThemeToggle className="h-10 w-10 rounded-xl border border-white/10 bg-white/5" />
+              <ThemeToggle className="h-10 w-10 shrink-0 rounded-xl border border-cyan-400/15 bg-[#163554]/70" />
               <button
                 onClick={reload}
                 aria-label="Actualizar"
-                className="grid h-10 w-10 place-items-center rounded-xl border border-white/10 bg-white/5 active:scale-95"
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-cyan-400/15 bg-[#163554]/70 text-cyan-100 transition active:scale-95"
               >
                 <MdRefresh className={'text-xl ' + (loading ? 'animate-spin' : '')} />
               </button>
               <button
                 onClick={logout}
                 aria-label="Salir"
-                className="grid h-10 w-10 place-items-center rounded-xl border border-white/10 bg-white/5 active:scale-95 md:hidden"
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-red-400/20 bg-red-400/5 text-red-200 transition active:scale-95 md:hidden"
               >
                 <MdLogout className="text-xl" />
               </button>
@@ -301,12 +301,12 @@ export default function AdminShell({ children }) {
         )}
         <main className="mx-auto max-w-7xl px-4 pb-28 pt-6 md:px-7 md:pb-10 md:pt-8">{children}</main>
 
-        <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-white/10 bg-[#090e1c]/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_rgba(0,0,0,0.3)] backdrop-blur-xl md:hidden">
+        <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-cyan-400/20 bg-[#09192E]/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_rgba(0,0,0,0.3)] backdrop-blur-xl md:hidden">
           {NAV.map(([href, label, Icon]) => (
             <Link
               key={href}
               href={href}
-              className={'relative flex flex-col items-center gap-0.5 py-2.5 text-[11px] font-bold ' + (active(href) ? 'text-yellow-300' : 'text-white/50')}
+              className={'relative flex min-h-[56px] flex-col items-center justify-center gap-1 py-2 text-[11px] font-bold transition-colors ' + (active(href) ? 'text-[#00D9FF]' : 'text-slate-400')}
             >
               <Icon className="text-2xl" />
               {label}
