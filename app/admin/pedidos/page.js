@@ -45,6 +45,7 @@ export default function Pedidos() {
   const [copied, setCopied] = useState(null);
   const [err, setErr] = useState('');
   const [showF, setShowF] = useState(false);
+  const [open, setOpen] = useState(null);
 
   useEffect(() => {
     const t = setTimeout(() => setQd(search.trim()), 300);
@@ -294,105 +295,116 @@ export default function Pedidos() {
         </div>
       )}
 
-      <div className="grid gap-3 lg:grid-cols-2">
+      <div className="divide-y divide-white/10 overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/80">
         {shown.map((o) => {
           const st = ST[o.status] || ST.EXPIRADO;
           const working = busy === o.id;
           const stale = o.status === 'PENDIENTE' && Date.now() - new Date(o.created_at).getTime() > 30 * 60 * 1000;
+          const isOpen = open === o.id;
           return (
-            <div key={o.id} className="relative overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/80 p-4 pl-5">
-              <span className={'absolute inset-y-0 left-0 w-1.5 ' + (stale ? 'bg-red-500' : st.bar)} />
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <div className="font-mono text-base font-bold text-yellow-300">{o.code}</div>
-                  <div className={'text-xs ' + (stale ? 'font-bold text-red-400' : 'text-white/40')}>{stale ? 'Sin atender: ' : ''}{ago(o.created_at)} · {fmt(o.created_at)}</div>
+            <div key={o.id} className={stale ? 'bg-red-500/5' : ''}>
+              <button
+                onClick={() => setOpen(isOpen ? null : o.id)}
+                className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-white/5"
+              >
+                <span className={'h-2.5 w-2.5 shrink-0 rounded-full ' + (stale ? 'bg-red-500' : st.bar)} />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-sm font-semibold">{o.code}</span>
+                    <span className="text-xs text-white/40">{ago(o.created_at)}</span>
+                  </div>
+                  <div className="truncate text-xs text-white/60">{pretty(o.game_slug)} · {o.package_label}</div>
                 </div>
-                <span className={'rounded-full border px-3 py-0.5 text-xs font-bold ' + st.badge}>{st.label}</span>
-              </div>
-
-              <div className="mt-3 flex items-end justify-between gap-2">
-                <div className="min-w-0">
-                  <div className="truncate text-sm font-semibold">{pretty(o.game_slug)}</div>
-                  <div className="truncate text-sm text-white/60">{o.package_label}</div>
+                <div className="shrink-0 text-right">
+                  <div className="text-sm font-semibold">{bs(o.price)}</div>
+                  <span className={'mt-0.5 inline-block rounded-full border px-2 py-0.5 text-[10px] font-semibold ' + (stale ? 'border-red-400/30 bg-red-400/10 text-red-300' : st.badge)}>
+                    {stale ? 'Sin atender' : st.label}
+                  </span>
                 </div>
-                <div className="font-display text-2xl font-bold">{bs(o.price)}</div>
-              </div>
+              </button>
 
-              <div className="mt-3 flex flex-wrap items-center gap-2 rounded-2xl bg-white/5 px-3 py-2 text-sm">
-                <span className="text-white/50">ID</span>
-                <span className="font-mono font-semibold">{o.player_id}</span>
-                <button onClick={() => copy('id' + o.id, o.player_id)} className="ml-auto flex items-center gap-1 rounded-lg bg-white/10 px-2 py-1 text-xs active:scale-95">
-                  {copied === 'id' + o.id ? <MdCheck className="text-emerald-300" /> : <MdContentCopy />}
-                  {copied === 'id' + o.id ? 'Copiado' : 'Copiar'}
-                </button>
-              </div>
-              {o.nickname && (
-                <div className="mt-2 flex items-center gap-1.5 text-sm text-white/60">
-                  <MdPerson className="text-base" /> {o.nickname}
-                </div>
-              )}
-              {o.paid_at && <div className="mt-1 text-xs text-white/40">Pagado: {fmt(o.paid_at)}</div>}
+              {isOpen && (
+                <div className="space-y-3 bg-white/[0.03] px-4 pb-4 pt-3">
+                  <div className="flex flex-wrap items-center gap-2 rounded-xl bg-white/5 px-3 py-2 text-sm">
+                    <span className="text-white/50">ID</span>
+                    <span className="font-mono font-semibold">{o.player_id}</span>
+                    <button onClick={() => copy('id' + o.id, o.player_id)} className="ml-auto flex items-center gap-1 rounded-lg bg-white/10 px-2 py-1 text-xs active:scale-95">
+                      {copied === 'id' + o.id ? <MdCheck className="text-emerald-300" /> : <MdContentCopy />}
+                      {copied === 'id' + o.id ? 'Copiado' : 'Copiar'}
+                    </button>
+                  </div>
+                  <div className="space-y-1 text-xs text-white/50">
+                    {o.nickname && (
+                      <div className="flex items-center gap-1.5 text-sm text-white/70">
+                        <MdPerson className="text-base" /> {o.nickname}
+                      </div>
+                    )}
+                    <div>Creado: {fmt(o.created_at)}</div>
+                    {o.paid_at && <div>Pagado: {fmt(o.paid_at)}</div>}
+                  </div>
 
-              {(o.status === 'PENDIENTE' || o.status === 'PAGADO' || o.status === 'ENTREGADO') && (
-                <button
-                  onClick={() => copy('m' + o.id, msg(o))}
-                  className="mt-3 flex items-center gap-1.5 rounded-xl border border-green-400/30 bg-green-400/10 px-3 py-2 text-xs font-bold text-green-300 active:scale-95"
-                >
-                  {copied === 'm' + o.id ? <MdCheck className="text-base" /> : <MdChatBubbleOutline className="text-base" />}
-                  {copied === 'm' + o.id ? 'Mensaje copiado' : 'Copiar mensaje para el cliente'}
-                </button>
-              )}
+                  {(o.status === 'PENDIENTE' || o.status === 'PAGADO' || o.status === 'ENTREGADO') && (
+                    <button
+                      onClick={() => copy('m' + o.id, msg(o))}
+                      className="flex items-center gap-1.5 rounded-xl border border-green-400/30 bg-green-400/10 px-3 py-2 text-xs font-bold text-green-300 active:scale-95"
+                    >
+                      {copied === 'm' + o.id ? <MdCheck className="text-base" /> : <MdChatBubbleOutline className="text-base" />}
+                      {copied === 'm' + o.id ? 'Mensaje copiado' : 'Copiar mensaje para el cliente'}
+                    </button>
+                  )}
 
-              {o.status === 'PENDIENTE' && (
-                <div className="mt-3 grid grid-cols-2 gap-2">
-                  <button
-                    disabled={working}
-                    onClick={() => both(o)}
-                    className="col-span-2 rounded-2xl bg-gradient-to-r from-yellow-300 to-orange-400 px-4 py-3 text-sm font-bold text-black shadow-lg shadow-orange-500/30 disabled:opacity-50"
-                  >
-                    Pagado + entregado
-                  </button>
-                  <button
-                    disabled={working}
-                    onClick={() => change(o, 'PAGADO')}
-                    className="rounded-2xl border border-sky-400/30 bg-sky-400/10 px-3 py-2.5 text-sm font-bold text-sky-300 disabled:opacity-50"
-                  >
-                    Solo pagado
-                  </button>
-                  <button
-                    disabled={working}
-                    onClick={() => change(o, 'CANCELADO')}
-                    className="rounded-2xl border border-red-400/30 bg-red-400/10 px-3 py-2.5 text-sm font-bold text-red-300 disabled:opacity-50"
-                  >
-                    Cancelar
-                  </button>
-                </div>
-              )}
-              {(o.status === 'CANCELADO' || o.status === 'EXPIRADO') && (
-                <button
-                  disabled={working}
-                  onClick={() => change(o, 'PENDIENTE')}
-                  className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-2xl border border-white/10 bg-white/5 px-3 py-3 text-sm font-bold text-white/80 disabled:opacity-50"
-                >
-                  <MdReplay className="text-lg" /> Reabrir pedido
-                </button>
-              )}
-              {o.status === 'PAGADO' && (
-                <div className="mt-3 grid grid-cols-2 gap-2">
-                  <button
-                    disabled={working}
-                    onClick={() => change(o, 'ENTREGADO')}
-                    className="rounded-2xl bg-emerald-400 px-3 py-3 text-sm font-bold text-black disabled:opacity-50"
-                  >
-                    Marcar entregado
-                  </button>
-                  <button
-                    disabled={working}
-                    onClick={() => change(o, 'PENDIENTE')}
-                    className="rounded-2xl border border-white/10 bg-white/5 px-3 py-3 text-sm font-bold text-white/80 disabled:opacity-50"
-                  >
-                    Volver a pendiente
-                  </button>
+                  {o.status === 'PENDIENTE' && (
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        disabled={working}
+                        onClick={() => both(o)}
+                        className="col-span-2 rounded-xl bg-gradient-to-r from-yellow-300 to-orange-400 px-4 py-3 text-sm font-bold text-black disabled:opacity-50"
+                      >
+                        Pagado + entregado
+                      </button>
+                      <button
+                        disabled={working}
+                        onClick={() => change(o, 'PAGADO')}
+                        className="rounded-xl border border-sky-400/30 bg-sky-400/10 px-3 py-2.5 text-sm font-bold text-sky-300 disabled:opacity-50"
+                      >
+                        Solo pagado
+                      </button>
+                      <button
+                        disabled={working}
+                        onClick={() => change(o, 'CANCELADO')}
+                        className="rounded-xl border border-red-400/30 bg-red-400/10 px-3 py-2.5 text-sm font-bold text-red-300 disabled:opacity-50"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  )}
+                  {(o.status === 'CANCELADO' || o.status === 'EXPIRADO') && (
+                    <button
+                      disabled={working}
+                      onClick={() => change(o, 'PENDIENTE')}
+                      className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-sm font-bold text-white/80 disabled:opacity-50"
+                    >
+                      <MdReplay className="text-lg" /> Reabrir pedido
+                    </button>
+                  )}
+                  {o.status === 'PAGADO' && (
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        disabled={working}
+                        onClick={() => change(o, 'ENTREGADO')}
+                        className="rounded-xl bg-emerald-400 px-3 py-3 text-sm font-bold text-black disabled:opacity-50"
+                      >
+                        Marcar entregado
+                      </button>
+                      <button
+                        disabled={working}
+                        onClick={() => change(o, 'PENDIENTE')}
+                        className="rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-sm font-bold text-white/80 disabled:opacity-50"
+                      >
+                        Volver a pendiente
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
