@@ -294,6 +294,11 @@ export default function OrderPay({ order, onBack }) {
                 </li>
                 <li>Vuelve a esta página para enviar tu comprobante.</li>
               </ol>
+              <div className="rounded-2xl border border-yellow-300/40 bg-yellow-300/10 p-4 text-center">
+                <p className="text-xs uppercase tracking-wide text-white/60">Paga exactamente</p>
+                <p className="font-display text-5xl font-bold text-yellow-300">Bs {order.price}</p>
+                <p className="mt-1 text-xs text-white/60">Escribe este monto exacto al pagar: si es otro, no se confirma solo.</p>
+              </div>
               <div className="mx-auto w-64 max-w-full rounded-2xl bg-white p-3 shadow-[0_0_40px_-8px_rgb(var(--accent)/0.7)]">
                 <img src={qrUrl} alt="QR de pago" className="h-auto w-full" onError={(e) => { if (!e.currentTarget.src.endsWith("/qr-pago.png")) e.currentTarget.src = "/qr-pago.png"; }} />
               </div>
