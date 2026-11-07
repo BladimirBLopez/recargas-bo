@@ -8,6 +8,7 @@ import { useSettings } from '@/components/SettingsProvider';
 
 const OK = ['PAGADO', 'ENTREGADO'];
 const BAD = ['CANCELADO', 'EXPIRADO'];
+const LATE_MS = 90 * 1000;
 
 function Row({ k, v }) {
   return (
@@ -114,6 +115,7 @@ const fade = (d = 0) => ({
 export default function OrderPay({ order, onBack }) {
   const [stage, setStage] = useState('pay');
   const [status, setStatus] = useState('PENDIENTE');
+  const [late, setLate] = useState(false);
 
   useEffect(() => {
     try {
@@ -146,12 +148,25 @@ export default function OrderPay({ order, onBack }) {
       } catch (e) {}
     };
     tick();
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') tick();
+    };
+    document.addEventListener('visibilitychange', onVisible);
     const t = setInterval(tick, 5000);
     return () => {
       stop = true;
       clearInterval(t);
+      document.removeEventListener('visibilitychange', onVisible);
     };
   }, [order.code, status]);
+
+  // Pasados 90 s sin confirmación, aparece el enlace para enviar el comprobante.
+  useEffect(() => {
+    if (OK.includes(status) || BAD.includes(status)) return;
+    const wait = Math.max(0, LATE_MS - (Date.now() - (order.ts || Date.now())));
+    const t = setTimeout(() => setLate(true), wait);
+    return () => clearTimeout(t);
+  }, [order.ts, status]);
 
   const clear = () => {
     try {
@@ -303,7 +318,7 @@ export default function OrderPay({ order, onBack }) {
                 <li>
                   Abre tu banca móvil y paga por <b>Bs {order.price}</b> exactos.
                 </li>
-                <li>Vuelve a esta página para enviar tu comprobante.</li>
+                <li>Vuelve a esta página: tu pago se confirma solo.</li>
               </ol>
               <div id="pay-amount" className="scroll-mt-24 rounded-2xl border border-yellow-300/40 bg-yellow-300/10 p-4 text-center">
                 <p className="text-xs uppercase tracking-wide text-white/60">Paga exactamente</p>
@@ -320,12 +335,23 @@ export default function OrderPay({ order, onBack }) {
                 Si no se descarga, mantén presionada la imagen y guárdala.
               </p>
             </div>
-            <button
-              onClick={() => setStage('proof')}
-              className="w-full rounded-2xl border-2 border-white/20 py-3 font-display text-lg font-bold uppercase transition active:scale-95"
-            >
-              Ya pagué
-            </button>
+            <div className="space-y-3 text-center">
+              <div className="flex items-center justify-center gap-2 text-sm text-white/70">
+                <span className="relative flex h-2.5 w-2.5 shrink-0">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-yellow-300 opacity-75" />
+                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-yellow-300" />
+                </span>
+                Esperando tu pago… se confirma sola, no necesitas tocar nada
+              </div>
+              {late && (
+                <button
+                  onClick={() => setStage('proof')}
+                  className="text-sm text-white/60 underline underline-offset-4"
+                >
+                  ¿Ya pagaste y no se confirma? Envía tu comprobante
+                </button>
+              )}
+            </div>
           </motion.div>
         ) : (
           <motion.div
