@@ -215,8 +215,7 @@ export default function Checkout({ game }) {
             <div className="rounded-2xl border border-white/15 bg-black p-4 text-sm">
               <p className="text-white/50">Se recargará a:</p>
               <p className="mt-1 font-bold text-white">
-                {game.name} · ID {id}
-                {isML ? ` · Zona ${zoneT}` : ''}
+                {game.name} · {isML ? `ID ${id} · Zona ${zoneT}` : `${game.idLabel}: ${id}`}
               </p>
             </div>
           )}
