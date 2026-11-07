@@ -387,7 +387,9 @@ export default function Checkout({ game }) {
         <div className="rounded-3xl border border-white/10 bg-zinc-950/80">
           <Acc icon={MdDescription} title={`Sobre ${game.name}`}>
             <p>
-              Recarga {game.name} en Bolivia usando solo tu {game.idLabel}.
+              {game.kind === 'tarjeta'
+                ? `Compra tarjetas de ${game.name} en Bolivia. La entrega se coordina por WhatsApp.`
+                : `Recarga ${game.name} en Bolivia usando solo tu ${game.idLabel}.`}
             </p>
           </Acc>
           <Acc icon={MdListAlt} title="Cómo comprar">
@@ -395,7 +397,7 @@ export default function Checkout({ game }) {
             <p>2. Elige tu paquete.</p>
             <p>3. Toca COMPRAR AHORA y paga el QR por el monto exacto.</p>
             <p>4. Envía tu comprobante por WhatsApp.</p>
-            <p>5. Entregamos tu recarga apenas confirmemos el pago.</p>
+            <p>5. {game.kind === 'tarjeta' ? 'Te enviamos tu código por WhatsApp apenas confirmemos el pago.' : 'Entregamos tu recarga apenas confirmemos el pago.'}</p>
           </Acc>
         </div>
       </section>
@@ -404,10 +406,16 @@ export default function Checkout({ game }) {
         <h2 className="mb-3 font-display text-xl font-extrabold uppercase italic">Preguntas frecuentes</h2>
         <div className="rounded-3xl border border-white/10 bg-zinc-950/80">
           <Acc title="¿Dónde encuentro mi ID?">
-            <p>Abre el juego y entra a tu perfil: ahí aparece tu ID. Cópialo para no equivocarte.</p>
+            <p>
+              {isML
+                ? 'Toca tu avatar arriba a la izquierda en el juego. Verás tu ID y, entre paréntesis, tu Zona (ej. 123456789 (1234)). Escribe cada número en su campo.'
+                : game.slug === 'roblox'
+                ? 'Es tu nombre de usuario de Roblox (no el nombre visible). Lo ves en tu perfil.'
+                : 'Abre el juego y entra a tu perfil: ahí aparece tu ID. Cópialo para no equivocarte.'}
+            </p>
           </Acc>
           <Acc title="¿Necesitan mi contraseña?">
-            <p>No. Solo necesitamos tu ID. Nunca te pediremos tu contraseña.</p>
+            <p>No. Solo necesitamos tu {isML ? 'ID y Zona' : game.slug === 'roblox' ? 'usuario' : 'ID'}. Nunca te pediremos tu contraseña.</p>
           </Acc>
         </div>
       </section>
