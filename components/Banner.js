@@ -32,9 +32,9 @@ function Slide({ s }) {
             <p className="font-display text-xs font-bold uppercase italic tracking-wide text-white/80 sm:text-base">
               {s.kicker}
             </p>
-            <h1 className="font-display text-2xl font-extrabold uppercase italic leading-none sm:text-5xl">
+            <p className="font-display text-2xl font-extrabold uppercase italic leading-none sm:text-5xl">
               {s.title}
-            </h1>
+            </p>
             {s.cta && (
               <span className="mt-2 inline-block -skew-x-12 rounded bg-white px-2.5 py-0.5 font-display text-xs font-bold uppercase italic text-black">
                 {s.cta}

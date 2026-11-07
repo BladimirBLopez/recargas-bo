@@ -7,5 +7,10 @@ export const dynamic = 'force-dynamic';
 
 export default async function Home() {
   const games = await getGames();
-  return <GameSearch games={games} />;
+  return (
+    <>
+      <h1 className="sr-only">Recargas de juegos en Bolivia con pago por QR</h1>
+      <GameSearch games={games} />
+    </>
+  );
 }

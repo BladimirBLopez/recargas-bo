@@ -51,6 +51,41 @@ export default async function GamePage({ params }) {
   const others = all.filter((g) => g.slug !== game.slug && !g.maintenance).slice(0, 4);
   const detail = await getDetailBanner(game.slug);
 
+  const prices = (game.packages || []).map((p) => Number(p.price)).filter((n) => n > 0);
+  const pageUrl = `https://flakitogaming.store/juego/${game.slug}`;
+  const ld = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Inicio', item: 'https://flakitogaming.store' },
+          { '@type': 'ListItem', position: 2, name: game.name, item: pageUrl },
+        ],
+      },
+      ...(prices.length
+        ? [
+            {
+              '@type': 'Product',
+              name: `Recarga ${game.name} en Bolivia`,
+              description: game.about || `Recarga ${game.name} en Bolivia con pago por QR.`,
+              url: pageUrl,
+              brand: { '@type': 'Brand', name: game.name },
+              offers: {
+                '@type': 'AggregateOffer',
+                priceCurrency: 'BOB',
+                lowPrice: Math.min(...prices),
+                highPrice: Math.max(...prices),
+                offerCount: prices.length,
+                availability: 'https://schema.org/InStock',
+              },
+            },
+          ]
+        : []),
+    ],
+  };
+  const ldJson = JSON.stringify(ld).replace(/</g, '\\u003c');
+
   return (
     <div className="space-y-6">
       <nav className="flex items-center gap-1 text-sm text-white/60">
@@ -110,6 +145,7 @@ export default async function GamePage({ params }) {
         </div>
       </section>
 
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldJson }} />
       <Checkout game={game} />
 
       {others.length > 0 && (
