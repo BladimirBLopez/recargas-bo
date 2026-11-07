@@ -31,7 +31,12 @@ export const games = [
     packages: [
       { id: 'ml-86', label: '86 💎', price: 12 },
       { id: 'ml-172', label: '172 💎', price: 24 },
-      { id: 'ml-343', label: '343 💎', price: 47 },
+      { id: 'ml-257', label: '257 💎', price: 36 },
+      { id: 'ml-344', label: '344 💎', price: 48 },
+      { id: 'ml-514', label: '514 💎', price: 72 },
+      { id: 'ml-706', label: '706 💎', price: 98 },
+      { id: 'ml-1412', label: '1412 💎', price: 196 },
+      { id: 'ml-2195', label: '2195 💎', price: 306 },
       { id: 'ml-pase', label: 'Pase Semanal', price: 14 },
     ],
   },
@@ -47,6 +52,9 @@ export const games = [
       { id: 'pubg-60', label: '60 UC', price: 10 },
       { id: 'pubg-325', label: '325 UC', price: 50 },
       { id: 'pubg-660', label: '660 UC', price: 100 },
+      { id: 'pubg-1800', label: '1800 UC', price: 270 },
+      { id: 'pubg-3850', label: '3850 UC', price: 580 },
+      { id: 'pubg-8100', label: '8100 UC', price: 1210 },
     ],
   },
   {
