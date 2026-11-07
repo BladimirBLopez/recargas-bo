@@ -58,10 +58,11 @@ export async function POST(req) {
       VALUES (${msgId}, ${amount}, 'procesando') ON CONFLICT (msg_id) DO NOTHING RETURNING msg_id`;
     if (!ins[0]) return json({ ok: true, dup: true });
 
+    // Solo pendientes con el precio exacto creados en los ultimos 90 min antes del pago.
     const cands = await q`SELECT id, code FROM orders
       WHERE status = 'PENDIENTE' AND price = ${amount}::numeric
         AND created_at <= ${paidAt}::timestamptz + interval '1 minute'
-        AND created_at > ${paidAt}::timestamptz - interval '3 hours'
+        AND created_at > ${paidAt}::timestamptz - interval '90 minutes'
       ORDER BY id`;
 
     if (cands.length === 1) {
@@ -75,13 +76,21 @@ export async function POST(req) {
       }
     }
 
-    const state = cands.length === 0 ? 'sin_pedido' : 'varios';
+    const state = cands.length > 1 ? 'varios' : 'sin_pedido';
+    let msg;
+    if (cands.length > 1) {
+      msg = '⚠️ Llegó un pago de Bs ' + amount + ' y hay ' + cands.length + ' pedidos pendientes con ese monto: ' + cands.map((c) => c.code).join(', ') + '. Elige el correcto en Pagos.';
+    } else {
+      msg = '⚠️ Llegó un pago de Bs ' + amount + ' y no hay pedido pendiente con ese monto.';
+      const dup = await q`SELECT code FROM orders
+        WHERE status IN ('PAGADO','ENTREGADO') AND price = ${amount}::numeric
+          AND paid_at > ${paidAt}::timestamptz - interval '3 hours'
+        ORDER BY id DESC LIMIT 1`;
+      if (dup[0]) msg += ' Posible pago repetido: ' + dup[0].code + ' ya estaba pagado.';
+      msg += ' Revísalo en Pagos.';
+    }
     await q`UPDATE pagos_recibidos SET status = ${state} WHERE msg_id = ${msgId}`;
-    const msg =
-      cands.length === 0
-        ? '⚠️ Llegó un pago de Bs ' + amount + ' y no hay pedido pendiente con ese monto. Revisa a mano.'
-        : '⚠️ Llegó un pago de Bs ' + amount + ' y hay ' + cands.length + ' pedidos pendientes con ese monto: ' + cands.map((c) => c.code).join(', ') + '. Confirma a mano.';
-    await telegram(msg + '\nPanel: ' + origin + '/admin');
+    await telegram(msg + '\nPagos: ' + origin + '/admin/pagos');
     return json({ ok: true, confirmed: null, state });
   } catch (e) {
     console.error('pago aviso error', e?.code || '', e?.message || '');

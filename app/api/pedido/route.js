@@ -1,11 +1,9 @@
-import { games } from '../../../data/games.js';
 import { sql } from '../../../lib/db.js';
 import { limited } from '../../../lib/ratelimit.js';
 import { allGames, maintenanceMap, packageMap, applyPackages } from '../../../lib/games-state.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-
 
 function json(body, status = 200) {
   return Response.json(body, { status, headers: { 'Cache-Control': 'no-store' } });
@@ -48,6 +46,26 @@ export async function POST(req) {
 
   try {
     const q = sql();
+
+    // Mismo jugador y mismo paquete aun pendiente: se reutiliza el pedido (no se acumulan).
+    try {
+      const ex = await q`SELECT id, code, created_at, price FROM orders
+        WHERE status = 'PENDIENTE' AND game_slug = ${game.slug} AND package_id = ${pkg.id}
+          AND player_id = ${playerId} AND created_at > now() - interval '90 minutes'
+        ORDER BY id DESC LIMIT 1`;
+      if (ex[0]) {
+        return json({
+          orderId: ex[0].id,
+          code: ex[0].code,
+          ts: new Date(ex[0].created_at).getTime(),
+          game: game.name,
+          pkg: pkg.label,
+          price: Number(ex[0].price),
+          reused: true,
+        });
+      }
+    } catch (e) {}
+
     for (let i = 0; i < 3; i++) {
       const code = newCode();
       try {
