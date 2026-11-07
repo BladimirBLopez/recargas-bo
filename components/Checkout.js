@@ -12,11 +12,13 @@ import {
   MdCheckCircle,
 } from 'react-icons/md';
 import { motion } from 'framer-motion';
+import { MdPaid, MdSell } from 'react-icons/md';
 import OrderPay from '@/components/OrderPay';
 
 const inputCls =
   'w-full rounded-2xl border-2 border-white/15 bg-zinc-950 px-4 py-3.5 text-base outline-none placeholder:text-white/40 focus:border-yellow-300';
 const PAGE = 8;
+const ICONS = { diamond: IoDiamond, coin: MdPaid, tag: MdSell };
 
 function Step({ n, title, action, children }) {
   return (
@@ -92,6 +94,7 @@ export default function Checkout({ game }) {
   const id = playerId.trim();
   const idFormatOk = /^\d{8,12}$/.test(id);
   const isML = game.slug === 'mobile-legends';
+  const PkgIcon = ICONS[game.icon] || IoDiamond;
   const zoneT = zone.trim();
   const mlOk = /^\d{5,12}$/.test(id) && /^\d{1,5}$/.test(zoneT);
   const fullId = isML ? `${id} (${zoneT})` : id;
@@ -327,7 +330,7 @@ export default function Checkout({ game }) {
                   </span>
                 )}
                 <div className="flex items-start gap-3">
-                  <IoDiamond size={30} className="shrink-0 text-sky-400" />
+                  <PkgIcon size={30} className="shrink-0 text-sky-400" />
                   <div className="min-w-0">
                     <div className={`${num ? 'text-2xl' : 'text-base'} font-display font-extrabold leading-tight`}>
                       {big}
@@ -388,8 +391,8 @@ export default function Checkout({ game }) {
           <Acc icon={MdDescription} title={`Sobre ${game.name}`}>
             <p>
               {game.kind === 'tarjeta'
-                ? `Compra tarjetas de ${game.name} en Bolivia. La entrega se coordina por WhatsApp.`
-                : `Recarga ${game.name} en Bolivia usando solo tu ${game.idLabel}.`}
+                ? game.about || `Compra tarjetas de ${game.name} en Bolivia. La entrega se coordina por WhatsApp.`
+                : game.about || `Recarga ${game.name} en Bolivia usando solo tu ${game.idLabel}.`}
             </p>
           </Acc>
           <Acc icon={MdListAlt} title="Cómo comprar">
@@ -408,10 +411,10 @@ export default function Checkout({ game }) {
           <Acc title="¿Dónde encuentro mi ID?">
             <p>
               {isML
-                ? 'Toca tu avatar arriba a la izquierda en el juego. Verás tu ID y, entre paréntesis, tu Zona (ej. 123456789 (1234)). Escribe cada número en su campo.'
+                ? (game.idHelp || 'Toca tu avatar arriba a la izquierda en el juego. Verás tu ID y, entre paréntesis, tu Zona (ej. 123456789 (1234)). Escribe cada número en su campo.')
                 : game.slug === 'roblox'
-                ? 'Es tu nombre de usuario de Roblox (no el nombre visible). Lo ves en tu perfil.'
-                : 'Abre el juego y entra a tu perfil: ahí aparece tu ID. Cópialo para no equivocarte.'}
+                ? (game.idHelp || 'Es tu nombre de usuario de Roblox (no el nombre visible). Lo ves en tu perfil.')
+                : (game.idHelp || 'Abre el juego y entra a tu perfil: ahí aparece tu ID. Cópialo para no equivocarte.')}
             </p>
           </Acc>
           <Acc title="¿Necesitan mi contraseña?">

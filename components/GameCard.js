@@ -14,7 +14,10 @@ export default function GameCard({ game, big = false }) {
   const from = game.packages && game.packages.length ? Math.min(...game.packages.map((p) => p.price)) : null;
 
   const body = (
-    <div className={`relative bg-gradient-to-br ${game.color} aspect-[3/4] overflow-hidden`}>
+    <div
+      style={game.gradient ? { backgroundImage: game.gradient } : undefined}
+      className={`relative ${game.gradient ? '' : 'bg-gradient-to-br ' + game.color} aspect-[3/4] overflow-hidden`}
+    >
       <div className={off ? 'h-full w-full grayscale opacity-60' : 'h-full w-full'}>
         <GameImg
           game={game}
