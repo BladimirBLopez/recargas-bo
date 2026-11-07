@@ -165,6 +165,20 @@ export default function OrderPay({ order, onBack }) {
 
   const { whatsapp, payment_qr } = useSettings();
   const qrUrl = payment_qr || '/qr-pago.png';
+
+  // Baja al monto y al QR al entrar a la etapa de pago.
+  useEffect(() => {
+    if (stage !== 'pay') return;
+    const t = setTimeout(() => {
+      document.getElementById('pay-amount')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 350);
+    return () => clearTimeout(t);
+  }, [stage]);
+
+  // Sube arriba cuando el pago se confirma.
+  useEffect(() => {
+    if (OK.includes(status)) window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [status]);
   const wa = (text) => `https://wa.me/${whatsapp}?text=${encodeURIComponent(text)}`;
   const proofMsg = [
     `Hola, te envío mi comprobante del pedido ${order.code}`,
@@ -294,7 +308,7 @@ export default function OrderPay({ order, onBack }) {
                 </li>
                 <li>Vuelve a esta página para enviar tu comprobante.</li>
               </ol>
-              <div className="rounded-2xl border border-yellow-300/40 bg-yellow-300/10 p-4 text-center">
+              <div id="pay-amount" className="scroll-mt-24 rounded-2xl border border-yellow-300/40 bg-yellow-300/10 p-4 text-center">
                 <p className="text-xs uppercase tracking-wide text-white/60">Paga exactamente</p>
                 <p className="font-display text-5xl font-bold text-yellow-300">Bs {order.price}</p>
                 <p className="mt-1 text-xs text-white/60">Escribe este monto exacto al pagar: si es otro, no se confirma solo.</p>
