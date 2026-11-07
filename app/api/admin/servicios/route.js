@@ -56,6 +56,7 @@ export async function GET(req) {
         custom: Boolean(g.custom),
         idLabel: g.idLabel || '',
         badge: g.badge || '',
+        popular: Boolean(g.popular),
         image: im.has(g.slug) ? thumb(im.get(g.slug), 300) : null,
         packages: (g.packages || []).map((p) => ({ id: p.id, label: p.label, price: p.price })),
       })),
@@ -112,13 +113,16 @@ export async function PATCH(req) {
     }
     if (body.edit) {
       const e = body.edit;
+      const name = String(e.name || '').trim().slice(0, 40);
+      if (!name) return json({ error: 'nombre_invalido' }, 400);
+      const popular = e.popular === true;
       const kind = e.kind === 'tarjeta' ? 'tarjeta' : 'directa';
       const badge = BADGES.includes(e.badge) ? e.badge : null;
       const idLabel = String(e.idLabel || '').trim().slice(0, 40) || 'ID de jugador';
       const packages = cleanPackages(e.packages || [], slug);
       if (!packages) return json({ error: 'paquetes_invalidos' }, 400);
       const r = await q`UPDATE custom_games
-        SET kind = ${kind}, badge = ${badge}, id_label = ${idLabel}, packages = ${JSON.stringify(packages)}::jsonb
+        SET name = ${name}, popular = ${popular}, kind = ${kind}, badge = ${badge}, id_label = ${idLabel}, packages = ${JSON.stringify(packages)}::jsonb
         WHERE slug = ${slug} RETURNING slug`;
       if (!r.length) return json({ error: 'no_editable' }, 400);
       return json({ ok: true });
@@ -138,10 +142,19 @@ export async function DELETE(req) {
   try {
     const q = sql();
     if (!body.imageOnly) {
-      const r = await q`DELETE FROM custom_games WHERE slug = ${slug} RETURNING slug`;
+      const cnt = await q`SELECT count(*)::int AS n FROM orders WHERE game_slug = ${slug}`;
+      if ((cnt[0]?.n || 0) > 0 && body.force !== true) return json({ error: 'tiene_pedidos', pedidos: cnt[0].n }, 409);
+      const r = await q`DELETE FROM custom_games WHERE slug = ${slug} RETURNING slug, packages`;
       if (!r.length) return json({ error: 'no_editable' }, 400);
       try {
         await q`DELETE FROM game_settings WHERE slug = ${slug}`;
+      } catch (e) {}
+      try {
+        const ids = (Array.isArray(r[0].packages) ? r[0].packages : []).map((p) => String(p?.id || '')).filter(Boolean);
+        for (const pid of ids) await q`DELETE FROM package_settings WHERE package_id = ${pid}`;
+      } catch (e) {}
+      try {
+        await q`DELETE FROM game_details WHERE slug = ${slug}`;
       } catch (e) {}
     }
     const img = await q`DELETE FROM game_images WHERE slug = ${slug} RETURNING public_id`;

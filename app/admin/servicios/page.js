@@ -12,7 +12,7 @@ const ERR = {
   existe: 'Ya existe un servicio con ese nombre',
   paquetes_invalidos: 'Revisa los paquetes: cada uno necesita nombre y precio mayor a 0',
 };
-const NEW = { slug: '', name: '', kind: 'directa', idLabel: 'ID de jugador', badge: '', packages: [{ label: '', price: '' }] };
+const NEW = { slug: '', name: '', kind: 'directa', idLabel: 'ID de jugador', badge: '', popular: false, packages: [{ label: '', price: '' }] };
 
 export default function AdminServicios() {
   const [list, setList] = useState([]);
@@ -48,7 +48,7 @@ export default function AdminServicios() {
     try {
       d = await r.json();
     } catch (e) {}
-    return { ok: r.ok, error: d.error };
+    return { ok: r.ok, error: d.error, pedidos: d.pedidos };
   };
 
   const upload = async (file) => {
@@ -114,7 +114,7 @@ export default function AdminServicios() {
     setBusy(true);
     setMsg('');
     const r = f.slug
-      ? await call('PATCH', { slug: f.slug, edit: { kind: f.kind, idLabel: f.idLabel, badge: f.badge, packages } })
+      ? await call('PATCH', { slug: f.slug, edit: { name: f.name, popular: f.popular, kind: f.kind, idLabel: f.idLabel, badge: f.badge, packages } })
       : await call('POST', { name: f.name, kind: f.kind, idLabel: f.idLabel, badge: f.badge, packages });
     if (r.ok) {
       setMsg('Guardado ✔');
@@ -122,6 +122,24 @@ export default function AdminServicios() {
     } else {
       setMsg(ERR[r.error] || 'Error al guardar');
     }
+    await load();
+    setBusy(false);
+  };
+
+  const del = async (g) => {
+    if (!confirm('¿Borrar "' + g.name + '"? Se quitan también sus paquetes, su foto y sus ajustes.')) return;
+    setBusy(true);
+    setMsg('');
+    let r = await call('DELETE', { slug: g.slug });
+    if (!r.ok && r.error === 'tiene_pedidos') {
+      const ok = confirm('Tiene ' + r.pedidos + ' pedido(s). Se conservan, pero en el panel puede verse su código en vez del nombre. ¿Borrar de todos modos? (Para quitarlo sin borrar, páusalo en Juegos.)');
+      if (!ok) {
+        setBusy(false);
+        return;
+      }
+      r = await call('DELETE', { slug: g.slug, force: true });
+    }
+    setMsg(r.ok ? 'Servicio borrado ✔' : 'Error al borrar');
     await load();
     setBusy(false);
   };
@@ -136,6 +154,7 @@ export default function AdminServicios() {
       kind: g.kind || 'directa',
       idLabel: g.idLabel || '',
       badge: g.badge || '',
+      popular: Boolean(g.popular),
       packages: g.packages.length
         ? g.packages.map((p) => ({ id: p.id, label: p.label, price: String(p.price) }))
         : [{ label: '', price: '' }],
@@ -164,7 +183,7 @@ export default function AdminServicios() {
       {form && (
         <div className={card + ' space-y-3'}>
           <h2 className="text-base font-semibold">{form.slug ? 'Editar servicio' : 'Nuevo servicio'}</h2>
-          <input className={input} placeholder="Nombre (ej. Honor of Kings)" value={form.name} disabled={Boolean(form.slug)} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+          <input className={input} placeholder="Nombre (ej. Honor of Kings)" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
           <select className={input} value={form.kind} onChange={(e) => setForm({ ...form, kind: e.target.value })}>
             <option value="directa">Recarga directa</option>
             <option value="tarjeta">Tarjeta</option>
@@ -175,6 +194,12 @@ export default function AdminServicios() {
             <option value="promo">PROMO</option>
             <option value="nuevo">NUEVO</option>
           </select>
+          {form.slug && (
+            <label className="flex items-center gap-3 rounded-2xl border border-white/15 bg-[#081A2F]/70 px-4 py-3 text-sm">
+              <input type="checkbox" checked={Boolean(form.popular)} onChange={(e) => setForm({ ...form, popular: e.target.checked })} />
+              Mostrar en Populares del inicio
+            </label>
+          )}
           <p className="pt-1 text-sm font-bold text-white/70">Paquetes</p>
           {form.packages.map((p, i) => (
             <div key={i} className="flex gap-2">
@@ -219,7 +244,7 @@ export default function AdminServicios() {
               {g.custom && (
                 <>
                   <button className={mini} disabled={busy} onClick={() => edit(g)}>Editar</button>
-                  <button className={mini + ' text-red-300'} disabled={busy} onClick={() => confirm('¿Borrar este servicio?') && act('DELETE', { slug: g.slug }, 'Servicio borrado ✔')}>Borrar</button>
+                  <button className={mini + ' text-red-300'} disabled={busy} onClick={() => del(g)}>Borrar</button>
                 </>
               )}
             </div>
