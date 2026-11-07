@@ -125,16 +125,28 @@ export default function AdminGames() {
     load();
   }, [load]);
 
-  async function toggle(g) {
+  const [note, setNote] = useState('');
+
+  async function toggle(g, state) {
     setBusy(g.slug);
     setErr('');
     try {
       const r = await fetch('/api/admin/juegos', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug: g.slug, maintenance: !g.maintenance }),
+        body: JSON.stringify({ slug: g.slug, state }),
       });
-      if (!r.ok) setErr('No se pudo cambiar (' + r.status + ')');
+      if (!r.ok) {
+        setErr('No se pudo cambiar (' + r.status + ')');
+        setNote('');
+      } else {
+        const d = await r.json().catch(() => ({}));
+        setNote(
+          d.pendientes > 0 && state !== 'publicado'
+            ? g.name + ' tiene ' + d.pendientes + ' pedido(s) pendiente(s). Confírmalos o cancélalos.'
+            : ''
+        );
+      }
       await load();
     } catch (e) {
       setErr('Sin conexión');
@@ -151,12 +163,14 @@ export default function AdminGames() {
   }
 
   const activos = list.filter((g) => !g.maintenance).length;
+  const ocultos = list.filter((g) => g.state === 'oculto').length;
 
   return (
     <div>
       <div className="mb-4 rounded-xl border border-cyan-400/15 bg-[#102B49]/70 px-4 py-3 text-sm font-semibold text-slate-300">
-        {activos} activos · {list.length - activos} en mantenimiento
+        {activos} publicados · {list.length - activos - ocultos} en mantenimiento · {ocultos} ocultos
       </div>
+      {note && <div className="mb-3 rounded-2xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-200">{note}</div>}
       {err && <div className="mb-3 rounded-2xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-200">{err}</div>}
       <div className="grid items-start gap-4 lg:grid-cols-2">
         {list.map((g) => {
@@ -171,9 +185,9 @@ export default function AdminGames() {
                 )}
                 <div className="min-w-0 flex-1">
                   <div className="truncate font-extrabold text-white">{g.name}</div>
-                  <div className={'mt-0.5 flex items-center gap-1.5 text-xs font-semibold ' + (g.maintenance ? 'text-red-300' : 'text-emerald-300')}>
-                    <span className={'h-1.5 w-1.5 rounded-full ' + (g.maintenance ? 'bg-red-400' : 'bg-emerald-400')} />
-                    {g.maintenance ? 'En mantenimiento' : 'Activo'}
+                  <div className={'mt-0.5 flex items-center gap-1.5 text-xs font-semibold ' + (g.state === 'oculto' ? 'text-slate-400' : g.maintenance ? 'text-amber-300' : 'text-emerald-300')}>
+                    <span className={'h-1.5 w-1.5 rounded-full ' + (g.state === 'oculto' ? 'bg-slate-400' : g.maintenance ? 'bg-amber-400' : 'bg-emerald-400')} />
+                    {g.state === 'oculto' ? 'Oculto' : g.maintenance ? 'En mantenimiento' : 'Publicado'}
                     {!g.canToggle && ' · sin paquetes'}
                   </div>
                 </div>
@@ -228,24 +242,41 @@ export default function AdminGames() {
 
                   {section === 'estado' && (
                     <div className="rounded-xl border border-white/10 bg-[#102B49] p-4">
-                      <div className="text-sm font-bold text-white">Estado del juego</div>
-                      <p className="mt-2 text-xs text-slate-400">
-                        {g.maintenance
-                          ? 'El juego está en mantenimiento.'
-                          : 'El juego está disponible para recibir pedidos.'}
+                      <div className="text-sm font-bold text-white">Estado del servicio</div>
+                      <div className="mt-3 grid grid-cols-3 gap-2">
+                        {[
+                          ['publicado', 'Publicado', 'border-emerald-400/50 bg-emerald-400/15 text-emerald-200'],
+                          ['mantenimiento', 'Mantenimiento', 'border-amber-400/50 bg-amber-400/15 text-amber-200'],
+                          ['oculto', 'Oculto', 'border-slate-400/50 bg-slate-400/15 text-slate-200'],
+                        ].map(([id, label, on]) => (
+                          <button
+                            key={id}
+                            type="button"
+                            disabled={busy === g.slug || (id === 'publicado' && !g.canToggle)}
+                            onClick={() => g.state !== id && toggle(g, id)}
+                            className={
+                              'rounded-xl border px-2 py-3 text-xs font-bold disabled:opacity-40 ' +
+                              (g.state === id ? on : 'border-white/10 bg-[#0d2440] text-slate-400')
+                            }
+                          >
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                      <p className="mt-3 text-xs text-slate-400">
+                        {g.state === 'oculto'
+                          ? 'No aparece en la tienda ni se puede comprar.'
+                          : g.state === 'mantenimiento'
+                          ? 'Pausado: no se puede comprar hasta que lo publiques.'
+                          : 'Visible en la tienda y listo para recibir pedidos.'}
                       </p>
-                      <button
-                        type="button"
-                        disabled={!g.canToggle || busy === g.slug}
-                        onClick={() => toggle(g)}
-                        className="mt-3 rounded-xl border border-cyan-400/30 bg-[#163554] px-4 py-2.5 text-sm font-bold text-cyan-200 disabled:opacity-40"
-                      >
-                        {g.maintenance ? 'Activar juego' : 'Pausar juego'}
-                      </button>
+                      {!g.canToggle && (
+                        <p className="mt-1 text-xs text-amber-300">Sin paquetes: agrega uno para poder publicarlo.</p>
+                      )}
                     </div>
                   )}
 
-                  {section === 'banner' && (
+                                    {section === 'banner' && (
                     <div className="rounded-xl border border-white/10 bg-[#102B49] p-4">
                       <div className="text-sm font-bold text-white">Imágenes del juego</div>
                       <p className="mt-2 text-xs text-slate-400">
