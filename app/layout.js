@@ -25,9 +25,9 @@ export const metadata = {
     siteName: SITE_NAME,
     locale: 'es_BO',
     type: 'website',
-    images: [{ url: '/og.png', width: 1200, height: 630 }],
+    images: [{ url: '/og.jpg', width: 1200, height: 630 }],
   },
-  twitter: { card: 'summary_large_image', images: ['/og.png'] },
+  twitter: { card: 'summary_large_image', images: ['/og.jpg'] },
   title: `${SITE_NAME} | Recargas de juegos en Bolivia`,
   description:
     'Recarga diamantes y créditos de tus juegos favoritos en Bolivia. Paga con QR, entrega rápida.',
