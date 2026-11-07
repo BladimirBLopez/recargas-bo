@@ -160,7 +160,7 @@ export default function AdminShell({ children }) {
 
   useEffect(() => {
     const n = data?.counts?.PENDIENTE || 0;
-    document.title = (n ? '(' + n + ') ' : '') + 'Admin · Recargas BO';
+    document.title = (n ? '(' + n + ') ' : '') + 'Admin · Flakito Gaming';
   }, [data]);
 
   async function login() {
@@ -245,7 +245,7 @@ export default function AdminShell({ children }) {
               <MdSportsEsports className="text-2xl" />
             </div>
             <div className="leading-tight">
-              <div className="font-display text-lg font-bold uppercase tracking-wide">Recargas BO</div>
+              <div className="font-display text-lg font-bold uppercase tracking-wide">Flakito Gaming</div>
               <div className="mt-1 text-[10px] font-bold uppercase tracking-[0.2em] text-[#00D9FF]">Admin Console</div>
             </div>
           </div>
@@ -302,7 +302,7 @@ export default function AdminShell({ children }) {
         <header className="sticky top-0 z-20 border-b border-cyan-400/15 bg-[#09192E]/95 shadow-lg shadow-black/10 backdrop-blur-xl">
           <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-3 sm:px-4 md:gap-3 md:px-7">
             <div className="min-w-0">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#00D9FF]">Recargas BO / Administración</div>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#00D9FF]">Flakito Gaming / Administración</div>
               <h1 className="truncate text-lg font-bold tracking-tight text-white md:text-xl">{current[1]}</h1>
             </div>
             <div className="flex shrink-0 gap-1.5 sm:gap-2">
