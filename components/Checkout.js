@@ -78,7 +78,25 @@ export default function Checkout({ game }) {
       const raw = localStorage.getItem('rb_order');
       if (!raw) return;
       const o = JSON.parse(raw);
-      if (o.slug === game.slug && Date.now() - o.ts < 2 * 60 * 60 * 1000) setOrder(o);
+      if (o.slug === game.slug && Date.now() - o.ts < 2 * 60 * 60 * 1000) {
+        setOrder(o);
+        // Si ese pedido ya no esta PENDIENTE (pagado, entregado, cancelado, expirado o inexistente), se descarta.
+        if (o.code) {
+          fetch('/api/pedido/estado?code=' + encodeURIComponent(o.code), { cache: 'no-store' })
+            .then((r) => (r.ok || r.status === 404 ? r.json() : null))
+            .then((d) => {
+              if (!d) return;
+              if ((d.status && d.status !== 'PENDIENTE') || d.error === 'no_existe') {
+                try {
+                  const cur = JSON.parse(localStorage.getItem('rb_order') || 'null');
+                  if (cur && cur.code === o.code) localStorage.removeItem('rb_order');
+                } catch (e) {}
+                setOrder((x) => (x && x.code === o.code ? null : x));
+              }
+            })
+            .catch(() => {});
+        }
+      }
     } catch (e) {}
   }, [game.slug]);
 

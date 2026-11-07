@@ -116,6 +116,7 @@ export default function OrderPay({ order, onBack }) {
   const [stage, setStage] = useState('pay');
   const [status, setStatus] = useState('PENDIENTE');
   const [late, setLate] = useState(false);
+  const [returned, setReturned] = useState(false);
 
   useEffect(() => {
     try {
@@ -128,7 +129,7 @@ export default function OrderPay({ order, onBack }) {
     let left = false;
     const onVis = () => {
       if (document.visibilityState === 'hidden') left = true;
-      // sin salto automatico: el cliente toca 'Ya pague' cuando quiera
+      else if (left) setReturned(true);
     };
     document.addEventListener('visibilitychange', onVis);
     return () => document.removeEventListener('visibilitychange', onVis);
@@ -341,8 +342,11 @@ export default function OrderPay({ order, onBack }) {
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-yellow-300 opacity-75" />
                   <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-yellow-300" />
                 </span>
-                Esperando tu pago… se confirma sola, no necesitas tocar nada
+                {returned ? 'Verificando tu pago…' : 'Esperando tu pago… se confirma sola, no necesitas tocar nada'}
               </div>
+              {returned && (
+                <p className="text-xs text-white/50">Toma unos segundos, no cierres esta pantalla.</p>
+              )}
               {late && (
                 <button
                   onClick={() => setStage('proof')}
