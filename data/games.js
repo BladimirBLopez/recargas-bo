@@ -111,9 +111,12 @@ export const games = [
     emoji: '🧱',
     color: 'from-zinc-500 to-zinc-800',
     kind: 'tarjeta',
-    maintenance: true,
     idLabel: 'Usuario',
-    packages: [],
+    packages: [
+      { id: 'rbx-10', label: '10 USD', price: 100 },
+      { id: 'rbx-25', label: '25 USD', price: 250 },
+      { id: 'rbx-50', label: '50 USD', price: 500 },
+    ],
   },
 ];
 

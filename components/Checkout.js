@@ -195,7 +195,7 @@ export default function Checkout({ game }) {
               value={playerId}
               onChange={(e) => setPlayerId(e.target.value)}
               placeholder={isML ? 'ID de usuario' : game.idLabel}
-              inputMode="numeric"
+              inputMode={game.kind === 'tarjeta' ? 'text' : 'numeric'}
               className={inputCls}
             />
           )}
@@ -273,7 +273,9 @@ export default function Checkout({ game }) {
             <p className="text-sm text-red-400">El ID debe tener solo números (8 a 12 dígitos).</p>
           )}
           <p className="text-xs text-white/50">
-            Revisa bien tu ID{isML ? ' y Zona' : ''}: si te equivocas, la recarga va a otra cuenta y no se puede revertir.
+            {game.kind === 'tarjeta'
+              ? 'Revisa bien tu usuario de Roblox. La entrega de la tarjeta se coordina por WhatsApp.'
+              : `Revisa bien tu ID${isML ? ' y Zona' : ''}: si te equivocas, la recarga va a otra cuenta y no se puede revertir.`}
           </p>
         </div>
       </Step>
