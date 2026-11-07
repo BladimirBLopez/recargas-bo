@@ -1,4 +1,5 @@
 'use client';
+import SocialsCard from '@/components/admin/SocialsCard';
 import { useEffect, useRef, useState } from 'react';
 import { FaWhatsapp } from 'react-icons/fa';
 import { MdCampaign, MdQrCode2, MdVpnKey, MdCheckCircle, MdErrorOutline } from 'react-icons/md';
@@ -204,6 +205,8 @@ export default function Ajustes() {
           Administra los ajustes generales y datos de atención.
         </p>
       </div>
+
+      <SocialsCard />
 
       <div className="grid gap-4 md:grid-cols-2">
         <div className={card}>

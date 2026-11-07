@@ -6,10 +6,13 @@ import { useSettings } from '@/components/SettingsProvider';
 import BottomNav from '@/components/BottomNav';
 import Header from '@/components/Header';
 import SalesToast from '@/components/SalesToast';
+import { NETWORKS } from '@/lib/socials';
+import { SOCIAL_ICONS } from '@/components/SocialIcons';
 
 export default function ShopFrame({ children }) {
   const path = usePathname() || '/';
-  const { whatsapp, notice } = useSettings();
+  const { whatsapp, notice, socials } = useSettings();
+  const links = NETWORKS.filter((n) => socials && socials[n.key]);
   if (path.startsWith('/admin')) return children;
   const wa = `https://wa.me/${whatsapp}`;
   return (
@@ -31,6 +34,26 @@ export default function ShopFrame({ children }) {
           <a href={wa} target="_blank" rel="noreferrer" className="mt-1 inline-block font-semibold text-green-400">
             Escríbenos por WhatsApp
           </a>
+          {links.length > 0 && (
+            <div className="mt-5 flex flex-wrap items-center gap-2.5">
+              {links.map((n) => {
+                const Icon = SOCIAL_ICONS[n.key];
+                return (
+                  <a
+                    key={n.key}
+                    href={socials[n.key]}
+                    target="_blank"
+                    rel="noopener noreferrer me"
+                    aria-label={n.label}
+                    title={n.label}
+                    className="grid h-10 w-10 place-items-center rounded-full border border-white/15 bg-white/5 text-white/70 transition hover:-translate-y-0.5 hover:border-yellow-300/60 hover:text-yellow-300 hover:shadow-[0_0_14px_-2px_rgb(var(--accent)/0.7)]"
+                  >
+                    <Icon size={18} />
+                  </a>
+                );
+              })}
+            </div>
+          )}
           <nav className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-white/60">
             {[['/terminos', 'Términos'], ['/privacidad', 'Privacidad'], ['/garantias', 'Garantías'], ['/ayuda', 'Ayuda']].map(([h, t]) => (
               <Link key={h} href={h} className="hover:text-white">{t}</Link>

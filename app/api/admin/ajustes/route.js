@@ -2,6 +2,7 @@ import { revalidatePath } from 'next/cache';
 import { sql } from '../../../../lib/db.js';
 import { isAdmin } from '../../../../lib/admin.js';
 import { getSettings } from '../../../../lib/settings.js';
+import { cleanSocials } from '../../../../lib/socials.js';
 import { cldConfig } from '../../../../lib/cloudinary.js';
 
 const QR_FALLBACK = '/qr-pago.png';
@@ -60,6 +61,23 @@ export async function PATCH(req) {
       return json({ ok: true, payment_qr: body.payment_qr });
     } catch (e) {
       console.error('payment qr error', e?.code || '', e?.message || '');
+      return json({ error: 'db' }, 500);
+    }
+  }
+  if (body?.action === 'socials') {
+    const { clean, bad } = cleanSocials(body.socials);
+    if (bad) return json({ error: 'social_invalido', red: bad }, 400);
+    try {
+      await sql()`INSERT INTO app_settings (key, value, updated_at)
+        VALUES ('socials', ${JSON.stringify(clean)}, now())
+        ON CONFLICT (key) DO UPDATE
+        SET value = EXCLUDED.value, updated_at = now()`;
+      try {
+        revalidatePath('/', 'layout');
+      } catch (e) {}
+      return json({ ok: true, socials: clean });
+    } catch (e) {
+      console.error('socials error', e?.code || '', e?.message || '');
       return json({ error: 'db' }, 500);
     }
   }
