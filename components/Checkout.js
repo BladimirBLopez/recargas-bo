@@ -69,6 +69,7 @@ export default function Checkout({ game }) {
   const [verif, setVerif] = useState(null);
   const [creating, setCreating] = useState(false);
   const [err, setErr] = useState('');
+  const [zone, setZone] = useState('');
 
   useEffect(() => {
     try {
@@ -90,6 +91,10 @@ export default function Checkout({ game }) {
   const isFF = game.slug === 'free-fire';
   const id = playerId.trim();
   const idFormatOk = /^\d{8,12}$/.test(id);
+  const isML = game.slug === 'mobile-legends';
+  const zoneT = zone.trim();
+  const mlOk = /^\d{5,12}$/.test(id) && /^\d{1,5}$/.test(zoneT);
+  const fullId = isML ? `${id} (${zoneT})` : id;
 
   useEffect(() => {
     if (!isFF || !idFormatOk) {
@@ -115,10 +120,14 @@ export default function Checkout({ game }) {
     };
   }, [id, isFF, idFormatOk, game.slug]);
 
-  const idReady = isFF ? idFormatOk && (verif?.state === 'ok' || verif?.state === 'unknown') : id.length > 3;
+  const idReady = isML
+    ? mlOk
+    : isFF
+      ? idFormatOk && (verif?.state === 'ok' || verif?.state === 'unknown')
+      : id.length > 3;
   const ready = Boolean(pkg) && idReady;
   const showCard = isFF && verif?.state === 'ok';
-  const hint = !idReady ? 'Escribe tu ID' : !pkg ? 'Elige un paquete' : '';
+  const hint = !idReady ? (isML ? 'Escribe tu ID y Zona' : 'Escribe tu ID') : !pkg ? 'Elige un paquete' : '';
 
   async function createOrder() {
     if (creating || !ready) return;
@@ -131,7 +140,7 @@ export default function Checkout({ game }) {
         body: JSON.stringify({
           slug: game.slug,
           packageId: pkg.id,
-          playerId: id,
+          playerId: fullId,
           nickname: verif?.state === 'ok' ? verif.nickname : undefined,
         }),
       });
@@ -149,7 +158,7 @@ export default function Checkout({ game }) {
         pkg: pkg.label,
         price: d.price,
         idLabel: game.idLabel,
-        id,
+        id: fullId,
         nick: verif?.state === 'ok' ? verif.nickname : undefined,
       });
     } catch (e) {
@@ -165,7 +174,7 @@ export default function Checkout({ game }) {
     <div className="space-y-8 pb-32">
       <Step
         n="1"
-        title={game.idLabel}
+        title={isML ? 'ID de usuario y Zona' : game.idLabel}
         action={
           showCard && (
             <button
@@ -185,10 +194,31 @@ export default function Checkout({ game }) {
             <input
               value={playerId}
               onChange={(e) => setPlayerId(e.target.value)}
-              placeholder={game.idLabel}
+              placeholder={isML ? 'ID de usuario' : game.idLabel}
               inputMode="numeric"
               className={inputCls}
             />
+          )}
+          {isML && (
+            <input
+              value={zone}
+              onChange={(e) => setZone(e.target.value.replace(/\D/g, '').slice(0, 5))}
+              placeholder="Zona (ej. 1234)"
+              inputMode="numeric"
+              className={inputCls}
+            />
+          )}
+          {isML && id !== '' && zoneT !== '' && !mlOk && (
+            <p className="text-sm text-red-400">El ID debe tener solo números (5 a 12 dígitos) y la Zona hasta 5 dígitos.</p>
+          )}
+          {!isFF && idReady && (
+            <div className="rounded-2xl border border-white/15 bg-black p-4 text-sm">
+              <p className="text-white/50">Se recargará a:</p>
+              <p className="mt-1 font-bold text-white">
+                {game.name} · ID {id}
+                {isML ? ` · Zona ${zoneT}` : ''}
+              </p>
+            </div>
           )}
           {isFF && verif?.state === 'loading' && <p className="text-sm text-white/60">Verificando ID...</p>}
           {showCard && (
@@ -243,7 +273,9 @@ export default function Checkout({ game }) {
           {id !== '' && isFF && !idFormatOk && (
             <p className="text-sm text-red-400">El ID debe tener solo números (8 a 12 dígitos).</p>
           )}
-          <p className="text-xs text-white/50">Revisa bien tu ID: si te equivocas, la recarga va a otra cuenta.</p>
+          <p className="text-xs text-white/50">
+            Revisa bien tu ID{isML ? ' y Zona' : ''}: si te equivocas, la recarga va a otra cuenta y no se puede revertir.
+          </p>
         </div>
       </Step>
 

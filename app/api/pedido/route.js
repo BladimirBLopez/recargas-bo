@@ -39,7 +39,9 @@ export async function POST(req) {
   const okId =
     game.slug === 'free-fire'
       ? /^\d{8,12}$/.test(playerId)
-      : playerId.length > 3 && playerId.length <= 40;
+      : game.slug === 'mobile-legends'
+        ? /^\d{5,12} \(\d{1,5}\)$/.test(playerId)
+        : playerId.length > 3 && playerId.length <= 40;
   if (!okId) return json({ error: 'id_invalido' }, 400);
 
   const nickname = body?.nickname ? String(body.nickname).trim().slice(0, 60) : null;
