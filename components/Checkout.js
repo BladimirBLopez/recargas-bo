@@ -186,6 +186,7 @@ export default function Checkout({ game }) {
             <button
               onClick={() => {
                 setPlayerId('');
+                setZone('');
                 setVerif(null);
               }}
               className="rounded-xl border border-yellow-300 px-3 py-1 font-display text-sm font-bold uppercase text-yellow-300"
@@ -205,7 +206,7 @@ export default function Checkout({ game }) {
               className={inputCls}
             />
           )}
-          {isML && (
+          {isML && !showCard && (
             <input
               value={zone}
               onChange={(e) => setZone(e.target.value.replace(/\D/g, '').slice(0, 5))}
