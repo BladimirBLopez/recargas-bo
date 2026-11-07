@@ -198,22 +198,24 @@ export default function Checkout({ game }) {
       >
         <div className="space-y-3">
           {!showCard && (
-            <input
-              value={playerId}
-              onChange={(e) => setPlayerId(e.target.value)}
-              placeholder={isML ? 'ID de usuario' : game.idLabel}
-              inputMode={game.kind === 'tarjeta' ? 'text' : 'numeric'}
-              className={inputCls}
-            />
-          )}
-          {isML && !showCard && (
-            <input
-              value={zone}
-              onChange={(e) => setZone(e.target.value.replace(/\D/g, '').slice(0, 5))}
-              placeholder="Zona (ej. 1234)"
-              inputMode="numeric"
-              className={inputCls}
-            />
+            <div className={isML ? 'grid grid-cols-[1fr_7.5rem] gap-3' : ''}>
+              <input
+                value={playerId}
+                onChange={(e) => setPlayerId(e.target.value)}
+                placeholder={isML ? 'ID de usuario' : game.idLabel}
+                inputMode={game.kind === 'tarjeta' ? 'text' : 'numeric'}
+                className={inputCls}
+              />
+              {isML && (
+                <input
+                  value={zone}
+                  onChange={(e) => setZone(e.target.value.replace(/\D/g, '').slice(0, 5))}
+                  placeholder="Zona"
+                  inputMode="numeric"
+                  className={inputCls}
+                />
+              )}
+            </div>
           )}
           {isML && id !== '' && zoneT !== '' && !mlOk && (
             <p className="text-sm text-red-400">El ID debe tener solo números (5 a 12 dígitos) y la Zona hasta 5 dígitos.</p>
@@ -224,6 +226,9 @@ export default function Checkout({ game }) {
               <p className="mt-1 font-bold text-white">
                 {game.name} · {isML ? `ID ${id} · Zona ${zoneT}` : `${game.idLabel}: ${id}`}
               </p>
+              {verif?.state === 'unknown' && (
+                <p className="mt-2 text-xs text-yellow-300">No pudimos verificar el nombre ahora. Revisa bien tus datos antes de comprar.</p>
+              )}
             </div>
           )}
           {hasVerif && verif?.state === 'loading' && <p className="text-sm text-white/60">{isRbx ? 'Verificando usuario...' : 'Verificando ID...'}</p>}
@@ -266,26 +271,28 @@ export default function Checkout({ game }) {
               </div>
               <div className="mt-4 flex items-center gap-3 border-t border-white/15 pt-4 text-sm text-white/50">
                 <MdLock size={20} className="shrink-0 text-green-400" />
-                <span>{isRbx ? 'Confirma que esta es tu cuenta. La entrega se coordina por WhatsApp.' : 'Tu recarga será entregada directamente a esta cuenta.'}</span>
+                <span>{isRbx ? 'Confirma que esta es tu cuenta. La entrega se coordina por WhatsApp.' : isML ? 'Tu recarga irá a esta cuenta y no se puede revertir. Revisa que sea la tuya.' : 'Tu recarga será entregada directamente a esta cuenta.'}</span>
               </div>
             </div>
           )}
           {hasVerif && verif?.state === 'invalid' && (
             <p className="text-sm text-red-400">{isRbx ? 'No encontramos ese usuario en Roblox. Revísalo.' : 'No encontramos ese ID en Free Fire. Revísalo.'}</p>
           )}
-          {hasVerif && verif?.state === 'unknown' && (
+          {hasVerif && !isML && verif?.state === 'unknown' && (
             <p className="text-sm text-yellow-300">No pudimos verificar el ID ahora. Revísalo bien antes de continuar.</p>
           )}
           {id !== '' && hasVerif && !isML && !formatOk && (
             <p className="text-sm text-red-400">{isRbx ? 'El usuario debe tener 3 a 20 caracteres: letras, números o _ (sin espacios).' : 'El ID debe tener solo números (8 a 12 dígitos).'}</p>
           )}
-          <p className="text-xs text-white/50">
-            {game.kind === 'tarjeta'
-              ? showCard
-                ? 'Revisa bien tu usuario antes de continuar.'
-                : 'Revisa bien tu usuario de Roblox. La entrega de la tarjeta se coordina por WhatsApp.'
-              : `Revisa bien tu ID${isML ? ' y Zona' : ''}: si te equivocas, la recarga va a otra cuenta y no se puede revertir.`}
-          </p>
+          {!(showCard && isML) && (
+            <p className="text-xs text-white/50">
+              {game.kind === 'tarjeta'
+                ? showCard
+                  ? 'Revisa bien tu usuario antes de continuar.'
+                  : 'Revisa bien tu usuario de Roblox. La entrega de la tarjeta se coordina por WhatsApp.'
+                : `Revisa bien tu ID${isML ? ' y Zona' : ''}: si te equivocas, la recarga va a otra cuenta y no se puede revertir.`}
+            </p>
+          )}
         </div>
       </Step>
 
