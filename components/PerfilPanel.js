@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { MdHistory, MdLogout, MdLock } from 'react-icons/md';
 import { FcGoogle } from 'react-icons/fc';
@@ -14,6 +14,13 @@ const MSG = {
   limite: 'Demasiados intentos. Espera un minuto.',
   usa_google: 'Esa cuenta entra con Google.',
   sin_config: 'Falta configurar el servidor.',
+};
+
+const GMSG = {
+  cancelado: 'Cancelaste el inicio de sesión con Google.',
+  error: 'No pudimos entrar con Google. Intenta otra vez.',
+  limite: 'Demasiados intentos. Espera un minuto.',
+  config: 'El inicio con Google no está disponible por ahora.',
 };
 
 const inputCls =
@@ -39,6 +46,15 @@ export default function PerfilPanel() {
   const [pin, setPin] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
+
+  useEffect(() => {
+    try {
+      const g = new URLSearchParams(window.location.search).get('g');
+      if (!g) return;
+      if (GMSG[g]) setErr(GMSG[g]);
+      window.history.replaceState(null, '', '/perfil');
+    } catch (e) {}
+  }, []);
 
   async function submit(e) {
     e.preventDefault();
@@ -183,13 +199,12 @@ export default function PerfilPanel() {
           <span className="h-px flex-1 bg-white/10" />
         </div>
 
-        <button
-          type="button"
-          disabled
-          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white py-3 font-semibold text-black opacity-50"
+        <a
+          href="/api/auth/google"
+          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white py-3.5 font-semibold text-black shadow-[0_6px_20px_-8px_rgb(255_255_255/0.5)] transition active:scale-95"
         >
-          <FcGoogle size={22} /> Continuar con Google · muy pronto
-        </button>
+          <FcGoogle size={22} /> Continuar con Google
+        </a>
 
         <p className="mt-4 flex items-start gap-2 text-xs text-white/50">
           <MdLock size={16} className="mt-0.5 shrink-0 text-green-400" />
