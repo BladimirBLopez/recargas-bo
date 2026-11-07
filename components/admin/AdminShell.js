@@ -5,7 +5,7 @@ import ThemeToggle from '@/components/ThemeToggle';
 import { setNames } from '@/components/admin/ui';
 import { usePathname } from 'next/navigation';
 import { MdMenu, MdClose } from 'react-icons/md';
-import { MdDashboard, MdReceiptLong, MdSportsEsports, MdLogout, MdRefresh, MdLock, MdBarChart, MdNotificationsActive, MdNotificationsOff, MdSettings, MdOpenInNew, MdCircle } from 'react-icons/md';
+import { MdDashboard, MdReceiptLong, MdSportsEsports, MdLogout, MdRefresh, MdLock, MdBarChart, MdNotificationsActive, MdNotificationsOff, MdSettings, MdOpenInNew, MdCircle, MdAccountBalanceWallet } from 'react-icons/md';
 
 const Ctx = createContext({ data: null, reload: () => {}, loading: false });
 export function useAdmin() {
@@ -16,6 +16,7 @@ const NAV = [
   ['/admin', 'Inicio', MdDashboard],
   ['/admin/pedidos', 'Pedidos', MdReceiptLong],
   ['/admin/reportes', 'Reportes', MdBarChart],
+  ['/admin/pagos', 'Pagos', MdAccountBalanceWallet],
   ['/admin/juegos', 'Juegos y precios', MdSportsEsports],
   ['/admin/servicios', 'Servicios', MdSportsEsports],
   ['/admin/banners', 'Banners de portada', MdSettings],
@@ -24,17 +25,17 @@ const NAV = [
 ];
 
 const NAV_GROUPS = [
-  { title: 'PRINCIPAL', items: NAV.slice(0, 3) },
-  { title: 'CATÁLOGO', items: NAV.slice(3, 5) },
-  { title: 'CONTENIDO', items: NAV.slice(5, 7) },
-  { title: 'SISTEMA', items: NAV.slice(7) },
+  { title: 'PRINCIPAL', items: NAV.slice(0, 4) },
+  { title: 'CATÁLOGO', items: NAV.slice(4, 6) },
+  { title: 'CONTENIDO', items: NAV.slice(6, 8) },
+  { title: 'SISTEMA', items: NAV.slice(8) },
 ];
 
 const MOBILE_NAV = [
   NAV[0],
   NAV[1],
-  NAV[3],
-  NAV[7],
+  NAV[4],
+  NAV[8],
 ];
 
 export default function AdminShell({ children }) {
