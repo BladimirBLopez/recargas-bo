@@ -169,10 +169,7 @@ export default function OrderPay({ order, onBack }) {
   // Baja al monto y al QR al entrar a la etapa de pago.
   useEffect(() => {
     if (stage !== 'pay') return;
-    const t = setTimeout(() => {
-      document.getElementById('pay-amount')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 350);
-    return () => clearTimeout(t);
+    document.getElementById('pay-amount')?.scrollIntoView({ block: 'start' });
   }, [stage]);
 
   // Sube arriba cuando el pago se confirma.

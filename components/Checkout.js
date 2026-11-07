@@ -152,7 +152,6 @@ export default function Checkout({ game }) {
         id,
         nick: verif?.state === 'ok' ? verif.nickname : undefined,
       });
-      window.scrollTo(0, 0);
     } catch (e) {
       setErr('Sin conexión. Revisa tu internet e intenta otra vez.');
     } finally {
