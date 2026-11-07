@@ -254,7 +254,7 @@ export default function Checkout({ game }) {
                 <div className="min-w-0 flex-1">
                   <p className="text-xl font-bold text-white">{game.name}</p>
                   <div className="mt-1 flex justify-between gap-3 text-sm">
-                    <span className="text-white/50">Usuario:</span>
+                    <span className="text-white/50">{isRbx ? 'Nombre:' : 'Usuario:'}</span>
                     <span className="truncate font-bold text-white">{verif.nickname}</span>
                   </div>
                   <div className="flex justify-between gap-3 text-sm">
@@ -280,7 +280,9 @@ export default function Checkout({ game }) {
           )}
           <p className="text-xs text-white/50">
             {game.kind === 'tarjeta'
-              ? 'Revisa bien tu usuario de Roblox. La entrega de la tarjeta se coordina por WhatsApp.'
+              ? showCard
+                ? 'Revisa bien tu usuario antes de continuar.'
+                : 'Revisa bien tu usuario de Roblox. La entrega de la tarjeta se coordina por WhatsApp.'
               : `Revisa bien tu ID${isML ? ' y Zona' : ''}: si te equivocas, la recarga va a otra cuenta y no se puede revertir.`}
           </p>
         </div>
