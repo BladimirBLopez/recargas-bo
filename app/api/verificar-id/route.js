@@ -130,6 +130,48 @@ async function verificarRoblox(id, request) {
   }
 }
 
+async function verificarML(id, zone, request) {
+  if (!/^\d{5,12}$/.test(id) || !/^\d{1,5}$/.test(zone)) {
+    return json({ ok: false, code: 'INVALID_FORMAT', message: 'ID o Zona con formato inválido.' }, 400);
+  }
+  const ip = (request.headers.get('x-forwarded-for') || 'x').split(',')[0].trim();
+  if (await limited('verificar:' + ip, 15)) {
+    return json({ ok: false, code: 'RATE_LIMITED', message: 'Demasiadas consultas, espera un minuto.' }, 429);
+  }
+  const base = process.env.ML_CHECK_URL || 'https://api.isan.eu.org/nickname/ml';
+  try {
+    const u = new URL(base);
+    if (u.protocol !== 'https:') throw new Error('url');
+    u.searchParams.set('id', id);
+    u.searchParams.set('server', zone);
+    const res = await fetch(u.href, {
+      headers: { Accept: 'application/json' },
+      signal: AbortSignal.timeout(8000),
+      cache: 'no-store',
+    });
+    if (res.status === 429) {
+      return json({ ok: false, code: 'RATE_LIMITED', message: 'El verificador limitó las consultas.' });
+    }
+    const data = await res.json().catch(() => null);
+    if (!res.ok || !data || typeof data !== 'object') {
+      return json({ ok: false, code: 'NETWORK_ERROR', message: 'El verificador respondió HTTP ' + res.status + '.' });
+    }
+    const name = typeof data.name === 'string' ? data.name.trim() : '';
+    if (data.success === true && name) {
+      return json({
+        ok: true,
+        code: 'SUCCESS',
+        nickname: name.slice(0, 60),
+        region: String(data.country || ''),
+        avatar: '',
+      });
+    }
+    return json({ ok: false, code: 'NOT_FOUND', message: 'No se pudo confirmar la cuenta.' });
+  } catch (e) {
+    return json({ ok: false, code: 'NETWORK_ERROR', message: 'No se pudo consultar el verificador.' });
+  }
+}
+
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const game = searchParams.get('game');
@@ -137,6 +179,7 @@ export async function GET(request) {
   const debug = searchParams.get('debug') === '1';
 
   if (game === 'roblox') return verificarRoblox(id, request);
+  if (game === 'mobile-legends') return verificarML(id, (searchParams.get('zone') || '').trim(), request);
 
   if (game !== 'free-fire') {
     return json({ ok: false, code: 'GAME_NOT_SUPPORTED', message: 'Juego no soportado.' }, 400);

@@ -92,13 +92,13 @@ export default function Checkout({ game }) {
 
   const isFF = game.slug === 'free-fire';
   const isRbx = game.slug === 'roblox';
-  const hasVerif = isFF || isRbx;
+  const hasVerif = isFF || isRbx || game.slug === 'mobile-legends';
   const id = playerId.trim();
   const idFormatOk = /^\d{8,12}$/.test(id);
   const isML = game.slug === 'mobile-legends';
   const PkgIcon = ICONS[game.icon] || IoDiamond;
   const zoneT = zone.trim();
-  const formatOk = isRbx ? /^[A-Za-z0-9_]{3,20}$/.test(id) : /^\d{8,12}$/.test(id);
+  const formatOk = isRbx ? /^[A-Za-z0-9_]{3,20}$/.test(id) : isML ? /^\d{8,12}$/.test(id) && /^\d{3,5}$/.test(zoneT) : /^\d{8,12}$/.test(id);
   const mlOk = /^\d{5,12}$/.test(id) && /^\d{1,5}$/.test(zoneT);
   const fullId = isML ? `${id} (${zoneT})` : id;
 
@@ -111,7 +111,7 @@ export default function Checkout({ game }) {
     const ctrl = new AbortController();
     const t = setTimeout(async () => {
       try {
-        const r = await fetch(`/api/verificar-id?game=${game.slug}&id=${id}`, { signal: ctrl.signal });
+        const r = await fetch(`/api/verificar-id?game=${game.slug}&id=${id}&zone=${encodeURIComponent(zoneT)}`, { signal: ctrl.signal });
         const d = await r.json();
         if (d.ok) setVerif({ state: 'ok', nickname: d.nickname, username: d.username || '', region: d.region, avatar: d.avatar || '' });
         else if (d.code === 'INVALID_PLAYER') setVerif({ state: 'invalid' });
@@ -124,7 +124,7 @@ export default function Checkout({ game }) {
       clearTimeout(t);
       ctrl.abort();
     };
-  }, [id, hasVerif, formatOk, game.slug]);
+  }, [id, zoneT, hasVerif, formatOk, game.slug]);
 
   const idReady = isML
     ? mlOk
@@ -217,7 +217,7 @@ export default function Checkout({ game }) {
           {isML && id !== '' && zoneT !== '' && !mlOk && (
             <p className="text-sm text-red-400">El ID debe tener solo números (5 a 12 dígitos) y la Zona hasta 5 dígitos.</p>
           )}
-          {!hasVerif && idReady && (
+          {(!hasVerif || isML) && idReady && !showCard && (
             <div className="rounded-2xl border border-white/15 bg-black p-4 text-sm">
               <p className="text-white/50">Se recargará a:</p>
               <p className="mt-1 font-bold text-white">
@@ -259,7 +259,7 @@ export default function Checkout({ game }) {
                   </div>
                   <div className="flex justify-between gap-3 text-sm">
                     <span className="text-white/50">{isRbx ? 'Usuario Roblox:' : 'ID del juego:'}</span>
-                    <span className="truncate font-bold text-white">{isRbx ? '@' + (verif.username || id) : id}</span>
+                    <span className="truncate font-bold text-white">{isRbx ? '@' + (verif.username || id) : isML ? id + ' (' + zoneT + ')' : id}</span>
                   </div>
                 </div>
               </div>
@@ -275,7 +275,7 @@ export default function Checkout({ game }) {
           {hasVerif && verif?.state === 'unknown' && (
             <p className="text-sm text-yellow-300">No pudimos verificar el ID ahora. Revísalo bien antes de continuar.</p>
           )}
-          {id !== '' && hasVerif && !formatOk && (
+          {id !== '' && hasVerif && !isML && !formatOk && (
             <p className="text-sm text-red-400">{isRbx ? 'El usuario debe tener 3 a 20 caracteres: letras, números o _ (sin espacios).' : 'El ID debe tener solo números (8 a 12 dígitos).'}</p>
           )}
           <p className="text-xs text-white/50">
