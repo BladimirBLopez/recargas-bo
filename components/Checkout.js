@@ -91,16 +91,19 @@ export default function Checkout({ game }) {
   const shown = all ? list : list.slice(0, PAGE);
 
   const isFF = game.slug === 'free-fire';
+  const isRbx = game.slug === 'roblox';
+  const hasVerif = isFF || isRbx;
   const id = playerId.trim();
   const idFormatOk = /^\d{8,12}$/.test(id);
   const isML = game.slug === 'mobile-legends';
   const PkgIcon = ICONS[game.icon] || IoDiamond;
   const zoneT = zone.trim();
+  const formatOk = isRbx ? /^[A-Za-z0-9_]{3,20}$/.test(id) : /^\d{8,12}$/.test(id);
   const mlOk = /^\d{5,12}$/.test(id) && /^\d{1,5}$/.test(zoneT);
   const fullId = isML ? `${id} (${zoneT})` : id;
 
   useEffect(() => {
-    if (!isFF || !idFormatOk) {
+    if (!hasVerif || !formatOk) {
       setVerif(null);
       return;
     }
@@ -110,7 +113,7 @@ export default function Checkout({ game }) {
       try {
         const r = await fetch(`/api/verificar-id?game=${game.slug}&id=${id}`, { signal: ctrl.signal });
         const d = await r.json();
-        if (d.ok) setVerif({ state: 'ok', nickname: d.nickname, region: d.region, avatar: d.avatar || '' });
+        if (d.ok) setVerif({ state: 'ok', nickname: d.nickname, username: d.username || '', region: d.region, avatar: d.avatar || '' });
         else if (d.code === 'INVALID_PLAYER') setVerif({ state: 'invalid' });
         else setVerif({ state: 'unknown' });
       } catch (e) {
@@ -121,15 +124,15 @@ export default function Checkout({ game }) {
       clearTimeout(t);
       ctrl.abort();
     };
-  }, [id, isFF, idFormatOk, game.slug]);
+  }, [id, hasVerif, formatOk, game.slug]);
 
   const idReady = isML
     ? mlOk
-    : isFF
-      ? idFormatOk && (verif?.state === 'ok' || verif?.state === 'unknown')
+    : hasVerif
+      ? formatOk && (verif?.state === 'ok' || verif?.state === 'unknown')
       : id.length > 3;
   const ready = Boolean(pkg) && idReady;
-  const showCard = isFF && verif?.state === 'ok';
+  const showCard = hasVerif && verif?.state === 'ok';
   const hint = !idReady ? (isML ? 'Escribe tu ID y Zona' : 'Escribe tu ID') : !pkg ? 'Elige un paquete' : '';
 
   async function createOrder() {
@@ -214,7 +217,7 @@ export default function Checkout({ game }) {
           {isML && id !== '' && zoneT !== '' && !mlOk && (
             <p className="text-sm text-red-400">El ID debe tener solo números (5 a 12 dígitos) y la Zona hasta 5 dígitos.</p>
           )}
-          {!isFF && idReady && (
+          {!hasVerif && idReady && (
             <div className="rounded-2xl border border-white/15 bg-black p-4 text-sm">
               <p className="text-white/50">Se recargará a:</p>
               <p className="mt-1 font-bold text-white">
@@ -222,7 +225,7 @@ export default function Checkout({ game }) {
               </p>
             </div>
           )}
-          {isFF && verif?.state === 'loading' && <p className="text-sm text-white/60">Verificando ID...</p>}
+          {hasVerif && verif?.state === 'loading' && <p className="text-sm text-white/60">{isRbx ? 'Verificando usuario...' : 'Verificando ID...'}</p>}
           {showCard && (
             <div className="rounded-3xl border border-white/15 bg-black p-5">
               <div className="flex items-center gap-4">
@@ -255,25 +258,25 @@ export default function Checkout({ game }) {
                     <span className="truncate font-bold text-white">{verif.nickname}</span>
                   </div>
                   <div className="flex justify-between gap-3 text-sm">
-                    <span className="text-white/50">ID del juego:</span>
-                    <span className="font-bold text-white">{id}</span>
+                    <span className="text-white/50">{isRbx ? 'Usuario Roblox:' : 'ID del juego:'}</span>
+                    <span className="truncate font-bold text-white">{isRbx ? '@' + (verif.username || id) : id}</span>
                   </div>
                 </div>
               </div>
               <div className="mt-4 flex items-center gap-3 border-t border-white/15 pt-4 text-sm text-white/50">
                 <MdLock size={20} className="shrink-0 text-green-400" />
-                <span>Tu recarga será entregada directamente a esta cuenta.</span>
+                <span>{isRbx ? 'Confirma que esta es tu cuenta. La entrega se coordina por WhatsApp.' : 'Tu recarga será entregada directamente a esta cuenta.'}</span>
               </div>
             </div>
           )}
-          {isFF && verif?.state === 'invalid' && (
-            <p className="text-sm text-red-400">No encontramos ese ID en Free Fire. Revísalo.</p>
+          {hasVerif && verif?.state === 'invalid' && (
+            <p className="text-sm text-red-400">{isRbx ? 'No encontramos ese usuario en Roblox. Revísalo.' : 'No encontramos ese ID en Free Fire. Revísalo.'}</p>
           )}
-          {isFF && verif?.state === 'unknown' && (
+          {hasVerif && verif?.state === 'unknown' && (
             <p className="text-sm text-yellow-300">No pudimos verificar el ID ahora. Revísalo bien antes de continuar.</p>
           )}
-          {id !== '' && isFF && !idFormatOk && (
-            <p className="text-sm text-red-400">El ID debe tener solo números (8 a 12 dígitos).</p>
+          {id !== '' && hasVerif && !formatOk && (
+            <p className="text-sm text-red-400">{isRbx ? 'El usuario debe tener 3 a 20 caracteres: letras, números o _ (sin espacios).' : 'El ID debe tener solo números (8 a 12 dígitos).'}</p>
           )}
           <p className="text-xs text-white/50">
             {game.kind === 'tarjeta'

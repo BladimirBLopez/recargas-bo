@@ -75,11 +75,68 @@ async function login(id, jar) {
   return { res, data, body };
 }
 
+async function verificarRoblox(id, request) {
+  if (!/^[A-Za-z0-9_]{3,20}$/.test(id)) {
+    return json({ ok: false, code: 'INVALID_FORMAT', message: 'El usuario debe tener de 3 a 20 caracteres: letras, números o _.' }, 400);
+  }
+  const ip = (request.headers.get('x-forwarded-for') || 'x').split(',')[0].trim();
+  if (await limited('verificar:' + ip, 15)) {
+    return json({ ok: false, code: 'RATE_LIMITED', message: 'Demasiadas consultas, espera un minuto.' }, 429);
+  }
+  try {
+    const res = await fetch('https://users.roblox.com/v1/usernames/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({ usernames: [id], excludeBannedUsers: true }),
+      signal: AbortSignal.timeout(8000),
+      cache: 'no-store',
+    });
+    if (res.status === 429) {
+      return json({ ok: false, code: 'RATE_LIMITED', message: 'Roblox limitó las consultas.' });
+    }
+    if (!res.ok) {
+      return json({ ok: false, code: 'NETWORK_ERROR', message: 'Roblox respondió HTTP ' + res.status + '.' });
+    }
+    const data = await res.json();
+    const u = Array.isArray(data && data.data) ? data.data[0] : null;
+    if (!u || !u.id) {
+      return json({ ok: false, code: 'INVALID_PLAYER', message: 'No se encontró el usuario.' });
+    }
+    let avatar = '';
+    try {
+      const t = await fetch(
+        'https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=' + encodeURIComponent(u.id) + '&size=150x150&format=Png&isCircular=false',
+        { signal: AbortSignal.timeout(5000), cache: 'no-store' }
+      );
+      if (t.ok) {
+        const td = await t.json();
+        const url = td && td.data && td.data[0] && td.data[0].imageUrl;
+        if (typeof url === 'string') {
+          const p = new URL(url);
+          if (p.protocol === 'https:') avatar = p.href;
+        }
+      }
+    } catch (e) {}
+    return json({
+      ok: true,
+      code: 'SUCCESS',
+      nickname: String(u.displayName || u.name),
+      username: String(u.name),
+      region: '',
+      avatar,
+    });
+  } catch (e) {
+    return json({ ok: false, code: 'NETWORK_ERROR', message: 'No se pudo consultar a Roblox.' });
+  }
+}
+
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const game = searchParams.get('game');
   const id = (searchParams.get('id') || '').trim();
   const debug = searchParams.get('debug') === '1';
+
+  if (game === 'roblox') return verificarRoblox(id, request);
 
   if (game !== 'free-fire') {
     return json({ ok: false, code: 'GAME_NOT_SUPPORTED', message: 'Juego no soportado.' }, 400);
