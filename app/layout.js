@@ -14,7 +14,7 @@ const display = Barlow_Condensed({ subsets: ['latin'], weight: ['500', '600', '7
 export const metadata = {
   applicationName: SITE_NAME,
   appleWebApp: { capable: true, title: SITE_NAME, statusBarStyle: 'black-translucent' },
-  metadataBase: new URL('https://recargas-bo.vercel.app'),
+  metadataBase: new URL('https://flakitogaming.store'),
   icons: {
     icon: [{ url: '/icon-32.png', sizes: '32x32', type: 'image/png' }, { url: '/icon-192.png', sizes: '192x192', type: 'image/png' }],
     apple: '/icon-180.png',
@@ -38,12 +38,22 @@ export const viewport = { themeColor: '#08080c', viewportFit: 'cover' };
 const THEME_SCRIPT =
   "(function(){try{var t=localStorage.getItem('rb_theme');document.documentElement.dataset.theme=t==='light'?'light':'dark';}catch(e){document.documentElement.dataset.theme='dark';}})();";
 
+const SITE_URL = 'https://flakitogaming.store';
+const LD = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    { '@type': 'Organization', name: SITE_NAME, url: SITE_URL, logo: SITE_URL + '/icon-512.png' },
+    { '@type': 'WebSite', name: SITE_NAME, url: SITE_URL, inLanguage: 'es-BO' },
+  ],
+};
+
 export default async function RootLayout({ children }) {
   const settings = await getSettings();
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(LD) }} />
       </head>
       <body className={`${font.className} ${display.variable} min-h-screen flex flex-col`}>
         <SettingsProvider value={settings}>

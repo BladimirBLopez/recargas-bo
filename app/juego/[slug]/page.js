@@ -4,7 +4,7 @@ import { MdQrCode2, MdVerifiedUser, MdHeadsetMic, MdChevronRight, MdClose } from
 import Checkout from '@/components/Checkout';
 import GameImg from '@/components/GameImg';
 import GameCard from '@/components/GameCard';
-import { getGame } from '@/data/games';
+import { getGame, SITE_NAME } from '@/data/games';
 import { getGames } from '@/lib/games-state';
 import { getDetailBanner } from '@/lib/game-detail-banners';
 
@@ -13,7 +13,28 @@ export const dynamic = 'force-dynamic';
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const game = (await getGames()).find((g) => g.slug === slug);
-  return { title: game ? `Recargar ${game.name} en Bolivia` : 'Juego no encontrado' };
+  if (!game) return { title: 'Juego no encontrado', robots: { index: false } };
+  const title = `Recargar ${game.name} en Bolivia | ${SITE_NAME}`;
+  const description =
+    game.about ||
+    (game.kind === 'tarjeta'
+      ? `Compra tarjetas de ${game.name} en Bolivia. Paga con QR y coordina la entrega por WhatsApp.`
+      : `Recarga ${game.name} en Bolivia con tu ID. Elige tu paquete, paga con QR y recibe tu recarga.`);
+  return {
+    title,
+    description,
+    alternates: { canonical: `/juego/${slug}` },
+    openGraph: {
+      title,
+      description,
+      url: `/juego/${slug}`,
+      siteName: SITE_NAME,
+      locale: 'es_BO',
+      type: 'website',
+      images: [{ url: '/og.png', width: 1200, height: 630 }],
+    },
+    twitter: { card: 'summary_large_image', title, description, images: ['/og.png'] },
+  };
 }
 
 const CHIPS = [
