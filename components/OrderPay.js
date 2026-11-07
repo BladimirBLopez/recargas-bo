@@ -112,7 +112,7 @@ const fade = (d = 0) => ({
 });
 
 export default function OrderPay({ order, onBack }) {
-  const [stage, setStage] = useState(order.stage === 'proof' ? 'proof' : 'pay');
+  const [stage, setStage] = useState('pay');
   const [status, setStatus] = useState('PENDIENTE');
 
   useEffect(() => {
@@ -121,12 +121,12 @@ export default function OrderPay({ order, onBack }) {
     } catch (e) {}
   }, [order, stage]);
 
-  // Si el cliente sale a su app del banco y vuelve, pasamos a "enviar comprobante".
+  // Al volver de la banca se mantiene el QR a la vista.
   useEffect(() => {
     let left = false;
     const onVis = () => {
       if (document.visibilityState === 'hidden') left = true;
-      else if (left && stage === 'pay') setStage('proof');
+      // sin salto automatico: el cliente toca 'Ya pague' cuando quiera
     };
     document.addEventListener('visibilitychange', onVis);
     return () => document.removeEventListener('visibilitychange', onVis);
