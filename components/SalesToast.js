@@ -39,7 +39,7 @@ export default function SalesToast() {
       t2 = setTimeout(() => {
         i += 1;
         cycle();
-      }, 14000);
+      }, 24000);
     };
     const first = setTimeout(cycle, 4000);
     return () => {
@@ -49,7 +49,7 @@ export default function SalesToast() {
     };
   }, [list, hidden]);
 
-  if (path.startsWith('/admin') || hidden || !cur) return null;
+  if (path !== '/' || hidden || !cur) return null;
 
   return (
     <div

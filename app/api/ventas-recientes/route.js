@@ -18,7 +18,9 @@ export async function GET() {
     const rows = await sql()`SELECT game_slug, package_label, price, nickname, paid_at
       FROM orders
       WHERE status IN ('PAGADO', 'ENTREGADO') AND paid_at IS NOT NULL
-      ORDER BY paid_at DESC LIMIT 10`;
+      AND paid_at > now() - interval '6 hours'
+      AND game_slug NOT ILIKE '%prueba%'
+      ORDER BY paid_at DESC LIMIT 5`;
     const list = await allGames();
     const ventas = rows.map((r) => ({
       user: mask(r.nickname),
