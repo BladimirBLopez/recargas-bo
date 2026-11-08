@@ -454,7 +454,7 @@ export default function Checkout({ game }) {
         </div>
       </section>
 
-      <div className="fixed inset-x-0 bottom-0 z-10 border-t-2 border-yellow-300/60 bg-gradient-to-t from-black via-black/95 to-zinc-950/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur">
+      <div className="buybar fixed inset-x-0 bottom-0 z-10 border-t-2 border-yellow-300/60 bg-gradient-to-t from-black via-black/95 to-zinc-950/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-3">
           <div className="min-w-0 text-sm">
             {pkg ? (

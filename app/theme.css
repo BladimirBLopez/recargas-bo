@@ -93,3 +93,10 @@ html[data-theme='light'] input[type='date'] { color-scheme: light; }
 /* Botones con degradado de acento: texto blanco sobre el azul del modo claro */
 html[data-theme='light'] [class*='from-yellow-300'].text-black,
 html[data-theme='light'] .bg-yellow-300.text-black { color: #ffffff; }
+
+/* Lote 1 diseno: arreglos del modo claro */
+html[data-theme='light'] .gc-name { color: #ffffff; }
+html[data-theme='light'] .gc-name.text-white\/60 { color: rgb(255 255 255 / 0.7); }
+html[data-theme='light'] .tabsbar { background-color: rgb(244 244 247 / 0.92); }
+html[data-theme='light'] .buybar { background-image: none; background-color: rgb(255 255 255 / 0.96); }
+html[data-theme='light'] .placeholder\:text-white\/40::placeholder { color: rgb(22 22 29 / 0.45); }

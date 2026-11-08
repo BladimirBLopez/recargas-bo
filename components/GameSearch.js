@@ -77,7 +77,7 @@ export default function GameSearch({ games }) {
         <>
           <Banner />
 
-          <div className="no-scrollbar sticky top-[var(--hh,62px)] z-20 -mx-4 flex gap-3 overflow-x-auto bg-[#08080c]/90 px-4 py-2 backdrop-blur">
+          <div className="no-scrollbar sticky top-[var(--hh,62px)] z-20 -mx-4 flex gap-3 overflow-x-auto tabsbar bg-[#08080c]/90 px-4 py-2 backdrop-blur">
             {TABS.map((t) => (
               <button
                 key={t.id}

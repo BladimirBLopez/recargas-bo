@@ -42,7 +42,7 @@ export default function GameCard({ game, big = false }) {
       )}
       <div className="absolute inset-x-0 bottom-0 px-3 pb-2.5">
         <div
-          className={`font-display font-bold uppercase italic leading-tight drop-shadow ${big ? 'text-xl' : 'text-sm'} ${
+          className={`gc-name font-display font-bold uppercase italic leading-tight drop-shadow ${big ? 'text-xl' : 'text-sm'} ${
             off ? 'text-white/60' : ''
           }`}
         >
