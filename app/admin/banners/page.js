@@ -56,9 +56,20 @@ export default function AdminBanners() {
     setBusy(true);
     setMsg('Subiendo…');
     try {
-      const s = await fetch('/api/admin/subir', { method: 'POST' });
+      const s = await fetch('/api/admin/subir', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ folder: 'banners' }),
+      });
       const sd = await s.json();
-      if (!s.ok) throw new Error(sd.error === 'cloudinary_no_configurado' ? 'Faltan las variables de Cloudinary en Vercel' : 'No autorizado');
+      if (!s.ok) {
+        const message = sd.error === 'cloudinary_no_configurado'
+          ? 'Faltan las variables de Cloudinary en Vercel'
+          : sd.error === 'no_autorizado'
+            ? 'Tu sesión de administrador no es válida'
+            : `Error al preparar subida (${s.status}): ${sd.error || 'desconocido'}`;
+        throw new Error(message);
+      }
       const fd = new FormData();
       fd.append('file', file);
       fd.append('api_key', sd.apiKey);
