@@ -54,8 +54,8 @@ export default function SalesToast() {
   return (
     <div
       className={
-        'pointer-events-none fixed right-3 top-[72px] z-20 w-[min(88vw,300px)] transition-all duration-500 ' +
-        (show ? 'translate-y-0 opacity-100' : '-translate-y-3 opacity-0')
+        'pointer-events-none fixed bottom-24 left-3 z-20 w-[calc(100vw-6rem)] max-w-[300px] transition-all duration-500 ' +
+        (show ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0')
       }
     >
       <div className="pointer-events-auto relative overflow-hidden rounded-2xl border border-yellow-300/40 bg-zinc-950/95 p-3 shadow-[0_8px_30px_-8px_rgb(var(--accent)/0.6)] backdrop-blur">

@@ -9,7 +9,9 @@ export const dynamic = 'force-dynamic';
 function mask(n) {
   const s = String(n || '').trim();
   if (!s) return 'Cliente';
-  return Array.from(s).slice(0, 2).join('') + '•••';
+  const first = Array.from(s).slice(0, 2).join('');
+  if (!/^[\p{L}\p{N}]{2}$/u.test(first)) return 'Cliente';
+  return first + '•••';
 }
 
 export async function GET() {
