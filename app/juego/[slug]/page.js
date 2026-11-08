@@ -107,6 +107,9 @@ export default async function GamePage({ params }) {
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/25" />
         <div className="pointer-events-none absolute -right-10 -top-10 h-44 w-44 rounded-full bg-white/20 blur-3xl" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+        <span aria-hidden="true" className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-yellow-300 to-transparent" />
+        <span aria-hidden="true" className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 rounded-tl-xl border-l-2 border-t-2 border-yellow-300/70" />
+        <span aria-hidden="true" className="pointer-events-none absolute bottom-2.5 right-2.5 h-4 w-4 rounded-br-xl border-b-2 border-r-2 border-yellow-300/70" />
         <Link
           href="/"
           aria-label="Cerrar detalle y volver al catálogo"
@@ -116,7 +119,7 @@ export default async function GamePage({ params }) {
         </Link>
 
         <div className="relative mb-4 flex flex-wrap gap-2 pr-10">
-          <span className="rounded-full bg-orange-500 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wide text-white shadow-lg sm:text-xs">
+          <span className="-skew-x-12 rounded-md bg-orange-500 px-3 py-1.5 text-[10px] font-extrabold uppercase italic tracking-wide text-white shadow-lg sm:text-xs">
             {game.kind === 'tarjeta' ? 'TARJETAS DIGITALES' : 'RECARGA DIRECTA AL ID'}
           </span>
         </div>
