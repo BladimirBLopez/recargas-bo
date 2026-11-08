@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import GameCard from '@/components/GameCard';
 import Banner from '@/components/Banner';
-import { MdFlashOn, MdVerifiedUser, MdHeadsetMic } from 'react-icons/md';
+import { MdQrCode2, MdVerifiedUser, MdHeadsetMic } from 'react-icons/md';
 
 const TABS = [
   { id: 'todos', label: 'Todos', emoji: '', title: 'Todos los juegos', test: () => true },
@@ -12,11 +12,54 @@ const TABS = [
   { id: 'tarjetas', label: 'Tarjetas y códigos', emoji: '', title: 'Tarjetas y códigos', test: (g) => g.kind === 'tarjeta' },
 ];
 
-const PERKS = [
-  [<MdFlashOn size={20} className="text-yellow-300" />, 'Entrega rápida', 'Procesamos tu pedido en pocos minutos.'],
-  [<MdVerifiedUser size={20} className="text-yellow-300" />, 'Pago seguro', 'QR bancario de Bolivia.'],
-  [<MdHeadsetMic size={20} className="text-yellow-300" />, 'Soporte real', 'Te atendemos por WhatsApp si algo falla.'],
+const TRUST = [
+  [<MdQrCode2 size={18} />, 'Pago con QR'],
+  [<MdVerifiedUser size={18} />, 'Pago seguro'],
+  [<MdHeadsetMic size={18} />, 'Soporte WhatsApp'],
 ];
+
+const STEPS = [
+  ['1', 'Elige tu juego', 'Busca el juego y el paquete que quieres.'],
+  ['2', 'Escribe tu ID', 'Revisa que tus datos estén bien.'],
+  ['3', 'Paga con QR', 'Verás la confirmación en esa misma pantalla.'],
+];
+
+function TrustBar() {
+  return (
+    <div className="grid grid-cols-3 gap-2">
+      {TRUST.map(([icon, text]) => (
+        <div
+          key={text}
+          className="flex items-center justify-center gap-1.5 rounded-xl border border-yellow-300/30 bg-zinc-950/80 px-2 py-2 text-center text-[11px] font-bold uppercase leading-tight text-white shadow-[0_0_14px_-8px_rgb(var(--accent)/0.7)]"
+        >
+          <span className="shrink-0 text-yellow-300">{icon}</span>
+          {text}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Steps() {
+  return (
+    <section>
+      <Title>Cómo comprar</Title>
+      <div className="grid gap-3 sm:grid-cols-3">
+        {STEPS.map(([n, title, text]) => (
+          <div key={n} className="flex items-start gap-3 rounded-2xl border border-white/10 bg-zinc-950/80 p-4">
+            <span className="grid h-9 w-9 shrink-0 -skew-x-12 place-items-center rounded-lg bg-gradient-to-r from-yellow-300 to-orange-400 font-display text-lg font-extrabold text-black shadow-[0_0_14px_-3px_rgb(var(--accent)/0.8)]">
+              {n}
+            </span>
+            <div>
+              <div className="font-display text-base font-bold uppercase">{title}</div>
+              <p className="text-sm text-white/70">{text}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 function Title({ emoji, children }) {
   return (
@@ -82,6 +125,8 @@ export default function GameSearch({ games }) {
         <>
           <Banner />
 
+          <TrustBar />
+
           <div className="no-scrollbar sticky top-[var(--hh,62px)] z-20 -mx-4 flex gap-3 overflow-x-auto tabsbar bg-[#08080c]/90 px-4 py-2 backdrop-blur">
             {TABS.filter((t) => t.id === 'todos' || games.some(t.test)).map((t) => (
               <button
@@ -111,25 +156,15 @@ export default function GameSearch({ games }) {
                 <div key="todos" className="space-y-8">
                   <Section emoji={TABS[1].emoji} title={TABS[1].title} list={pop} />
                   <Section emoji={TABS[2].emoji} title={TABS[2].title} list={fresh} />
+                  {split && <Steps />}
                   <Section title={split ? 'Más juegos' : TABS[0].title} list={rest} />
+                  {!split && <Steps />}
                 </div>
               );
             }
             return <Section key={tab.id} emoji={tab.emoji} title={tab.title} list={games.filter(tab.test)} />;
           })()}
 
-          <section className="space-y-4 pt-2">
-            {PERKS.map(([icon, title, text]) => (
-              <div key={title} className="relative rounded-3xl border border-white/10 bg-zinc-950/80 px-5 py-3">
-                <span className="absolute bottom-4 left-0 top-4 w-1 rounded-r bg-yellow-300" />
-                <div className="font-display text-lg font-bold uppercase">
-                  <span className="mr-2 inline-grid h-8 w-8 place-items-center rounded-lg bg-yellow-300/15 align-middle text-base shadow-[0_0_14px_-4px_rgb(var(--accent)/0.8)]">{icon}</span>
-                  {title}
-                </div>
-                <p className="text-white/70">{text}</p>
-              </div>
-            ))}
-          </section>
         </>
       )}
     </div>
