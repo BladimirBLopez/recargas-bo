@@ -73,6 +73,7 @@ export default function Checkout({ game }) {
   const [creating, setCreating] = useState(false);
   const [err, setErr] = useState('');
   const [zone, setZone] = useState('');
+  const [confirmed, setConfirmed] = useState(false);
 
   useEffect(() => {
     try {
@@ -117,8 +118,13 @@ export default function Checkout({ game }) {
   const isML = game.slug === 'mobile-legends';
   const PkgIcon = ICONS[game.icon] || IoDiamond;
   const zoneT = zone.trim();
-  const formatOk = isRbx ? /^[A-Za-z0-9_]{3,20}$/.test(id) : isML ? /^\d{8,12}$/.test(id) && /^\d{3,5}$/.test(zoneT) : /^\d{8,12}$/.test(id);
+  const formatOk = isRbx ? /^[A-Za-z0-9_]{3,20}$/.test(id) : isML ? /^\d{5,12}$/.test(id) && /^\d{1,5}$/.test(zoneT) : /^\d{8,12}$/.test(id);
   const mlOk = /^\d{5,12}$/.test(id) && /^\d{1,5}$/.test(zoneT);
+  const isPubg = game.slug === 'pubg-mobile';
+  const pubgOk = /^\d{7,14}$/.test(id);
+  // Cuentas sin nombre verificado: el cliente confirma sus datos antes de comprar.
+  const softUnverified = (isML && mlOk && verif?.state === 'unknown') || (isPubg && pubgOk);
+  const unverifiedTitle = isPubg ? 'Sin verificación automática' : 'No pudimos confirmar el nombre de esta cuenta';
   const fullId = isML ? `${id} (${zoneT})` : id;
 
   useEffect(() => {
@@ -145,14 +151,32 @@ export default function Checkout({ game }) {
     };
   }, [id, zoneT, hasVerif, formatOk, game.slug]);
 
+  useEffect(() => {
+    setConfirmed(false);
+  }, [id, zoneT]);
+
   const idReady = isML
-    ? mlOk
-    : hasVerif
+    ? mlOk && (verif?.state === 'ok' || (softUnverified && confirmed))
+    : isPubg
+      ? pubgOk && confirmed
+      : hasVerif
       ? formatOk && (verif?.state === 'ok' || verif?.state === 'unknown')
       : id.length > 3;
   const ready = Boolean(pkg) && idReady;
   const showCard = hasVerif && verif?.state === 'ok';
-  const hint = !idReady ? (isML ? 'Escribe tu ID y Zona' : 'Escribe tu ID') : !pkg ? 'Elige un paquete' : '';
+  const hint = !idReady
+    ? isML
+      ? mlOk && verif?.state === 'loading'
+        ? 'Verificando tu cuenta…'
+        : softUnverified
+          ? 'Confirma tus datos'
+          : 'Escribe tu ID y Zona'
+      : isPubg && pubgOk
+        ? 'Confirma tus datos'
+        : 'Escribe tu ID'
+    : !pkg
+      ? 'Elige un paquete'
+      : '';
 
   async function createOrder() {
     if (creating || !ready) return;
@@ -239,7 +263,7 @@ export default function Checkout({ game }) {
           {isML && id !== '' && zoneT !== '' && !mlOk && (
             <p className="text-sm text-red-400">El ID debe tener solo números (5 a 12 dígitos) y la Zona hasta 5 dígitos.</p>
           )}
-          {(!hasVerif || isML) && idReady && !showCard && (
+          {!hasVerif && !isPubg && idReady && !showCard && (
             <div className="rounded-2xl border border-white/15 bg-black p-4 text-sm">
               <p className="text-white/50">Se recargará a:</p>
               <p className="mt-1 font-bold text-white">
@@ -303,7 +327,32 @@ export default function Checkout({ game }) {
           {id !== '' && hasVerif && !isML && !formatOk && (
             <p className="text-sm text-red-400">{isRbx ? 'El usuario debe tener 3 a 20 caracteres: letras, números o _ (sin espacios).' : 'El ID debe tener solo números (8 a 12 dígitos).'}</p>
           )}
-          {!(showCard && isML) && (
+          {isPubg && id !== '' && !pubgOk && (
+            <p className="text-sm text-red-400">El ID debe tener solo números (de 7 a 14 dígitos).</p>
+          )}
+          {softUnverified && (
+            <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm">
+              <p className="font-display text-base font-bold uppercase tracking-wide text-amber-600">{unverifiedTitle}</p>
+              <p className="mt-1 text-white/70">
+                {isPubg
+                  ? 'Revisa tu ID en tu perfil de PUBG Mobile: si te equivocas, la recarga va a otra cuenta y no se puede revertir.'
+                  : 'Revisa tu ID y tu Zona (el número entre paréntesis en tu perfil): si te equivocas, la recarga va a otra cuenta y no se puede revertir.'}
+              </p>
+              <p className="mt-2 font-semibold text-white">
+                {game.name} · {isML ? `ID ${id} · Zona ${zoneT}` : `ID ${id}`}
+              </p>
+              <label className="mt-3 flex cursor-pointer items-start gap-3 text-white">
+                <input
+                  type="checkbox"
+                  checked={confirmed}
+                  onChange={(e) => setConfirmed(e.target.checked)}
+                  className="mt-0.5 h-5 w-5 shrink-0 accent-[rgb(var(--accent))]"
+                />
+                <span>Confirmo que mis datos son correctos</span>
+              </label>
+            </div>
+          )}
+          {!(showCard && isML) && !softUnverified && (
             <p className="text-xs text-white/50">
               {game.kind === 'tarjeta'
                 ? showCard
