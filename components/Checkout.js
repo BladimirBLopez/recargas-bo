@@ -14,6 +14,7 @@ import {
 import { motion } from 'framer-motion';
 import { MdPaid, MdSell } from 'react-icons/md';
 import OrderPay from '@/components/OrderPay';
+import FFDiscountOffer from '@/components/FFDiscountOffer';
 
 const inputCls =
   'w-full rounded-2xl border-2 border-white/15 bg-zinc-950 px-4 py-3.5 text-base outline-none placeholder:text-white/40 focus:border-yellow-300 focus:shadow-[0_0_18px_-4px_rgb(var(--accent)/0.7)]';
@@ -259,6 +260,16 @@ export default function Checkout({ game }) {
                 />
               )}
             </div>
+          )}
+          {isFF && idReady && (
+            <FFDiscountOffer
+              playerId={id}
+              nickname={
+                verif?.state === 'ok'
+                  ? verif.nickname
+                  : ''
+              }
+            />
           )}
           {isML && id !== '' && zoneT !== '' && !mlOk && (
             <p className="text-sm text-red-400">El ID debe tener solo números (5 a 12 dígitos) y la Zona hasta 5 dígitos.</p>

@@ -117,6 +117,12 @@ export default function OrderPay({ order, onBack }) {
   const [status, setStatus] = useState('PENDIENTE');
   const [late, setLate] = useState(false);
   const [returned, setReturned] = useState(false);
+  const [paymentInfo, setPaymentInfoRaw] = useState({
+    code: null,
+    mode: null,
+    price: null,
+    error: false,
+  });
 
   useEffect(() => {
     try {
@@ -143,10 +149,53 @@ export default function OrderPay({ order, onBack }) {
       if (document.visibilityState === 'hidden') return;
       try {
         const r = await fetch('/api/pedido/estado?code=' + encodeURIComponent(order.code), { cache: 'no-store' });
-        if (!r.ok) return;
+        if (!r.ok) {
+          if (!stop) setPaymentInfo({
+            code: order.code,
+            mode: null,
+            price: null,
+            error: true,
+          });
+          return;
+        }
+
         const d = await r.json();
-        if (!stop && d.status) setStatus(d.status);
-      } catch (e) {}
+        if (stop) return;
+
+        const mode = d?.paymentMode;
+        const price = Number(d?.price);
+
+        if (
+          !['AUTOMATICO', 'MANUAL'].includes(mode) ||
+          !d?.status ||
+          (mode === 'MANUAL' &&
+            (!Number.isFinite(price) || price <= 0))
+        ) {
+          setPaymentInfo({
+            code: order.code,
+            mode: null,
+            price: null,
+            error: true,
+          });
+          return;
+        }
+
+        setPaymentInfo({
+          code: order.code,
+          mode,
+          price: mode === 'MANUAL' ? price : null,
+          error: false,
+        });
+
+        setStatus(d.status);
+      } catch (e) {
+        if (!stop) setPaymentInfo({
+          code: order.code,
+          mode: null,
+          price: null,
+          error: true,
+        });
+      }
     };
     tick();
     const onVisible = () => {
@@ -168,6 +217,10 @@ export default function OrderPay({ order, onBack }) {
     const t = setTimeout(() => setLate(true), wait);
     return () => clearTimeout(t);
   }, [order.ts, status]);
+
+  // Un fallo de red momentaneo no debe ocultar el QR ni un estado ya verificado.
+  const setPaymentInfo = (v) =>
+    setPaymentInfoRaw((p) => (v.error && p.code === v.code && p.mode ? p : v));
 
   const clear = () => {
     try {
@@ -210,6 +263,36 @@ export default function OrderPay({ order, onBack }) {
       }).catch(() => {});
     } catch (e) {}
   };
+
+  // No mostrar pagos sin verificar el tipo en Neon.
+  const paymentMode = paymentInfo.code === order.code
+    ? paymentInfo.mode
+    : null;
+
+  if (!paymentMode) {
+    return (
+      <div className="space-y-4 pb-12">
+        <h2 className="font-display text-2xl font-bold">
+          Verificando tu pedido
+        </h2>
+        <p className="text-sm text-white/60">
+          {paymentInfo.error
+            ? 'No pudimos verificar el pedido. Reintentaremos automáticamente.'
+            : 'Estamos verificando el tipo de pago antes de mostrar las instrucciones.'}
+        </p>
+        <p className="text-xs text-white/50">
+          Por seguridad, el QR no se muestra sin verificación.
+        </p>
+        <button
+          type="button"
+          onClick={back}
+          className={btnMain}
+        >
+          Volver a la tienda
+        </button>
+      </div>
+    );
+  }
 
   // ---- Pago recibido / entregado ----
   if (OK.includes(status)) {
@@ -281,6 +364,65 @@ export default function OrderPay({ order, onBack }) {
         <button onClick={back} className={btnMain}>
           Intentar de nuevo
         </button>
+      </div>
+    );
+  }
+
+  // Pedido manual: nunca mostrar el QR de Takenos.
+  if (paymentMode === 'MANUAL') {
+    const montoManual = Number(paymentInfo.price).toFixed(2);
+
+    const mensajeManual = [
+      `Hola, quiero coordinar el pago manual del pedido ${order.code}.`,
+      `Juego: ${order.game}`,
+      `Paquete: ${order.pkg}`,
+      `Monto autorizado: Bs ${montoManual}`,
+      `${order.idLabel}: ${order.id}`,
+    ].join('\n');
+
+    return (
+      <div className="space-y-5 pb-12">
+        <button
+          type="button"
+          onClick={back}
+          className="flex items-center gap-2 text-sm text-white/70"
+        >
+          <MdArrowBack size={18} /> Volver
+        </button>
+
+        <div>
+          <h2 className="font-display text-3xl font-bold">
+            Pago manual Free Fire
+          </h2>
+          <p className="text-sm text-white/60">
+            Pedido: {order.code}
+          </p>
+        </div>
+
+        <Summary
+          order={{ ...order, price: montoManual }}
+        />
+
+        <div className="rounded-2xl border border-yellow-300/20 bg-yellow-300/5 p-4 text-sm text-white/80">
+          Este pedido requiere confirmación manual.
+          Coordina el medio de cobro con la tienda por
+          WhatsApp. No utilices el QR de compras normales.
+        </div>
+
+        <a
+          href={wa(mensajeManual)}
+          target="_blank"
+          rel="noreferrer"
+          className={btnMain}
+        >
+          <FaWhatsapp size={22} />
+          Coordinar pago
+        </a>
+
+        <p className="text-center text-xs text-white/50">
+          Esperando confirmación manual del pago.
+          El estado se actualizará automáticamente.
+        </p>
       </div>
     );
   }
