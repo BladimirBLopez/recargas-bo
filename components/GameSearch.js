@@ -24,11 +24,26 @@ function Title({ emoji, children }) {
       <span className="h-5 w-1.5 -skew-x-12 rounded-sm bg-yellow-300 shadow-[0_0_10px_rgb(var(--accent)/0.8)]" />
       {emoji && <span>{emoji}</span>}
       {children}
+      <span className="ml-1 h-px flex-1 bg-gradient-to-r from-yellow-300/60 via-orange-400/30 to-transparent" />
     </h2>
   );
 }
 
 const GRID = 'grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5';
+
+function Section({ emoji, title, list }) {
+  if (!list.length) return null;
+  return (
+    <section>
+      <Title emoji={emoji}>{title}</Title>
+      <div className={GRID}>
+        {list.map((g) => (
+          <GameCard key={g.slug} game={g} />
+        ))}
+      </div>
+    </section>
+  );
+}
 
 export default function GameSearch({ games }) {
   const [q, setQ] = useState('');
@@ -42,7 +57,6 @@ export default function GameSearch({ games }) {
     window.addEventListener('rb-q', on);
     return () => window.removeEventListener('rb-q', on);
   }, []);
-
 
   const go = (id) => {
     setActive(id);
@@ -76,7 +90,7 @@ export default function GameSearch({ games }) {
                 className={
                   'shrink-0 rounded-xl border px-4 py-2 font-display text-sm font-bold uppercase transition ' +
                   (active === t.id
-                    ? 'border-yellow-300 bg-yellow-300 text-black shadow-[0_0_16px_-2px_rgb(var(--accent)/0.7)]'
+                    ? 'border-transparent bg-gradient-to-r from-yellow-300 to-orange-400 text-black shadow-[0_0_16px_-2px_rgb(var(--accent)/0.7)]'
                     : 'border-white/10 bg-zinc-950 text-white')
                 }
               >
@@ -88,17 +102,20 @@ export default function GameSearch({ games }) {
 
           {(() => {
             const tab = TABS.find((t) => t.id === active) || TABS[0];
-            const list = games.filter(tab.test);
-            return (
-              <section key={tab.id}>
-                <Title emoji={tab.emoji}>{tab.title}</Title>
-                <div className={GRID}>
-                  {list.map((g) => (
-                    <GameCard key={g.slug} game={g} />
-                  ))}
+            if (tab.id === 'todos') {
+              const pop = games.filter(TABS[1].test);
+              const fresh = games.filter((g) => TABS[2].test(g) && !pop.includes(g));
+              const rest = games.filter((g) => !pop.includes(g) && !fresh.includes(g));
+              const split = pop.length + fresh.length > 0;
+              return (
+                <div key="todos" className="space-y-8">
+                  <Section emoji={TABS[1].emoji} title={TABS[1].title} list={pop} />
+                  <Section emoji={TABS[2].emoji} title={TABS[2].title} list={fresh} />
+                  <Section title={split ? 'Más juegos' : TABS[0].title} list={rest} />
                 </div>
-              </section>
-            );
+              );
+            }
+            return <Section key={tab.id} emoji={tab.emoji} title={tab.title} list={games.filter(tab.test)} />;
           })()}
 
           <section className="space-y-4 pt-2">
