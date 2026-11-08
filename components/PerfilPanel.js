@@ -166,6 +166,19 @@ export default function PerfilPanel() {
     <div className="space-y-6 pb-28">
       <Title />
       <div className="rounded-3xl border border-yellow-300/25 bg-zinc-950/80 p-5 shadow-[0_0_40px_-14px_rgb(var(--accent)/0.6)]">
+        <a
+          href="/api/auth/google"
+          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white py-3.5 font-semibold text-black shadow-[0_6px_20px_-8px_rgb(255_255_255/0.5)] transition active:scale-95"
+        >
+          <FcGoogle size={22} /> Continuar con Google
+        </a>
+
+        <div className="my-5 flex items-center gap-3 text-xs uppercase text-white/40">
+          <span className="h-px flex-1 bg-white/10" />
+          o continúa con correo y PIN
+          <span className="h-px flex-1 bg-white/10" />
+        </div>
+
         <div className="mb-5 grid grid-cols-2 gap-3">
           {[
             ['login', 'Entrar'],
@@ -223,19 +236,6 @@ export default function PerfilPanel() {
             {busy ? 'Un momento...' : mode === 'login' ? 'Entrar' : 'Crear cuenta'}
           </button>
         </form>
-
-        <div className="my-5 flex items-center gap-3 text-xs uppercase text-white/40">
-          <span className="h-px flex-1 bg-white/10" />
-          o
-          <span className="h-px flex-1 bg-white/10" />
-        </div>
-
-        <a
-          href="/api/auth/google"
-          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white py-3.5 font-semibold text-black shadow-[0_6px_20px_-8px_rgb(255_255_255/0.5)] transition active:scale-95"
-        >
-          <FcGoogle size={22} /> Continuar con Google
-        </a>
 
         <p className="mt-4 flex items-start gap-2 text-xs text-white/50">
           <MdLock size={16} className="mt-0.5 shrink-0 text-green-400" />
