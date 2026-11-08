@@ -55,7 +55,8 @@ export async function POST(req) {
     try {
       const ex = await q`SELECT id, code, created_at, price FROM orders
         WHERE status = 'PENDIENTE' AND game_slug = ${game.slug} AND package_id = ${pkg.id}
-          AND player_id = ${playerId} AND created_at > now() - interval '90 minutes'
+          AND player_id = ${playerId} AND payment_mode = 'AUTOMATICO'
+          AND created_at > now() - interval '90 minutes'
         ORDER BY id DESC LIMIT 1`;
       if (ex[0]) {
         return json({

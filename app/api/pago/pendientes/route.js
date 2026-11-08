@@ -27,7 +27,9 @@ export async function GET(req) {
   try {
     const q = sql();
     const r = await q`SELECT count(*)::int AS n FROM orders
-      WHERE status = 'PENDIENTE' AND created_at > now() - interval '3 minutes'`;
+      WHERE status = 'PENDIENTE'
+          AND payment_mode = 'AUTOMATICO'
+          AND created_at > now() - interval '3 minutes'`;
     return json({ pending: r[0]?.n || 0 });
   } catch (e) {
     console.error('pendientes error', e?.code || '');

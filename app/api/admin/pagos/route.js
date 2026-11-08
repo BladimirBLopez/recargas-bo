@@ -21,10 +21,12 @@ export async function GET(req) {
         const [candidatos, pagados] = await Promise.all([
           q`SELECT code, status, game_slug, package_label, player_id, nickname, created_at FROM orders
             WHERE price = ${p.amount}::numeric AND status IN ('PENDIENTE','EXPIRADO','CANCELADO')
+              AND payment_mode = 'AUTOMATICO'
               AND created_at > now() - interval '2 days'
             ORDER BY (status = 'PENDIENTE') DESC, id DESC LIMIT 6`,
           q`SELECT code, paid_at FROM orders
             WHERE price = ${p.amount}::numeric AND status IN ('PAGADO','ENTREGADO')
+              AND payment_mode = 'AUTOMATICO'
               AND paid_at > ${p.created_at}::timestamptz - interval '3 hours'
             ORDER BY paid_at DESC LIMIT 3`,
         ]);
@@ -70,6 +72,7 @@ export async function POST(req) {
     if (used[0]) return json({ error: 'pedido_ya_pagado' }, 409);
     const upd = await q`UPDATE orders SET status = 'PAGADO', paid_at = now()
       WHERE code = ${code} AND price = ${p.amount}::numeric AND status IN ('PENDIENTE','EXPIRADO','CANCELADO')
+        AND payment_mode = 'AUTOMATICO'
       RETURNING id`;
     if (!upd[0]) return json({ error: 'pedido_no_valido' }, 409);
     await q`UPDATE pagos_recibidos SET status = 'confirmado', order_code = ${code} WHERE msg_id = ${msgId}`;

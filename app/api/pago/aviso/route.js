@@ -61,6 +61,7 @@ export async function POST(req) {
     // Solo pendientes con el precio exacto creados en los ultimos 90 min antes del pago.
     const cands = await q`SELECT id, code FROM orders
       WHERE status = 'PENDIENTE' AND price = ${amount}::numeric
+        AND payment_mode = 'AUTOMATICO'
         AND created_at <= ${paidAt}::timestamptz + interval '1 minute'
         AND created_at > ${paidAt}::timestamptz - interval '90 minutes'
       ORDER BY id`;
@@ -68,7 +69,8 @@ export async function POST(req) {
     if (cands.length === 1) {
       const o = cands[0];
       const upd = await q`UPDATE orders SET status = 'PAGADO', paid_at = now()
-        WHERE id = ${o.id} AND status = 'PENDIENTE' RETURNING id`;
+        WHERE id = ${o.id} AND status = 'PENDIENTE'
+          AND payment_mode = 'AUTOMATICO' RETURNING id`;
       if (upd[0]) {
         await q`UPDATE pagos_recibidos SET status = 'confirmado', order_code = ${o.code} WHERE msg_id = ${msgId}`;
         await telegram('✅ Pago automático Bs ' + amount + ' · ' + o.code + ' pasó a PAGADO\nPanel: ' + origin + '/admin');
@@ -84,6 +86,7 @@ export async function POST(req) {
       msg = '⚠️ Llegó un pago de Bs ' + amount + ' y no hay pedido pendiente con ese monto.';
       const dup = await q`SELECT code FROM orders
         WHERE status IN ('PAGADO','ENTREGADO') AND price = ${amount}::numeric
+          AND payment_mode = 'AUTOMATICO'
           AND paid_at > ${paidAt}::timestamptz - interval '3 hours'
         ORDER BY id DESC LIMIT 1`;
       if (dup[0]) msg += ' Posible pago repetido: ' + dup[0].code + ' ya estaba pagado.';
