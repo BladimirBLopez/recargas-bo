@@ -130,7 +130,16 @@ export async function PATCH(req) {
     } else if (to === 'PENDIENTE') {
       upd = await q`UPDATE orders SET status = ${to}, paid_at = NULL WHERE id = ${id} AND status = ${from} RETURNING id, status, paid_at`;
     } else {
-      upd = await q`UPDATE orders SET status = ${to} WHERE id = ${id} AND status = ${from} RETURNING id, status, paid_at`;
+      upd = await q`WITH u AS (
+        UPDATE orders SET status = ${to} WHERE id = ${id} AND status = ${from} RETURNING id, status, paid_at
+      ), r AS (
+        UPDATE ff_discount_requests SET status = 'vencida'
+        WHERE order_id = ${id}::bigint AND status = 'aprobado'
+          AND ${to}::text IN ('CANCELADO', 'EXPIRADO')
+          AND EXISTS (SELECT 1 FROM u)
+        RETURNING id
+      )
+      SELECT id, status, paid_at FROM u`;
     }
     if (!upd[0]) return json({ error: 'cambio_concurrente' }, 409);
     return json({ ok: true, order: upd[0] });

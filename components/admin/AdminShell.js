@@ -22,6 +22,7 @@ const NAV = [
   ['/admin/banners', 'Banners de portada', MdSettings],
   ['/admin/detalle-banners', 'Banners de juegos', MdSettings],
   ['/admin/ajustes', 'Configuración', MdSettings],
+  ['/admin/ff-descuento', 'Descuento Free Fire', MdReceiptLong],
 ];
 
 const NAV_GROUPS = [
