@@ -5,7 +5,7 @@ import GameImg from '@/components/GameImg';
 
 const BADGE = {
   promo: ['🔥 PROMO', 'bg-gradient-to-r from-red-500 to-rose-500 text-white'],
-  nuevo: ['NUEVO', 'bg-yellow-300 text-black'],
+  nuevo: ['NUEVO', 'bg-gradient-to-r from-yellow-300 to-orange-400 text-[#050810]'],
 };
 
 export default function GameCard({ game, big = false }) {
@@ -51,7 +51,7 @@ export default function GameCard({ game, big = false }) {
         {from !== null && !off ? (
           <div className="mt-1.5 flex items-center gap-1.5">
             
-            <span className="rounded-md bg-yellow-300 px-1.5 py-0.5 font-display text-[11px] font-extrabold uppercase tracking-wide text-black">Desde Bs {from}</span>
+            <span className="rounded-md bg-gradient-to-r from-yellow-300 to-orange-400 px-1.5 py-0.5 font-display text-[11px] font-extrabold uppercase tracking-wide text-black shadow-[0_0_14px_-3px_rgb(var(--accent)/0.8)]">Desde Bs {from}</span>
           </div>
         ) : (
           <div className="mt-1.5 h-1 w-1/4 rounded-full bg-yellow-300 transition-all duration-300 group-hover:w-1/2" />
@@ -61,7 +61,7 @@ export default function GameCard({ game, big = false }) {
   );
 
   const cls =
-    'group relative block overflow-hidden rounded-2xl border border-white/15 bg-black transition-shadow duration-300';
+    'group relative block overflow-hidden rounded-2xl border border-yellow-300/30 bg-black shadow-[0_0_20px_-10px_rgb(var(--accent)/0.6)] transition-shadow duration-300';
 
   if (off) {
     return (
