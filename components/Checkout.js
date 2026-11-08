@@ -24,10 +24,11 @@ function Step({ n, title, action, children }) {
   return (
     <section>
       <div className="mb-3 flex items-center gap-3">
-        <span className="grid h-8 w-8 place-items-center rounded-full bg-yellow-300 font-display text-lg font-extrabold text-black shadow-[0_0_14px_rgb(var(--accent)/0.6)]">
+        <span className="grid h-8 w-9 -skew-x-12 place-items-center rounded-md bg-yellow-300 font-display text-lg font-extrabold italic text-black shadow-[0_0_14px_rgb(var(--accent)/0.6)]">
           {n}
         </span>
-        <h2 className="flex-1 font-display text-xl font-extrabold uppercase italic">{title}</h2>
+        <h2 className="font-display text-xl font-extrabold uppercase italic">{title}</h2>
+        <span className="h-px flex-1 bg-gradient-to-r from-yellow-300/60 to-transparent" />
         {action}
       </div>
       {children}
@@ -327,9 +328,9 @@ export default function Checkout({ game }) {
                   setTab(k);
                   setAll(false);
                 }}
-                className={`rounded-2xl border-2 py-3 font-display text-lg font-bold uppercase transition ${
+                className={`rounded-xl border-2 py-2.5 font-display text-base font-bold uppercase tracking-wide transition ${
                   active === k
-                    ? 'border-yellow-300 bg-yellow-300 text-black'
+                    ? 'border-yellow-300 bg-gradient-to-r from-yellow-300 to-orange-400 text-black shadow-[0_0_16px_-4px_rgb(var(--accent)/0.7)]'
                     : 'border-white/10 bg-zinc-950 text-white/70'
                 }`}
               >
@@ -349,7 +350,7 @@ export default function Checkout({ game }) {
                 onClick={() => setPkgId(p.id)}
                 className={`relative rounded-2xl border-2 p-4 text-left transition active:scale-95 ${
                   on
-                    ? 'border-yellow-300 bg-yellow-300/10 shadow-[0_0_22px_-6px_rgb(var(--accent)/0.7)]'
+                    ? 'border-yellow-300 bg-yellow-300/15 shadow-[0_0_26px_-4px_rgb(var(--accent)/0.8)]'
                     : p.recommended
                     ? 'border-yellow-300/40 bg-zinc-950'
                     : 'border-white/10 bg-zinc-950'
@@ -361,7 +362,9 @@ export default function Checkout({ game }) {
                   </span>
                 )}
                 <div className="flex items-start gap-3">
-                  <PkgIcon size={30} className="shrink-0 text-sky-400" />
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-yellow-300/10">
+                    <PkgIcon size={22} className="text-sky-400" />
+                  </span>
                   <div className="min-w-0">
                     <div className={`${num ? 'text-2xl' : 'text-base'} font-display font-extrabold leading-tight`}>
                       {big}
@@ -371,7 +374,7 @@ export default function Checkout({ game }) {
                 </div>
                 <div className="mt-3 flex items-center justify-between">
                   {on ? <MdCheckCircle size={20} className="text-yellow-300" /> : <span />}
-                  <span className="font-display text-lg font-bold text-yellow-300">Bs {p.price}</span>
+                  <span className="rounded-lg bg-yellow-300/15 px-2.5 py-0.5 font-display text-lg font-bold text-yellow-300">Bs {p.price}</span>
                 </div>
               </button>
             );
