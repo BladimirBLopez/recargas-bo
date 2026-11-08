@@ -96,7 +96,7 @@ export default async function GamePage({ params }) {
 
       <section
         style={game.gradient ? { backgroundImage: game.gradient } : undefined}
-        className={`relative overflow-hidden rounded-3xl ${game.gradient ? '' : 'bg-gradient-to-br ' + game.color} p-5 ring-1 ring-white/15 shadow-[0_20px_50px_-20px_rgb(var(--accent)/0.6)] sm:p-8`}
+        className={`relative overflow-hidden rounded-3xl bg-gradient-to-br ${game.gradient ? '' : game.color} p-5 ring-1 ring-white/15 shadow-[0_20px_50px_-20px_rgb(var(--accent)/0.6)] sm:p-8`}
       >
         {detail?.url && (
           <div
