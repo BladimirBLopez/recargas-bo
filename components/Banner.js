@@ -17,7 +17,8 @@ function Slide({ s }) {
   const Icon = s.icon || Zap;
   const local = s.img.startsWith('/');
   return (
-    <div className="glow-pulse relative aspect-[8/3] overflow-hidden rounded-3xl border-2 border-yellow-300 bg-black">
+    <div className="glow-pulse rounded-3xl bg-gradient-to-r from-yellow-300 via-orange-400 to-yellow-300 p-[2px]">
+      <div className="relative aspect-[8/3] overflow-hidden rounded-[22px] bg-black">
       <span aria-hidden="true" className="pointer-events-none absolute inset-0 z-10">
         <span className="absolute left-1.5 top-1.5 h-3.5 w-3.5 rounded-tl-lg border-l-2 border-t-2 border-yellow-300/90" />
         <span className="absolute right-1.5 top-1.5 h-3.5 w-3.5 rounded-tr-lg border-r-2 border-t-2 border-yellow-300/90" />
@@ -50,6 +51,7 @@ function Slide({ s }) {
           <Icon className="shrink-0 text-yellow-300/40" size={56} />
         </div>
       )}
+      </div>
     </div>
   );
 }
