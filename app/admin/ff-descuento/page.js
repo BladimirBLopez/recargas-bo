@@ -5,6 +5,7 @@ import {
   useEffect,
   useState,
 } from 'react';
+import FFDiscountConfig from '@/components/admin/FFDiscountConfig';
 
 const card =
   'rounded-2xl border border-white/10 bg-zinc-950/80 p-4';
@@ -260,6 +261,8 @@ export default function DescuentoFreeFire() {
             : 'Promoción desactivada'}
         </p>
       </div>
+
+      <FFDiscountConfig />
 
       <div className="grid grid-cols-2 gap-2">
         {[
