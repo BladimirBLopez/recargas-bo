@@ -4,11 +4,14 @@ import { MdExpandMore, MdSave, MdRestartAlt, MdImage, MdSettings, MdInventory2 }
 import DetailBannerEditor from './admin/DetailBannerEditor';
 import GameProfileImageEditor from './admin/GameProfileImageEditor';
 
-function PackageRow({ p, onChanged, onError }) {
+function PackageRow({ p, onChanged, onError, onNote = () => {}, canEdit = false }) {
   const [price, setPrice] = useState(String(p.price));
   const [cost, setCost] = useState(p.cost === null ? '' : String(p.cost));
   const [active, setActive] = useState(p.active);
   const [busy, setBusy] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [name, setName] = useState(p.label);
+  const [askDel, setAskDel] = useState(false);
 
   useEffect(() => {
     setPrice(String(p.price));
@@ -32,12 +35,66 @@ function PackageRow({ p, onChanged, onError }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: p.id, ...payload }),
       });
-      if (!r.ok) onError('No se pudo guardar (' + r.status + '). ¿Creaste la tabla en Neon?');
+      if (!r.ok) onError('No se pudo guardar (' + r.status + '). Inténtalo otra vez.');
       else await onChanged();
     } catch (e) {
       onError('Sin conexión');
     }
     setBusy(false);
+  }
+
+  async function rename() {
+    const lab = name.trim();
+    if (!lab || lab === p.label) {
+      setEditing(false);
+      setName(p.label);
+      return;
+    }
+    setBusy(true);
+    onError('');
+    try {
+      const r = await fetch('/api/admin/paquetes', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: p.id, label: lab, price: p.price, cost: p.cost, active: p.active }),
+      });
+      if (!r.ok) onError('No se pudo cambiar el nombre (' + r.status + ').');
+      else {
+        setEditing(false);
+        await onChanged();
+      }
+    } catch (e) {
+      onError('Sin conexión');
+    }
+    setBusy(false);
+  }
+
+  async function remove() {
+    setBusy(true);
+    onError('');
+    try {
+      const r = await fetch('/api/admin/paquetes', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: p.id }),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        onError('No se pudo borrar (' + r.status + ').');
+        setBusy(false);
+        return;
+      }
+      onNote(
+        d.pendientes > 0
+          ? 'Se borró "' + p.label + '". Tenía ' + d.pendientes + ' pedido(s) pendiente(s): confírmalos o cancélalos.'
+          : 'Se borró "' + p.label + '".',
+        d.pendientes > 0
+      );
+      await onChanged();
+    } catch (e) {
+      onError('Sin conexión');
+      setBusy(false);
+    }
   }
 
   const inp =
@@ -47,7 +104,11 @@ function PackageRow({ p, onChanged, onError }) {
     <div className={'rounded-2xl border p-3.5 transition-colors ' + (active ? 'border-cyan-400/15 bg-[#102B49]/80' : 'border-red-400/25 bg-red-400/5')}>
       <div className="flex items-center justify-between gap-2">
         <div className="min-w-0">
-          <div className="truncate text-sm font-extrabold text-white">{p.label}</div>
+          {editing ? (
+            <input value={name} onChange={(e) => setName(e.target.value)} maxLength={40} autoFocus className={inp} />
+          ) : (
+            <div className="truncate text-sm font-extrabold text-white">{p.label}</div>
+          )}
           <div className="text-[11px] text-slate-400">Base: Bs {p.basePrice}</div>
         </div>
         <button
@@ -73,6 +134,69 @@ function PackageRow({ p, onChanged, onError }) {
           {Number(price) > 0 ? ' (' + Math.round((gan / Number(price)) * 100) + '%)' : ''}
         </div>
       )}
+      {canEdit && (
+        <div className="mt-3 border-t border-white/10 pt-3">
+          {editing ? (
+            <div className="flex gap-2">
+              <button
+                disabled={busy || !name.trim()}
+                onClick={rename}
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#00D9FF] to-[#007BFF] py-2.5 text-sm font-extrabold text-slate-950 transition active:scale-95 disabled:opacity-50"
+              >
+                <MdSave className="text-lg" /> Guardar nombre
+              </button>
+              <button
+                disabled={busy}
+                onClick={() => {
+                  setEditing(false);
+                  setName(p.label);
+                }}
+                className="rounded-xl border border-white/15 bg-[#163554] px-4 py-2 text-xs font-bold text-slate-200 transition active:scale-95"
+              >
+                Cancelar
+              </button>
+            </div>
+          ) : askDel ? (
+            <div className="rounded-xl border border-red-400/30 bg-red-400/10 p-3">
+              <p className="text-xs text-red-200">¿Borrar este paquete? Los pedidos ya creados no se borran.</p>
+              <div className="mt-2 flex gap-2">
+                <button
+                  disabled={busy}
+                  onClick={remove}
+                  className="flex-1 rounded-xl bg-red-500 py-2 text-sm font-extrabold text-white transition active:scale-95 disabled:opacity-50"
+                >
+                  Sí, borrar
+                </button>
+                <button
+                  disabled={busy}
+                  onClick={() => setAskDel(false)}
+                  className="rounded-xl border border-white/15 bg-[#163554] px-4 py-2 text-xs font-bold text-slate-200 transition active:scale-95"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  setName(p.label);
+                  setEditing(true);
+                }}
+                className="flex-1 rounded-xl border border-cyan-400/20 bg-[#163554] py-2 text-xs font-bold text-slate-200 transition active:scale-95"
+              >
+                Editar nombre
+              </button>
+              <button
+                onClick={() => setAskDel(true)}
+                className="rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-2 text-xs font-bold text-red-300 transition active:scale-95"
+              >
+                Borrar
+              </button>
+            </div>
+          )}
+        </div>
+      )}
       {(dirty || modified) && (
         <div className="mt-2 flex gap-2">
           {dirty && (
@@ -95,6 +219,108 @@ function PackageRow({ p, onChanged, onError }) {
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+const TONE = {
+  ok: 'border-emerald-400/30 bg-emerald-400/10 text-emerald-200',
+  warn: 'border-amber-400/30 bg-amber-400/10 text-amber-200',
+  bad: 'border-red-400/30 bg-red-400/10 text-red-200',
+};
+
+const ADD_ERR = {
+  existe: 'Ya hay un paquete con ese nombre en este juego.',
+  demasiados: 'Este juego ya tiene el máximo de 30 paquetes.',
+  datos_invalidos: 'Revisa el nombre y el precio (el precio debe ser mayor a 0).',
+  juego_invalido: 'Este juego no admite paquetes propios desde aquí.',
+  no_autorizado: 'Tu sesión venció. Vuelve a entrar al panel.',
+};
+
+function AddPackage({ slug, onChanged, onError, onNote }) {
+  const [open, setOpen] = useState(false);
+  const [label, setLabel] = useState('');
+  const [price, setPrice] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  async function create() {
+    const lab = label.trim();
+    const pr = Number(price);
+    if (!lab || !(pr > 0)) {
+      onError(ADD_ERR.datos_invalidos);
+      return;
+    }
+    setBusy(true);
+    onError('');
+    try {
+      const r = await fetch('/api/admin/paquetes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug, label: lab, price: pr }),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        onError(ADD_ERR[d.error] || 'No se pudo crear el paquete (' + r.status + ').');
+      } else {
+        onNote('Paquete "' + lab + '" creado. Si el juego está publicado, ya aparece en la tienda.');
+        setLabel('');
+        setPrice('');
+        setOpen(false);
+        await onChanged();
+      }
+    } catch (e) {
+      onError('Sin conexión');
+    }
+    setBusy(false);
+  }
+
+  const inp =
+    'mt-1 w-full rounded-xl border border-white/15 bg-[#081A2F]/80 px-3 py-2.5 text-sm font-semibold text-white outline-none transition focus:border-cyan-400/70 focus:ring-1 focus:ring-cyan-400/20';
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="w-full rounded-xl border border-dashed border-cyan-400/40 bg-cyan-400/5 py-3 text-sm font-extrabold text-cyan-200 transition active:scale-95"
+      >
+        + Agregar paquete
+      </button>
+    );
+  }
+
+  return (
+    <div className="rounded-2xl border border-cyan-400/25 bg-[#102B49]/80 p-3.5">
+      <div className="text-sm font-extrabold text-white">Nuevo paquete</div>
+      <div className="mt-3 grid gap-3">
+        <label className="text-[11px] text-white/50">
+          Nombre del paquete
+          <input value={label} onChange={(e) => setLabel(e.target.value)} maxLength={40} placeholder="Ej. 100 diamantes" className={inp} />
+        </label>
+        <label className="text-[11px] text-white/50">
+          Precio (Bs)
+          <input type="number" inputMode="decimal" min="0" step="0.5" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="0" className={inp} />
+        </label>
+      </div>
+      <div className="mt-3 flex gap-2">
+        <button
+          disabled={busy || !label.trim() || !(Number(price) > 0)}
+          onClick={create}
+          className="flex flex-1 items-center justify-center rounded-xl bg-gradient-to-r from-[#00D9FF] to-[#007BFF] py-2.5 text-sm font-extrabold text-slate-950 shadow-md shadow-cyan-500/15 transition active:scale-95 disabled:opacity-50"
+        >
+          Crear paquete
+        </button>
+        <button
+          disabled={busy}
+          onClick={() => {
+            setOpen(false);
+            onError('');
+          }}
+          className="rounded-xl border border-white/15 bg-[#163554] px-4 py-2 text-xs font-bold text-slate-200 transition active:scale-95"
+        >
+          Cancelar
+        </button>
+      </div>
     </div>
   );
 }
@@ -126,6 +352,7 @@ export default function AdminGames() {
   }, [load]);
 
   const [note, setNote] = useState('');
+  const [pnote, setPnote] = useState(null);
 
   async function toggle(g, state) {
     setBusy(g.slug);
@@ -197,6 +424,7 @@ export default function AdminGames() {
                 onClick={() => {
                   setOpen(isOpen ? '' : g.slug);
                   setSection('paquetes');
+                  setPnote(null);
                 }}
                 className="mt-3 flex w-full items-center justify-between rounded-xl border border-cyan-400/20 bg-[#163554]/70 px-3 py-3 text-sm font-bold text-cyan-100"
               >
@@ -232,10 +460,32 @@ export default function AdminGames() {
                   {section === 'paquetes' && (
                     <div className="space-y-2">
                       <div className="text-xs font-semibold text-slate-400">
-                        {g.packages.length} paquetes disponibles
+                        {g.packages.length === 0 ? 'Sin paquetes todavía' : g.packages.length === 1 ? '1 paquete' : g.packages.length + ' paquetes'}
                       </div>
+                      {pnote && pnote.slug === g.slug && (
+                        <div className={'rounded-xl border px-3 py-2 text-xs font-semibold ' + TONE[pnote.tone]}>{pnote.m}</div>
+                      )}
+                      {g.custom ? (
+                        <div className="rounded-xl border border-amber-400/25 bg-amber-400/10 px-3 py-2 text-xs text-amber-200">
+                          Los paquetes de este servicio se administran en Servicios.
+                        </div>
+                      ) : (
+                        <AddPackage
+                          slug={g.slug}
+                          onChanged={load}
+                          onError={(m) => setPnote(m ? { slug: g.slug, m, tone: 'bad' } : null)}
+                          onNote={(m, warn) => setPnote(m ? { slug: g.slug, m, tone: warn ? 'warn' : 'ok' } : null)}
+                        />
+                      )}
                       {g.packages.map((p) => (
-                        <PackageRow key={p.id} p={p} onChanged={load} onError={setErr} />
+                        <PackageRow
+                          key={p.id}
+                          p={p}
+                          onChanged={load}
+                          onError={(m) => setPnote(m ? { slug: g.slug, m, tone: 'bad' } : null)}
+                          onNote={(m, warn) => setPnote(m ? { slug: g.slug, m, tone: warn ? 'warn' : 'ok' } : null)}
+                          canEdit={Boolean(p.custom) && !g.custom}
+                        />
                       ))}
                     </div>
                   )}
