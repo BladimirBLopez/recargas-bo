@@ -140,7 +140,7 @@ export default async function GamePage({ params }) {
           {CHIPS.map(([Icon, text], index) => (
             <span
               key={text}
-              className="flex items-center gap-1.5 rounded-full border border-white/15 bg-black/45 px-3 py-1.5 backdrop-blur"
+              className="flex items-center gap-1.5 rounded-full border border-yellow-300/30 bg-black/45 px-3 py-1.5 shadow-[0_0_12px_-6px_rgb(var(--accent)/0.8)] backdrop-blur"
             >
               <Icon size={16} className="text-cyan-300" /> {[detail?.chip1, detail?.chip2, detail?.chip3][index] || text}
             </span>
