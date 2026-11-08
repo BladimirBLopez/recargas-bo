@@ -1,4 +1,5 @@
 import { sql } from '../../../lib/db.js';
+import { getUser, SESSION_COOKIE } from '../../../lib/auth.js';
 import { limited } from '../../../lib/ratelimit.js';
 import { allGames, maintenanceMap, packageMap, applyPackages } from '../../../lib/games-state.js';
 
@@ -50,12 +51,43 @@ export async function POST(req) {
 
   try {
     const q = sql();
+    const hasSessionCookie = (
+      req.headers.get('cookie') || ''
+    ).split(';').some(
+      (part) => part.trim().startsWith(
+        SESSION_COOKIE + '='
+      )
+    );
 
-    // Mismo jugador y mismo paquete aun pendiente: se reutiliza el pedido (no se acumulan).
+    let user;
+
+    try {
+      user = await getUser(req);
+    } catch (e) {
+      console.error(
+        'pedido sesion error',
+        e?.code || ''
+      );
+      return json({
+        error: 'sesion_no_verificable',
+      }, 503);
+    }
+
+    if (hasSessionCookie && !user) {
+      return json({
+        error: 'sesion_expirada',
+      }, 401);
+    }
+
+    const userId = user?.id ?? null;
+
+    // Reutilizar solo pedidos de la misma cuenta autenticada.
     try {
       const ex = await q`SELECT id, code, created_at, price FROM orders
         WHERE status = 'PENDIENTE' AND game_slug = ${game.slug} AND package_id = ${pkg.id}
-          AND player_id = ${playerId} AND payment_mode = 'AUTOMATICO'
+          AND player_id = ${playerId}
+          AND user_id = ${userId}::bigint
+          AND payment_mode = 'AUTOMATICO'
           AND created_at > now() - interval '90 minutes'
         ORDER BY id DESC LIMIT 1`;
       if (ex[0]) {
@@ -74,8 +106,8 @@ export async function POST(req) {
     for (let i = 0; i < 3; i++) {
       const code = newCode();
       try {
-        const rows = await q`INSERT INTO orders (code, game_slug, package_id, package_label, price, player_id, nickname)
-          VALUES (${code}, ${game.slug}, ${pkg.id}, ${pkg.label}, ${pkg.price}, ${playerId}, ${nickname})
+        const rows = await q`INSERT INTO orders (code, game_slug, package_id, package_label, price, player_id, nickname, user_id)
+          VALUES (${code}, ${game.slug}, ${pkg.id}, ${pkg.label}, ${pkg.price}, ${playerId}, ${nickname}, ${userId})
           RETURNING id, code, created_at`;
         const r = rows[0];
         if (pkg.cost !== null) {
