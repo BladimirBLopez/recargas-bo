@@ -18,6 +18,12 @@ function Slide({ s }) {
   const local = s.img.startsWith('/');
   return (
     <div className="glow-pulse relative aspect-[8/3] overflow-hidden rounded-3xl border-2 border-yellow-300 bg-black">
+      <span aria-hidden="true" className="pointer-events-none absolute inset-0 z-10">
+        <span className="absolute left-1.5 top-1.5 h-3.5 w-3.5 rounded-tl-lg border-l-2 border-t-2 border-yellow-300/90" />
+        <span className="absolute right-1.5 top-1.5 h-3.5 w-3.5 rounded-tr-lg border-r-2 border-t-2 border-yellow-300/90" />
+        <span className="absolute bottom-1.5 left-1.5 h-3.5 w-3.5 rounded-bl-lg border-b-2 border-l-2 border-yellow-300/90" />
+        <span className="absolute bottom-1.5 right-1.5 h-3.5 w-3.5 rounded-br-lg border-b-2 border-r-2 border-yellow-300/90" />
+      </span>
       {!fail && (
         <img
           src={svg ? s.img.replace(/\.jpg$/, '.svg') : s.img}
@@ -95,7 +101,7 @@ export default function Banner() {
             key={i}
             aria-label={`Banner ${i + 1}`}
             onClick={() => api && api.scrollTo(i)}
-            className={`h-1.5 rounded-full transition-all ${i === idx ? 'w-12 bg-yellow-300' : 'w-10 bg-white/25'}`}
+            className={`h-1.5 -skew-x-12 rounded-sm transition-all ${i === idx ? 'w-12 bg-yellow-300 shadow-[0_0_10px_rgb(var(--accent)/0.8)]' : 'w-10 bg-white/25'}`}
           />
         ))}
       </div>
