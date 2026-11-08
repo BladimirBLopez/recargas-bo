@@ -8,6 +8,13 @@ export async function POST(req) {
     await destroySession(req);
   } catch (e) {
     console.error('salir error', e?.code || '', e?.message || '');
+    return Response.json(
+      { error: 'no_disponible' },
+      {
+        status: 503,
+        headers: { 'Cache-Control': 'no-store' },
+      }
+    );
   }
   return Response.json(
     { ok: true },

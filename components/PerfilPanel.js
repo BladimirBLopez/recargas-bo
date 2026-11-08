@@ -85,10 +85,34 @@ export default function PerfilPanel() {
   }
 
   async function logout() {
+    if (busy) return;
+    setBusy(true);
+    setErr('');
+
     try {
-      await fetch('/api/auth/salir', { method: 'POST' });
-    } catch (e) {}
-    setUser(null);
+      const r = await fetch('/api/auth/salir', {
+        method: 'POST',
+      });
+
+      const d = await r.json().catch(() => null);
+
+      if (!r.ok || d?.ok !== true) {
+        setErr('No se pudo cerrar sesión. Intenta otra vez.');
+        return;
+      }
+
+      try {
+        localStorage.removeItem('rb_order');
+      } catch (e) {
+        setErr('Sesión cerrada, pero no se pudo borrar el pedido local.');
+      }
+
+      setUser(null);
+    } catch (e) {
+      setErr('Sin conexión. No se pudo cerrar sesión.');
+    } finally {
+      setBusy(false);
+    }
   }
 
   if (loading) {
@@ -123,10 +147,17 @@ export default function PerfilPanel() {
         </Link>
         <button
           onClick={logout}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-white/20 py-3 font-display text-lg font-bold uppercase transition active:scale-95"
+          disabled={busy}
+          className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-white/20 py-3 font-display text-lg font-bold uppercase transition active:scale-95 disabled:opacity-60"
         >
-          <MdLogout size={20} /> Cerrar sesión
+          <MdLogout size={20} />
+          {busy ? 'Cerrando sesión...' : 'Cerrar sesión'}
         </button>
+        {err && (
+          <p role="alert" className="text-sm text-red-400">
+            {err}
+          </p>
+        )}
       </div>
     );
   }
