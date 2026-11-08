@@ -275,7 +275,7 @@ export default function Checkout({ game }) {
             <p className="text-sm text-red-400">El ID debe tener solo números (5 a 12 dígitos) y la Zona hasta 5 dígitos.</p>
           )}
           {!hasVerif && !isPubg && idReady && !showCard && (
-            <div className="rounded-2xl border border-white/15 bg-black p-4 text-sm">
+            <div className="rounded-2xl border border-l-4 border-white/15 border-l-yellow-300 bg-black p-4 text-sm">
               <p className="text-white/50">Se recargará a:</p>
               <p className="mt-1 font-bold text-white">
                 {game.name} · {isML ? `ID ${id} · Zona ${zoneT}` : `${game.idLabel}: ${id}`}
@@ -408,12 +408,13 @@ export default function Checkout({ game }) {
               <button
                 key={p.id}
                 onClick={() => setPkgId(p.id)}
+                aria-pressed={on}
                 className={`relative rounded-2xl border-2 p-4 text-left transition active:scale-95 ${
                   on
-                    ? 'border-yellow-300 bg-yellow-300/15 shadow-[0_0_26px_-4px_rgb(var(--accent)/0.8)]'
+                    ? 'border-yellow-300 bg-gradient-to-br from-yellow-300/25 to-yellow-300/5 shadow-[0_0_26px_-4px_rgb(var(--accent)/0.8)]'
                     : p.recommended
                     ? 'border-yellow-300/40 bg-zinc-950'
-                    : 'border-white/10 bg-zinc-950'
+                    : 'border-white/10 bg-zinc-950 motion-safe:hover:-translate-y-0.5 hover:border-yellow-300/50'
                 }`}
               >
                 {p.recommended && (
@@ -434,7 +435,7 @@ export default function Checkout({ game }) {
                 </div>
                 <div className="mt-3 flex items-center justify-between">
                   {on ? <MdCheckCircle size={20} className="text-yellow-300" /> : <span />}
-                  <span className="rounded-lg bg-yellow-300/15 px-2.5 py-0.5 font-display text-lg font-bold text-yellow-300">Bs {p.price}</span>
+                  <span className="rounded-lg bg-yellow-300/15 px-3 py-1 font-display text-xl font-extrabold text-yellow-300">Bs {p.price}</span>
                 </div>
               </button>
             );
