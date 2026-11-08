@@ -41,6 +41,8 @@ export async function POST(req) {
         ? /^\d{5,12} \(\d{1,5}\)$/.test(playerId)
         : game.slug === 'roblox'
         ? /^[A-Za-z0-9_]{3,20}$/.test(playerId)
+        : game.slug === 'pubg-mobile'
+        ? /^\d{7,14}$/.test(playerId)
         : playerId.length > 3 && playerId.length <= 40;
   if (!okId) return json({ error: 'id_invalido' }, 400);
 
