@@ -24,9 +24,9 @@ export default function GameCard({ game, big = false }) {
           className={`h-full w-full ${big ? 'text-8xl' : 'text-6xl'} transition duration-500 group-hover:scale-110`}
         />
       </div>
-      <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black via-black/60 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-black via-black/70 to-transparent" />
       {!off && (
-        <span className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-[shine_0.9s_ease]" />
+        <span className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-[shine_0.9s_ease] group-active:opacity-100 group-active:animate-[shine_0.9s_ease]" />
       )}
       {badge && (
         <span
@@ -50,8 +50,8 @@ export default function GameCard({ game, big = false }) {
         </div>
         {from !== null && !off ? (
           <div className="mt-1.5 flex items-center gap-1.5">
-            <span className="h-1 w-1/4 rounded-full bg-yellow-300 transition-all duration-300 group-hover:w-1/6" />
-            <span className="font-display text-[11px] font-bold uppercase tracking-wide text-yellow-300">Desde Bs {from}</span>
+            
+            <span className="rounded-md bg-yellow-300 px-1.5 py-0.5 font-display text-[11px] font-extrabold uppercase tracking-wide text-black">Desde Bs {from}</span>
           </div>
         ) : (
           <div className="mt-1.5 h-1 w-1/4 rounded-full bg-yellow-300 transition-all duration-300 group-hover:w-1/2" />
@@ -85,7 +85,7 @@ export default function GameCard({ game, big = false }) {
     >
       <Link
         href={`/juego/${game.slug}`}
-        className={`${cls} hover:border-yellow-300/60 hover:shadow-[0_10px_30px_-8px_rgb(var(--accent)/0.6)]`}
+        className={`${cls} hover:border-yellow-300/60 hover:shadow-[0_10px_30px_-8px_rgb(var(--accent)/0.6)] active:border-yellow-300/80 active:shadow-[0_10px_30px_-8px_rgb(var(--accent)/0.6)]`}
       >
         {body}
       </Link>

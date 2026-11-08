@@ -2,8 +2,10 @@
 import { useEffect, useState } from 'react';
 import GameCard from '@/components/GameCard';
 import Banner from '@/components/Banner';
+import { MdFlashOn, MdVerifiedUser, MdHeadsetMic } from 'react-icons/md';
 
 const TABS = [
+  { id: 'todos', label: 'Todos', emoji: '', title: 'Todos los juegos', test: () => true },
   { id: 'populares', label: 'Populares', emoji: '🔥', title: 'Los más populares', test: (g) => g.popular },
   { id: 'nuevos', label: 'Nuevos', emoji: '🌟', title: 'Recién llegados', test: (g) => g.badge === 'nuevo' },
   { id: 'directa', label: 'Recarga directa', emoji: '', title: 'Recarga directa al ID', test: (g) => g.kind === 'directa' },
@@ -11,9 +13,9 @@ const TABS = [
 ];
 
 const PERKS = [
-  ['⚡', 'Entrega rápida', 'Procesamos tu pedido en pocos minutos.'],
-  ['🔒', 'Pago seguro', 'QR bancario de Bolivia.'],
-  ['💬', 'Soporte real', 'Te atendemos por WhatsApp si algo falla.'],
+  [<MdFlashOn size={20} className="text-yellow-300" />, 'Entrega rápida', 'Procesamos tu pedido en pocos minutos.'],
+  [<MdVerifiedUser size={20} className="text-yellow-300" />, 'Pago seguro', 'QR bancario de Bolivia.'],
+  [<MdHeadsetMic size={20} className="text-yellow-300" />, 'Soporte real', 'Te atendemos por WhatsApp si algo falla.'],
 ];
 
 function Title({ emoji, children }) {
@@ -30,7 +32,7 @@ const GRID = 'grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5';
 
 export default function GameSearch({ games }) {
   const [q, setQ] = useState('');
-  const [active, setActive] = useState('populares');
+  const [active, setActive] = useState('todos');
   const term = q.trim().toLowerCase();
   const found = term ? games.filter((g) => g.name.toLowerCase().includes(term)) : [];
 
@@ -41,17 +43,6 @@ export default function GameSearch({ games }) {
     return () => window.removeEventListener('rb-q', on);
   }, []);
 
-  // Marca la pestaña según la sección visible.
-  useEffect(() => {
-    if (term) return;
-    const els = TABS.map((t) => document.getElementById(t.id)).filter(Boolean);
-    const io = new IntersectionObserver(
-      (entries) => entries.forEach((e) => e.isIntersecting && setActive(e.target.id)),
-      { rootMargin: '-30% 0px -65% 0px' }
-    );
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, [term]);
 
   const go = (id) => {
     setActive(id);
@@ -78,10 +69,10 @@ export default function GameSearch({ games }) {
           <Banner />
 
           <div className="no-scrollbar sticky top-[var(--hh,62px)] z-20 -mx-4 flex gap-3 overflow-x-auto tabsbar bg-[#08080c]/90 px-4 py-2 backdrop-blur">
-            {TABS.map((t) => (
+            {TABS.filter((t) => t.id === 'todos' || games.some(t.test)).map((t) => (
               <button
                 key={t.id}
-                onClick={() => go(t.id)}
+                onClick={() => setActive(t.id)}
                 className={
                   'shrink-0 rounded-xl border px-4 py-2 font-display text-sm font-bold uppercase transition ' +
                   (active === t.id
@@ -95,12 +86,12 @@ export default function GameSearch({ games }) {
             ))}
           </div>
 
-          {TABS.map((t) => {
-            const list = games.filter(t.test);
-            if (!list.length) return null;
+          {(() => {
+            const tab = TABS.find((t) => t.id === active) || TABS[0];
+            const list = games.filter(tab.test);
             return (
-              <section key={t.id} id={t.id} className="scroll-mt-44">
-                <Title emoji={t.emoji && t.id !== 'directa' ? t.emoji : ''}>{t.title}</Title>
+              <section key={tab.id}>
+                <Title emoji={tab.emoji}>{tab.title}</Title>
                 <div className={GRID}>
                   {list.map((g) => (
                     <GameCard key={g.slug} game={g} />
@@ -108,7 +99,7 @@ export default function GameSearch({ games }) {
                 </div>
               </section>
             );
-          })}
+          })()}
 
           <section className="space-y-4 pt-2">
             {PERKS.map(([icon, title, text]) => (
