@@ -120,15 +120,34 @@ export async function PATCH(req) {
   if (!Number.isInteger(id) || !STATUSES.includes(to)) return json({ error: 'datos_invalidos' }, 400);
   try {
     const q = sql();
-    const cur = await q`SELECT status FROM orders WHERE id = ${id}`;
+    const cur = await q`SELECT status, discount, payment_mode FROM orders WHERE id = ${id}`;
     if (!cur[0]) return json({ error: 'no_existe' }, 404);
     const from = cur[0].status;
     if (!(NEXT[from] || []).includes(to)) return json({ error: 'cambio_no_permitido' }, 409);
+
+    if (
+      to === 'PENDIENTE' &&
+      (from === 'CANCELADO' || from === 'EXPIRADO') &&
+      cur[0].discount === true &&
+      cur[0].payment_mode === 'MANUAL'
+    ) {
+      return json({ error: 'promo_no_reactivable' }, 409);
+    }
+
     let upd;
     if (to === 'PAGADO') {
       upd = await q`UPDATE orders SET status = ${to}, paid_at = now() WHERE id = ${id} AND status = ${from} RETURNING id, status, paid_at`;
     } else if (to === 'PENDIENTE') {
-      upd = await q`UPDATE orders SET status = ${to}, paid_at = NULL WHERE id = ${id} AND status = ${from} RETURNING id, status, paid_at`;
+      upd = await q`UPDATE orders
+        SET status = ${to}, paid_at = NULL
+        WHERE id = ${id}
+          AND status = ${from}
+          AND NOT (
+            discount IS TRUE
+            AND payment_mode = 'MANUAL'
+            AND status IN ('CANCELADO', 'EXPIRADO')
+          )
+        RETURNING id, status, paid_at`;
     } else {
       upd = await q`WITH u AS (
         UPDATE orders SET status = ${to} WHERE id = ${id} AND status = ${from} RETURNING id, status, paid_at
