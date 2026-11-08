@@ -16,7 +16,7 @@ import { MdPaid, MdSell } from 'react-icons/md';
 import OrderPay from '@/components/OrderPay';
 
 const inputCls =
-  'w-full rounded-2xl border-2 border-white/15 bg-zinc-950 px-4 py-3.5 text-base outline-none placeholder:text-white/40 focus:border-yellow-300';
+  'w-full rounded-2xl border-2 border-white/15 bg-zinc-950 px-4 py-3.5 text-base outline-none placeholder:text-white/40 focus:border-yellow-300 focus:shadow-[0_0_18px_-4px_rgb(var(--accent)/0.7)]';
 const PAGE = 8;
 const ICONS = { diamond: IoDiamond, coin: MdPaid, tag: MdSell };
 
@@ -467,7 +467,7 @@ export default function Checkout({ game }) {
                   key={pkg.id}
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="font-display text-xl font-bold text-yellow-300"
+                  className="inline-block rounded-lg bg-yellow-300/15 px-2.5 py-0.5 font-display text-xl font-bold text-yellow-300"
                 >
                   Bs {pkg.price}
                 </motion.div>
@@ -480,11 +480,16 @@ export default function Checkout({ game }) {
           <button
             disabled={!ready || creating}
             onClick={createOrder}
-            className={`flex items-center gap-1 rounded-2xl px-5 py-3 font-display text-lg font-extrabold uppercase ${
+            className={`group relative flex items-center gap-1 overflow-hidden rounded-xl px-5 py-3 font-display text-lg font-extrabold uppercase ${
               ready ? 'bg-gradient-to-r from-yellow-300 to-orange-400 text-black shadow-[0_6px_20px_-6px_rgb(var(--accent)/0.8)] active:scale-95' : 'bg-white/10 text-white/40'
             }`}
           >
-            Comprar ahora <MdChevronRight size={22} />
+            {ready && !creating && (
+              <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-0 w-1/3 animate-[shine_2.6s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+            )}
+            <span className="relative flex items-center gap-1">
+              Comprar ahora <MdChevronRight size={22} />
+            </span>
           </button>
         </div>
       </div>
