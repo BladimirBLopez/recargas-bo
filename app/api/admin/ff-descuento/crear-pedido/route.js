@@ -163,7 +163,10 @@ export async function POST(req) {
         }, 201);
 
       } catch (e) {
-        if (e?.code === '23505') {
+        if (
+          e?.code === '23505' &&
+          e?.constraint === 'orders_code_key'
+        ) {
           continue;
         }
         throw e;
