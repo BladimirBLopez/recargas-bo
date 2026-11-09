@@ -223,10 +223,32 @@ export default function FFDiscountOffer({
         'Entiendo que debo esperar aprobación antes de pagar.',
       ].join('\n');
 
-      window.location.assign(
+      const whatsappLink =
         'https://wa.me/' + waNumber +
-        '?text=' + encodeURIComponent(text)
-      );
+        '?text=' + encodeURIComponent(text);
+
+      setReceipt({ ...ref, whatsappLink });
+
+      try {
+        const key = 'rb_ff_discount_refs';
+        const saved = JSON.parse(
+          sessionStorage.getItem(key) || '[]'
+        );
+
+        if (Array.isArray(saved)) {
+          const updated = saved.map((entry) =>
+            entry?.requestId === ref.requestId
+              ? { ...entry, whatsappLink }
+              : entry
+          );
+
+          sessionStorage.setItem(
+            key, JSON.stringify(updated)
+          );
+        }
+      } catch {}
+
+      window.location.assign(whatsappLink);
 
     } catch {
       setMessage(
@@ -252,6 +274,20 @@ export default function FFDiscountOffer({
           La tienda debe aprobarlo antes de que pagues.
         </p>
       </div>
+
+      {receipt?.whatsappLink &&
+        receipt.playerId === String(playerId).trim() &&
+        receipt.whatsappLink.startsWith('https://wa.me/') &&
+        new Date(receipt.expiresAt).getTime() > Date.now() && (
+        <a
+          href={receipt.whatsappLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block rounded-xl border border-yellow-300/40 px-4 py-3 text-center font-bold text-yellow-300"
+        >
+          Abrir WhatsApp nuevamente
+        </a>
+      )}
 
       {receipt && (
         <p className="rounded-xl bg-white/5 p-3 text-xs text-white/70">

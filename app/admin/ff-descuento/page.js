@@ -146,8 +146,8 @@ export default function DescuentoFreeFire() {
       } else {
         setError(
           json.error === 'solicitud_no_disponible'
-            ? 'La solicitud venció, cambió o ya fue procesada.'
-            : 'No se pudo guardar la decisión.'
+            ? 'La solicitud venció, ya fue procesada o la promoción o el paquete están desactivados.'
+            : 'No se pudo guardar la decisión. Revisa la conexión y vuelve a intentarlo.'
         );
       }
     } catch {
