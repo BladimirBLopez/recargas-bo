@@ -199,8 +199,13 @@ export default function FFDiscountOffer({
       });
 
       setMessage(
-        'Solicitud #' + result.requestId +
-        ' registrada. Espera la aprobación antes de pagar.'
+        result.fueraHorario
+          ? 'Solicitud #' + result.requestId +
+            ' registrada fuera del horario de atención. ' +
+            'Te responderán cuando vuelvan a atender. ' +
+            'No realices ningún pago todavía.'
+          : 'Solicitud #' + result.requestId +
+            ' registrada. Espera la aprobación antes de pagar.'
       );
 
       const text = [
@@ -209,6 +214,12 @@ export default function FFDiscountOffer({
         'ID del jugador: ' + requestedId,
         'Paquete: ' + selectedPack.label,
         'Precio solicitado: ' + bs(selectedPack.price),
+        ...(result.fueraHorario
+          ? [
+              'Solicitud fuera del horario de atención.',
+              'Espero respuesta cuando vuelvan a atender.',
+            ]
+          : []),
         'Entiendo que debo esperar aprobación antes de pagar.',
       ].join('\n');
 
