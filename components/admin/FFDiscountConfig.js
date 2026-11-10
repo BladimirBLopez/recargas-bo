@@ -11,6 +11,7 @@ const ERR = {
   costo_invalido: 'Costo no válido.',
   etiqueta_invalida: 'El nombre debe tener de 2 a 40 caracteres.',
   no_autorizado: 'Sesión vencida: vuelve a entrar al panel.',
+  paquete_duplicado: 'Ya existe un paquete con ese nombre.',
 };
 
 const input =
@@ -43,6 +44,11 @@ export default function FFDiscountConfig() {
   const [busy, setBusy] = useState('');
   const [msg, setMsg] = useState({});
   const [loadErr, setLoadErr] = useState('');
+  const [newPack, setNewPack] = useState({
+    label: '', price: '', cost: ''
+  });
+  const [adding, setAdding] = useState(false);
+  const [addMsg, setAddMsg] = useState(null);
 
   const apply = useCallback((d, mode) => {
     setData(d);
@@ -94,6 +100,33 @@ export default function FFDiscountConfig() {
       setMsg((m) => ({ ...m, [key]: { ok: false, t: 'Sin conexión.' } }));
     }
     setBusy('');
+  }
+
+
+  async function addPackage() {
+    if (adding) return;
+    setAdding(true);
+    setAddMsg(null);
+    try {
+      const { ok, d } = await call('POST', newPack);
+      if (ok && d.config) {
+        apply(d, 'all');
+        setNewPack({ label: '', price: '', cost: '' });
+        setAddMsg({
+          ok: true,
+          t: 'Paquete agregado como inactivo. Revisa y activa cuando quieras.'
+        });
+      } else {
+        setAddMsg({
+          ok: false,
+          t: ERR[d.error] || 'No se pudo agregar el paquete.'
+        });
+      }
+    } catch {
+      setAddMsg({ ok: false, t: 'Sin conexión.' });
+    } finally {
+      setAdding(false);
+    }
   }
 
   if (loadErr) {
@@ -180,6 +213,69 @@ export default function FFDiscountConfig() {
         {busy === 'cfg' ? 'Guardando...' : 'Guardar horario'}
       </button>
       {note('cfg')}
+
+
+      <div className="space-y-3 rounded-xl border border-yellow-300/30 bg-zinc-900 p-4">
+        <h3 className="font-bold text-yellow-300">
+          Agregar nuevo paquete de descuento
+        </h3>
+        <p className="text-xs text-white/60">
+          Se crea inactivo. Precio entero en Bs.
+          No modifica los paquetes existentes.
+        </p>
+
+        <input
+          className={input}
+          placeholder="Ejemplo: 200 diamantes + bonus"
+          aria-label="Nombre del nuevo paquete"
+          maxLength={40}
+          value={newPack.label}
+          onChange={(e) => setNewPack((p) => ({
+            ...p, label: e.target.value
+          }))}
+        />
+
+        <div className="grid grid-cols-2 gap-2">
+          <input
+            className={input}
+            inputMode="numeric"
+            placeholder="Precio Bs"
+            aria-label="Precio del nuevo paquete"
+            value={newPack.price}
+            onChange={(e) => setNewPack((p) => ({
+              ...p, price: e.target.value
+            }))}
+          />
+          <input
+            className={input}
+            inputMode="decimal"
+            placeholder="Costo Bs (opcional)"
+            aria-label="Costo del nuevo paquete"
+            value={newPack.cost}
+            onChange={(e) => setNewPack((p) => ({
+              ...p, cost: e.target.value
+            }))}
+          />
+        </div>
+
+        <button
+          type="button"
+          className={btn}
+          disabled={adding || !newPack.label.trim() || !newPack.price.trim()}
+          onClick={addPackage}
+        >
+          {adding ? 'Agregando...' : 'Agregar paquete'}
+        </button>
+
+        {addMsg && (
+          <p className={
+            'text-sm ' +
+            (addMsg.ok ? 'text-green-400' : 'text-red-400')
+          }>
+            {addMsg.t}
+          </p>
+        )}
+      </div>
 
       <div className="space-y-3">
         {data.prices.map((p) => {

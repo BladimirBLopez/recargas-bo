@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import { sql } from '../../../../../lib/db.js';
 import { isAdmin } from '../../../../../lib/admin.js';
 
@@ -50,6 +51,73 @@ function parseNum(v, current) {
   const n = Number(v);
   if (!Number.isFinite(n) || n < 0 || n > 100000) return { ok: false };
   return { ok: true, v: Math.round(n * 100) / 100 };
+}
+
+
+export async function POST(req) {
+  if (!await isAdmin(req)) {
+    return json({ error: 'no_autorizado' }, 401);
+  }
+
+  let body;
+  try {
+    body = await req.json();
+  } catch {
+    return json({ error: 'json_invalido' }, 400);
+  }
+
+  const label = String(body?.label ?? '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (label.length < 2 || label.length > 40) {
+    return json({ error: 'etiqueta_invalida' }, 400);
+  }
+
+  const pr = parseNum(body?.price, null);
+  const co = parseNum(body?.cost, null);
+
+  if (!pr.ok || !Number.isInteger(pr.v) || pr.v <= 0) {
+    return json({ error: 'precio_invalido_activo' }, 400);
+  }
+
+  if (!co.ok) {
+    return json({ error: 'costo_invalido' }, 400);
+  }
+
+  try {
+    const q = sql();
+
+    const duplicate = await q`
+      SELECT 1 FROM ff_discount_prices
+      WHERE lower(trim(label)) = lower(${label})
+      LIMIT 1`;
+
+    if (duplicate.length) {
+      return json({ error: 'paquete_duplicado' }, 409);
+    }
+
+    const id = 'ffd-' + crypto.randomBytes(8).toString('hex');
+
+    await q`
+      INSERT INTO ff_discount_prices (
+        id, base_package_id, label,
+        price, cost, active, sort
+      )
+      VALUES (
+        ${id}, ${null}, ${label},
+        ${pr.v}, ${co.v}, false,
+        (SELECT COALESCE(MAX(sort), 0) + 10
+         FROM ff_discount_prices)
+      )`;
+
+    return json(await readAll(), 201);
+  } catch (e) {
+    if (e?.code === '23505') {
+      return json({ error: 'paquete_duplicado' }, 409);
+    }
+    return fail(e, 'post');
+  }
 }
 
 export async function PATCH(req) {
