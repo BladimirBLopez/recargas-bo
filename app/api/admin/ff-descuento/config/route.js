@@ -120,6 +120,82 @@ export async function POST(req) {
   }
 }
 
+
+export async function DELETE(req) {
+  if (!await isAdmin(req)) {
+    return json({ error: 'no_autorizado' }, 401);
+  }
+
+  let body;
+  try {
+    body = await req.json();
+  } catch {
+    return json({ error: 'json_invalido' }, 400);
+  }
+
+  const id = String(body?.id ?? '').trim();
+
+  if (!/^ffd-[a-z0-9-]{1,40}$/.test(id)) {
+    return json({ error: 'datos_invalidos' }, 400);
+  }
+
+  try {
+    const q = sql();
+
+    // Borrado protegido y condicionado.
+    // No eliminar paquetes activos ni utilizados.
+    const deleted = await q`
+      DELETE FROM ff_discount_prices p
+      WHERE p.id = ${id}
+        AND p.active = false
+        AND NOT EXISTS (
+          SELECT 1
+          FROM ff_discount_requests r
+          WHERE r.discount_price_id = p.id
+        )
+        AND NOT EXISTS (
+          SELECT 1
+          FROM orders o
+          WHERE o.game_slug = 'free-fire'
+            AND (
+              o.package_id = p.id
+              OR (
+                o.discount = true
+                AND p.base_package_id IS NOT NULL
+                AND o.package_id = p.base_package_id
+              )
+            )
+        )
+      RETURNING p.id`;
+
+    if (deleted.length) {
+      return json(await readAll());
+    }
+
+    const current = (await q`
+      SELECT active
+      FROM ff_discount_prices
+      WHERE id = ${id}
+    `)[0];
+
+    if (!current) {
+      return json({ error: 'no_existe' }, 404);
+    }
+
+    if (current.active) {
+      return json({ error: 'paquete_activo' }, 409);
+    }
+
+    return json({ error: 'paquete_en_uso' }, 409);
+
+  } catch (e) {
+    if (e?.code === '23503') {
+      return json({ error: 'paquete_en_uso' }, 409);
+    }
+    return fail(e, 'delete');
+  }
+}
+
 export async function PATCH(req) {
   if (!await isAdmin(req)) return json({ error: 'no_autorizado' }, 401);
   let body;

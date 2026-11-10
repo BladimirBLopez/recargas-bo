@@ -12,6 +12,9 @@ const ERR = {
   etiqueta_invalida: 'El nombre debe tener de 2 a 40 caracteres.',
   no_autorizado: 'Sesión vencida: vuelve a entrar al panel.',
   paquete_duplicado: 'Ya existe un paquete con ese nombre.',
+  paquete_activo: 'Primero desactiva el paquete.',
+  paquete_en_uso: 'Este paquete tiene solicitudes o pedidos. No se puede eliminar; dejalo inactivo.',
+  no_existe: 'El paquete ya no existe.',
 };
 
 const input =
@@ -126,6 +129,62 @@ export default function FFDiscountConfig() {
       setAddMsg({ ok: false, t: 'Sin conexión.' });
     } finally {
       setAdding(false);
+    }
+  }
+
+
+  async function removePackage(p) {
+    if (busy) return;
+
+    const confirmed = window.confirm(
+      '¿Eliminar definitivamente "' + p.label + '"?\n\n' +
+      'Solo se eliminara si no tiene solicitudes ni pedidos.'
+    );
+
+    if (!confirmed) return;
+
+    const key = 'p-' + p.id;
+
+    setBusy(key);
+    setMsg((m) => ({
+      ...m,
+      [key]: null,
+      removed: null
+    }));
+
+    try {
+      const { ok, d } = await call('DELETE', {
+        id: p.id
+      });
+
+      if (ok && d.config) {
+        apply(d, 'all');
+        setMsg((m) => ({
+          ...m,
+          removed: {
+            ok: true,
+            t: 'Paquete eliminado correctamente.'
+          }
+        }));
+      } else {
+        setMsg((m) => ({
+          ...m,
+          [key]: {
+            ok: false,
+            t: ERR[d.error] || 'No se pudo eliminar.'
+          }
+        }));
+      }
+    } catch {
+      setMsg((m) => ({
+        ...m,
+        [key]: {
+          ok: false,
+          t: 'Sin conexion.'
+        }
+      }));
+    } finally {
+      setBusy('');
     }
   }
 
@@ -277,6 +336,7 @@ export default function FFDiscountConfig() {
         )}
       </div>
 
+      {note('removed')}
       <div className="space-y-3">
         {data.prices.map((p) => {
           const d = rows[p.id] || draftOf(p);
@@ -328,8 +388,22 @@ export default function FFDiscountConfig() {
                 disabled={busy === k}
                 onClick={() => send(k, { action: 'precio', id: p.id, label: d.label, price: d.price, cost: d.cost }, p.id)}
               >
-                {busy === k ? 'Guardando...' : 'Guardar'}
+                {busy === k ? 'Guardando...' : 'Guardar cambios'}
               </button>
+
+              <button
+                type="button"
+                disabled={p.active || busy !== ''}
+                onClick={() => removePackage(p)}
+                className="mt-2 rounded-xl border border-red-400/40 px-4 py-2.5 text-sm font-bold text-red-300 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {busy === k ? 'Procesando...' : 'Eliminar paquete'}
+              </button>
+              {p.active && (
+                <p className="mt-2 text-xs text-white/50">
+                  Desactiva el paquete antes de eliminarlo.
+                </p>
+              )}
               {note(k)}
             </div>
           );
