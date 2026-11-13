@@ -10,6 +10,7 @@ const ERR = {
   precio_invalido: 'Precio no válido.',
   costo_invalido: 'Costo no válido.',
   etiqueta_invalida: 'El nombre debe tener de 2 a 40 caracteres.',
+  paquete_normal_ambiguo: 'Hay dos paquetes normales con esa cantidad; revisa el catálogo.',
   no_autorizado: 'Sesión vencida: vuelve a entrar al panel.',
   paquete_duplicado: 'Ya existe un paquete con ese nombre.',
   paquete_activo: 'Primero desactiva el paquete.',
@@ -97,7 +98,7 @@ export default function FFDiscountConfig() {
         apply(d, mode);
         setMsg((m) => ({ ...m, [key]: { ok: true, t: 'Guardado' } }));
       } else {
-        setMsg((m) => ({ ...m, [key]: { ok: false, t: ERR[d.error] || 'No se pudo guardar.' } }));
+        setMsg((m) => ({ ...m, [key]: { ok: false, t: d.mensaje || ERR[d.error] || 'No se pudo guardar.' } }));
       }
     } catch (e) {
       setMsg((m) => ({ ...m, [key]: { ok: false, t: 'Sin conexión.' } }));
@@ -122,7 +123,7 @@ export default function FFDiscountConfig() {
       } else {
         setAddMsg({
           ok: false,
-          t: ERR[d.error] || 'No se pudo agregar el paquete.'
+          t: d.mensaje || ERR[d.error] || 'No se pudo agregar el paquete.'
         });
       }
     } catch {
@@ -285,7 +286,7 @@ export default function FFDiscountConfig() {
 
         <input
           className={input}
-          placeholder="Ejemplo: 200 diamantes + bonus"
+          placeholder="Ejemplo: 100+10 💎"
           aria-label="Nombre del nuevo paquete"
           maxLength={40}
           value={newPack.label}

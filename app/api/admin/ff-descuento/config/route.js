@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 import { sql } from '../../../../../lib/db.js';
 import { isAdmin } from '../../../../../lib/admin.js';
+import { games } from '../../../../../data/games.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -54,6 +55,30 @@ function parseNum(v, current) {
 }
 
 
+function validarBono(label) {
+  const m = /^([1-9]\d*)\s*\+\s*(0|[1-9]\d*)(?:\s*💎)?$/.exec(label);
+  if (!m || !Number.isSafeInteger(Number(m[1])) || !Number.isSafeInteger(Number(m[2]))) {
+    return { error: 'formato_bono_invalido', mensaje: 'Formato: 100+10 💎' };
+  }
+  const numero = Number(m[1]);
+  const esperado = Math.round(numero / 10);
+  if (Number(m[2]) !== esperado) {
+    return { error: 'bono_invalido', mensaje: `El bono de ${numero} es ${esperado}` };
+  }
+  return { numero };
+}
+
+async function vinculoBase(q, numero) {
+  const normales = games.find((g) => g.slug === 'free-fire')?.packages || [];
+  const propios = await q`SELECT id, label FROM custom_packages WHERE game_slug = 'free-fire'`;
+  const candidatos = [...normales, ...propios].filter((p) => {
+    const m = /^([1-9]\d*)(?=\s|💎|$)/.exec(String(p.label || '').trim());
+    return m && Number(m[1]) === numero;
+  });
+  if (candidatos.length > 1) return { error: 'paquete_normal_ambiguo' };
+  return { id: candidatos[0]?.id ?? null };
+}
+
 export async function POST(req) {
   if (!await isAdmin(req)) {
     return json({ error: 'no_autorizado' }, 401);
@@ -73,6 +98,9 @@ export async function POST(req) {
   if (label.length < 2 || label.length > 40) {
     return json({ error: 'etiqueta_invalida' }, 400);
   }
+
+  const bono = validarBono(label);
+  if (bono.error) return json({ error: bono.error, mensaje: bono.mensaje }, 400);
 
   const pr = parseNum(body?.price, null);
   const co = parseNum(body?.cost, null);
@@ -97,6 +125,8 @@ export async function POST(req) {
       return json({ error: 'paquete_duplicado' }, 409);
     }
 
+    const base = await vinculoBase(q, bono.numero);
+    if (base.error) return json({ error: base.error }, 409);
     const id = 'ffd-' + crypto.randomBytes(8).toString('hex');
 
     await q`
@@ -105,7 +135,7 @@ export async function POST(req) {
         price, cost, active, sort
       )
       VALUES (
-        ${id}, ${null}, ${label},
+        ${id}, ${base.id}, ${label},
         ${pr.v}, ${co.v}, false,
         (SELECT COALESCE(MAX(sort), 0) + 10
          FROM ff_discount_prices)
@@ -236,6 +266,8 @@ export async function PATCH(req) {
       if (!cur) return json({ error: 'no_existe' }, 404);
       const label = body.label === undefined ? cur.label : String(body.label).replace(/\s+/g, ' ').trim();
       if (label.length < 2 || label.length > 40) return json({ error: 'etiqueta_invalida' }, 400);
+      const bono = validarBono(label);
+      if (bono.error) return json({ error: bono.error, mensaje: bono.mensaje }, 400);
       const pr = parseNum(body.price, cur.price);
       const co = parseNum(body.cost, cur.cost);
       if (!pr.ok) return json({ error: 'precio_invalido' }, 400);
@@ -248,7 +280,13 @@ export async function PATCH(req) {
           FROM ff_discount_config c WHERE c.id = 1`)[0];
         if (s && s.enabled && !s.otros) return json({ error: 'sin_precios_activos' }, 409);
       }
-      await q`UPDATE ff_discount_prices SET label = ${label}, price = ${pr.v}, cost = ${co.v}, active = ${active} WHERE id = ${id}`;
+      const base = await vinculoBase(q, bono.numero);
+      if (base.error) return json({ error: base.error }, 409);
+      await q`WITH actualizado AS (
+        UPDATE ff_discount_prices SET label = ${label}, price = ${pr.v}, cost = ${co.v},
+          active = ${active}, base_package_id = ${base.id} WHERE id = ${id}
+        RETURNING id
+      ) SELECT id FROM actualizado`;
       return json(await readAll());
     }
 
