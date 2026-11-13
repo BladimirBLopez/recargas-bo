@@ -10,6 +10,18 @@ function bs(value) {
   });
 }
 
+function niceLabel(label) {
+  const m = String(label || '').match(/^\s*(\d+)\s*\+\s*(\d+)\s*$/);
+  return m ? m[1] + ' + ' + m[2] + ' BONO' : String(label || '');
+}
+
+function pctOff(p) {
+  const base = Number(p.basePrice);
+  const price = Number(p.price);
+  if (!Number.isFinite(base) || !Number.isFinite(price) || base <= 0 || price >= base) return 0;
+  return Math.round((1 - price / base) * 100);
+}
+
 export default function FFDiscountOffer({
   playerId,
   nickname = '',
@@ -270,7 +282,7 @@ export default function FFDiscountOffer({
         </p>
 
         <p className="mt-1 text-xs text-white/70">
-          Elige un paquete y solicita tu descuento.
+          {current?.preview ? 'VISTA PREVIA: la promoción está apagada y solo tú la ves.' : 'Elige un paquete y solicita tu descuento.'}
           La tienda debe aprobarlo antes de que pagues.
         </p>
       </div>
@@ -313,25 +325,33 @@ export default function FFDiscountOffer({
                 (selected === p.id
                   ? 'border-yellow-300 bg-yellow-300/15'
                   : 'border-white/15 bg-zinc-950/80') +
-                (!p.eligible
-                  ? ' opacity-40'
-                  : '')
+                (!p.eligible && !current?.preview ? ' opacity-40' : '')
               }
             >
-              <p className="text-sm font-bold text-white">
-                {p.label}
-              </p>
+              <p className="text-sm font-bold text-white">{niceLabel(p.label)}</p>
 
-              <p className="mt-1 font-display text-xl font-bold text-yellow-300">
-                {bs(p.price)}
-              </p>
+              <div className="mt-1 flex flex-wrap items-baseline gap-x-2">
+                {pctOff(p) > 0 && (
+                  <span className="text-xs text-white/40 line-through">
+                    {bs(p.basePrice)}
+                  </span>
+                )}
+                <span className="font-display text-xl font-bold text-yellow-300">
+                  {bs(p.price)}
+                </span>
+                {pctOff(p) > 0 && (
+                  <span className="rounded-md bg-yellow-300 px-1.5 py-0.5 font-display text-[11px] font-extrabold text-black">
+                    -{pctOff(p)}%
+                  </span>
+                )}
+              </div>
 
               <p className="mt-1 text-xs text-white/50">
                 {p.eligible
                   ? selected === p.id
                     ? 'Seleccionado'
                     : 'Disponible'
-                  : 'Ya solicitado o utilizado'}
+                  : current?.preview ? 'Vista previa' : 'Ya solicitado o utilizado'}
               </p>
             </button>
           ))}

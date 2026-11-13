@@ -1,5 +1,7 @@
 import { sql } from '../../../../lib/db.js';
 import { limited } from '../../../../lib/ratelimit.js';
+import { isAdmin } from '../../../../lib/admin.js';
+import { allGames, packageMap, applyPackages } from '../../../../lib/games-state.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -50,11 +52,19 @@ export async function POST(req) {
       FROM ff_discount_config
       WHERE id = 1`;
 
+    let preview = false;
     if (config[0]?.enabled !== true) {
-      return json({
-        enabled: false,
-        packages: [],
-      });
+      try {
+        preview = Boolean(await isAdmin(req));
+      } catch {
+        preview = false;
+      }
+      if (!preview) {
+        return json({
+          enabled: false,
+          packages: [],
+        });
+      }
     }
 
     const rows = await q`
@@ -62,6 +72,7 @@ export async function POST(req) {
         p.id,
         p.label,
         p.price,
+        p.base_package_id,
         (
           NOT EXISTS (
             SELECT 1
@@ -96,19 +107,32 @@ export async function POST(req) {
           )
         ) AS eligible
       FROM ff_discount_prices p
-      WHERE p.active = true
+      WHERE (p.active = true OR ${preview}::boolean)
         AND p.price >= 0.01
         AND p.price <= 9999999999.99
         AND p.price = round(p.price, 2)
       ORDER BY p.sort, p.id`;
 
+    let baseOf = new Map();
+    try {
+      const ff = (await allGames()).find((g) => g.slug === 'free-fire');
+      if (ff) {
+        const applied = applyPackages(ff, await packageMap(), true);
+        baseOf = new Map(applied.packages.map((x) => [x.id, Number(x.price)]));
+      }
+    } catch (e) {
+      baseOf = new Map();
+    }
+
     return json({
       enabled: true,
+      ...(preview ? { preview: true } : {}),
       packages: rows.map((p) => ({
         id: p.id,
         label: p.label,
         price: Number(p.price),
-        eligible: p.eligible === true,
+        basePrice: baseOf.get(p.base_package_id) ?? null,
+        eligible: preview ? false : p.eligible === true,
       })),
     });
 
