@@ -8,6 +8,7 @@ function PackageRow({ p, onChanged, onError, onNote = () => {}, canEdit = false 
   const [price, setPrice] = useState(String(p.price));
   const [cost, setCost] = useState(p.cost === null ? '' : String(p.cost));
   const [active, setActive] = useState(p.active);
+  const [bonus, setBonus] = useState(p.bonus || '');
   const [busy, setBusy] = useState(false);
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(p.label);
@@ -17,12 +18,14 @@ function PackageRow({ p, onChanged, onError, onNote = () => {}, canEdit = false 
     setPrice(String(p.price));
     setCost(p.cost === null ? '' : String(p.cost));
     setActive(p.active);
-  }, [p.price, p.cost, p.active]);
+    setBonus(p.bonus || '');
+  }, [p.price, p.cost, p.active, p.bonus]);
 
   const dirty =
     Number(price) !== p.price ||
     (cost === '' ? p.cost !== null : Number(cost) !== p.cost) ||
-    active !== p.active;
+    active !== p.active ||
+    bonus.trim() !== (p.bonus || '');
   const modified = p.price !== p.basePrice || p.cost !== null || !p.active;
   const gan = price !== '' && cost !== '' ? Number(price) - Number(cost) : null;
 
@@ -128,6 +131,10 @@ function PackageRow({ p, onChanged, onError, onNote = () => {}, canEdit = false 
           <input type="number" inputMode="decimal" min="0" step="0.5" value={cost} onChange={(e) => setCost(e.target.value)} placeholder="Sin costo" className={inp} />
         </label>
       </div>
+      <label className="mt-3 block text-[11px] text-white/50">
+        Bono (opcional, máx. 24 letras)
+        <input type="text" maxLength={24} value={bonus} onChange={(e) => setBonus(e.target.value)} placeholder="Ej: +10% extra" className={inp} />
+      </label>
       {gan !== null && (
         <div className={'mt-2 text-xs font-semibold ' + (gan >= 0 ? 'text-emerald-300' : 'text-red-300')}>
           Ganancia: Bs {Math.round(gan * 100) / 100}
@@ -202,7 +209,7 @@ function PackageRow({ p, onChanged, onError, onNote = () => {}, canEdit = false 
           {dirty && (
             <button
               disabled={busy}
-              onClick={() => send({ price: price === '' ? null : Number(price), cost: cost === '' ? null : Number(cost), active })}
+              onClick={() => send({ price: price === '' ? null : Number(price), cost: cost === '' ? null : Number(cost), active, bonus: bonus.trim() })}
               className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#00D9FF] to-[#007BFF] py-2.5 text-sm font-extrabold text-slate-950 shadow-md shadow-cyan-500/15 transition active:scale-95 disabled:opacity-50"
             >
               <MdSave className="text-lg" /> Guardar

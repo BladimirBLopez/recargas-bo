@@ -39,6 +39,7 @@ export async function GET(req) {
           custom: Boolean(p.custom),
           cost: p.cost,
           active: p.active,
+          bonus: p.bonus || '',
         })),
       })),
     });
