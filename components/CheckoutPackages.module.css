@@ -1,88 +1,207 @@
 .wrap {
   width: 100%;
   min-width: 0;
-  margin-inline: auto;
-  padding: clamp(14px, 3vw, 30px);
-  background: #101116;
-  border: 1px solid rgba(255,255,255,.13);
-  border-radius: 28px;
+  padding: clamp(14px, 3vw, 24px);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 26px;
+  background: linear-gradient(
+    180deg, #101218 0%, #0b0d13 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.04),
+    0 10px 30px rgba(0,0,0,.12);
 }
 
+/* PESTAÑAS */
 .tabs {
   display: flex !important;
   grid-template-columns: none !important;
   flex-wrap: nowrap;
-  gap: 10px;
+  gap: 8px;
   overflow-x: auto;
+  padding: 3px 0 8px;
   scrollbar-width: none;
-  padding: 4px 0 12px;
+  scroll-snap-type: x proximity;
   overscroll-behavior-x: contain;
 }
-.tabs::-webkit-scrollbar { display: none; }
 
-.tabs > button {
-  flex: 0 0 auto;
-  min-width: 112px;
-  max-width: 220px;
-  padding: 12px 17px;
-  border-radius: 999px;
-  white-space: nowrap;
-  font-size: clamp(12px, 2.8vw, 15px);
-}
-
-.cards {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(10px, 2.5vw, 20px);
-}
-
-.cards > button {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  min-height: clamp(150px, 24vw, 190px);
-  padding: clamp(14px, 3vw, 24px);
-  border-radius: 24px;
-  background: #0b0b10;
-  text-align: left;
-}
-
-.cards > button > div:first-of-type > span:first-child {
+.tabs::-webkit-scrollbar {
   display: none;
 }
 
-.cards > button > div:first-of-type > div > div:first-child {
-  font-size: clamp(19px, 4vw, 30px);
-  line-height: 1.12;
+.tabs > button {
+  flex: 0 0 auto;
+  min-width: 110px;
+  min-height: 43px;
+  max-width: 220px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: clamp(12px, 1.6vw, 14px);
+  line-height: 1.2;
+  white-space: nowrap;
+  scroll-snap-align: start;
+}
+
+/* CUADRICULA */
+.cards {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(10px, 2vw, 16px);
+}
+
+/* TARJETAS */
+.cards > button {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 142px;
+  padding: clamp(13px, 2.4vw, 20px);
+  border-radius: 20px;
+  background: #0a0c12;
+  text-align: left;
+  box-shadow: 0 4px 16px rgba(0,0,0,.14);
+  transition:
+    border-color .2s ease,
+    box-shadow .2s ease,
+    transform .2s ease;
+}
+
+/* OCULTAR ICONO SIN AFECTAR EL TEXTO */
+.cards > button > div:first-of-type >
+span:first-child {
+  display: none;
+}
+
+.cards > button > div:first-of-type {
+  gap: 0;
+}
+
+.cards > button > div:first-of-type > div {
+  width: 100%;
+  min-width: 0;
+}
+
+/* CANTIDAD DEL PAQUETE */
+.cards > button > div:first-of-type >
+div > div:first-child {
+  font-size: clamp(22px, 3.5vw, 31px);
+  line-height: 1.07;
+  font-weight: 900;
   overflow-wrap: anywhere;
 }
 
+/* TIPO: DIAMANTES, UC, ETC. */
+.cards > button > div:first-of-type >
+div > div:nth-child(2) {
+  margin-top: 5px;
+  font-size: clamp(10px, 1.8vw, 13px);
+  line-height: 1.2;
+  letter-spacing: .025em;
+  overflow-wrap: anywhere;
+}
+
+/* BONO */
+.cards > button >
+div:not(:first-of-type):not(:last-of-type) {
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 9px;
+  padding: 3px 0;
+  color: #36d5ff;
+  font-size: clamp(10px, 1.8vw, 12px);
+  font-weight: 800;
+}
+
+/* PRECIO INFERIOR */
 .cards > button > div:last-child {
-  margin-top: auto;
   display: flex;
   flex-direction: row-reverse;
-  align-items: center;
   justify-content: flex-end;
+  align-items: center;
   gap: 8px;
-  padding-top: 18px;
+  margin-top: auto;
+  padding-top: 12px;
 }
 
-.cards > button > div:last-child > span:last-child {
+.cards > button > div:last-child >
+span:last-child {
+  padding: 0;
   background: transparent;
   color: #31d3ff;
-  padding: 0;
-  font-size: clamp(20px, 4.4vw, 30px);
+  font-size: clamp(22px, 3.6vw, 30px);
+  font-weight: 900;
+  white-space: nowrap;
 }
 
+/* PAQUETE SELECCIONADO */
 .cards > button[aria-pressed="true"] {
   border-color: #22d3ee;
-  box-shadow: 0 0 20px rgba(34,211,238,.18);
+  background: linear-gradient(
+    155deg, #10212c 0%, #0a1019 90%
+  );
+  box-shadow:
+    0 0 0 1px rgba(34,211,238,.25),
+    0 0 20px rgba(34,211,238,.14);
 }
 
-@media (max-width: 359px) {
-  .cards { grid-template-columns: 1fr; }
+/* CELULARES MUY PEQUEÑOS */
+@media (max-width: 340px) {
+  .wrap {
+    padding: 11px;
+  }
+
+  .tabs > button {
+    min-width: 94px;
+    padding: 9px 11px;
+    font-size: 11px;
+  }
+
+  .cards {
+    gap: 9px;
+  }
+
+  .cards > button {
+    min-height: 135px;
+    padding: 11px;
+    border-radius: 16px;
+  }
 }
 
-@media (min-width: 900px) {
-  .wrap { max-width: 960px; }
+/* PANTALLAS EXTREMADAMENTE ESTRECHAS */
+@media (max-width: 290px) {
+  .cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* TABLETS Y COMPUTADORAS */
+@media (min-width: 768px) {
+  .wrap {
+    max-width: 960px;
+    margin-inline: auto;
+    padding: 26px;
+  }
+
+  .cards > button {
+    min-height: 170px;
+    border-radius: 24px;
+  }
+
+  .tabs > button {
+    min-width: 135px;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cards > button:hover {
+    border-color: rgba(34,211,238,.55);
+    box-shadow: 0 6px 20px rgba(0,0,0,.25);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cards > button {
+    transition: none;
+  }
 }
