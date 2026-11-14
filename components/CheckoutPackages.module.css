@@ -277,3 +277,23 @@ span:last-child {
     font-size: clamp(16px, 2.2vw, 24px);
   }
 }
+
+
+/* TARJETAS HORIZONTALES DEFINITIVAS */
+.cards > button {
+  aspect-ratio: 2.3 / 1 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  padding: clamp(8px, 1.8vw, 16px) !important;
+}
+
+.cards > button > div:last-child {
+  margin-top: auto;
+  padding-top: 5px;
+}
+
+@media (max-width: 340px) {
+  .cards > button {
+    padding: 8px !important;
+  }
+}
