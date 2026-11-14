@@ -46,6 +46,17 @@ export async function PATCH(req) {
 
     const q = sql();
 
+    if (sectionId === 'rec' || sectionId === 'pass') {
+      const name = sectionId === 'rec' ? 'Recargas' : 'Pases';
+      const sort = sectionId === 'rec' ? -2 : -1;
+      await q`
+        INSERT INTO package_sections
+          (game_slug, id, name, sort)
+        VALUES (${slug}, ${sectionId}, ${name}, ${sort})
+        ON CONFLICT (game_slug, id) DO NOTHING
+      `;
+    }
+
     if (sectionId === null) {
       await q`
         DELETE FROM package_section_links

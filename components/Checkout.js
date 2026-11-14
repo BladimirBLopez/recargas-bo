@@ -110,18 +110,18 @@ export default function Checkout({ game }) {
       id: 'rec',
       name: 'Recargas',
       packages: game.packages.filter(
-        p => !p.sectionId && !isPass(p)
+        p => p.sectionId === 'rec' || (!p.sectionId && !isPass(p))
       )
     },
     {
       id: 'pass',
       name: 'Pases',
       packages: game.packages.filter(
-        p => !p.sectionId && isPass(p)
+        p => p.sectionId === 'pass' || (!p.sectionId && isPass(p))
       )
     },
     ...(game.sections || [])
-      .filter(s => s.active)
+      .filter(s => s.active && s.id !== 'rec' && s.id !== 'pass')
       .map(s => ({
         id: s.id,
         name: s.name,

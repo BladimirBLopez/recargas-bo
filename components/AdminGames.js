@@ -473,20 +473,10 @@ export default function AdminGames() {
                       {pnote && pnote.slug === g.slug && (
                         <div className={'rounded-xl border px-3 py-2 text-xs font-semibold ' + TONE[pnote.tone]}>{pnote.m}</div>
                       )}
-                      {g.custom ? (
-                        <div className="rounded-xl border border-amber-400/25 bg-amber-400/10 px-3 py-2 text-xs text-amber-200">
-                          Los paquetes de este servicio se administran en Servicios.
-                        </div>
-                      ) : (
-                        <AddPackage
-                          slug={g.slug}
-                          onChanged={load}
-                          onError={(m) => setPnote(m ? { slug: g.slug, m, tone: 'bad' } : null)}
-                          onNote={(m, warn) => setPnote(m ? { slug: g.slug, m, tone: warn ? 'warn' : 'ok' } : null)}
-                        />
-                      )}
-                      <PackageSectionsEditor game={g} onChanged={load} />
-                      {g.packages.map((p) => (
+                      <PackageSectionsEditor
+                        game={g}
+                        onChanged={load}
+                        renderPackage={(p) => (
                         <PackageRow
                           key={p.id}
                           p={p}
@@ -495,7 +485,8 @@ export default function AdminGames() {
                           onNote={(m, warn) => setPnote(m ? { slug: g.slug, m, tone: warn ? 'warn' : 'ok' } : null)}
                           canEdit={Boolean(p.custom) && !g.custom}
                         />
-                      ))}
+                        )}
+                      />
                     </div>
                   )}
 

@@ -28,7 +28,7 @@ export async function POST(req) {
   const label = String(b?.label || '').trim();
   const price = Math.round(Number(b?.price) * 100) / 100;
 
-  if (!slug || !/^sec-[0-9a-f-]{36}$/.test(sectionId)
+  if (!slug || !(sectionId === 'rec' || sectionId === 'pass' || /^sec-[0-9a-f-]{36}$/.test(sectionId))
     || !label || label.length > 40
     || !Number.isFinite(price)
     || price < 0.01 || price > 100000)
@@ -49,6 +49,17 @@ export async function POST(req) {
     )) return json({ error: 'nombre_repetido' }, 409);
 
     const q = sql();
+
+    if (sectionId === 'rec' || sectionId === 'pass') {
+      const name = sectionId === 'rec' ? 'Recargas' : 'Pases';
+      const sort = sectionId === 'rec' ? -2 : -1;
+      await q`
+        INSERT INTO package_sections
+          (game_slug, id, name, sort)
+        VALUES (${slug}, ${sectionId}, ${name}, ${sort})
+        ON CONFLICT (game_slug, id) DO NOTHING
+      `;
+    }
 
     const section = await q`
       SELECT id FROM package_sections
