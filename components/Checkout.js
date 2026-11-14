@@ -452,6 +452,7 @@ export default function Checkout({ game }) {
                       {big}
                     </div>
                     {unit && <div className="text-xs font-semibold tracking-wide text-white/60">{unit}</div>}
+                    {p.bonus && <div className="mt-0.5 text-xs font-extrabold text-yellow-300">{p.bonus}</div>}
                   </div>
                 </div>
                 <div className="mt-3 flex items-center justify-between">
