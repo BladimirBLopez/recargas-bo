@@ -465,6 +465,11 @@ export default function Checkout({ game }) {
           {(discTab ? [] : shown).map((p) => {
             const { big, unit, num } = parse(p.label);
             const on = pkgId === p.id;
+            const bonusText = p.bonus ? String(p.bonus).replace(/^\+?\s*/, '+ ').replace(/\s+/g, ' ').trim().toUpperCase() : '';
+            const topLabel = bonusText && num
+              ? `(${big} ${bonusText})`
+              : big;
+
             return (
               <button
                 key={p.id}
@@ -489,12 +494,13 @@ export default function Checkout({ game }) {
                   </span>
                   <div className="min-w-0">
                     <div className={`${num ? 'text-2xl' : 'text-base'} font-display font-extrabold leading-tight`}>
-                      {big}
+                      {topLabel}
                     </div>
-                    {unit && <div className="text-xs font-semibold tracking-wide text-white/60">{unit}</div>}
+                    {unit && !bonusText && (
+                      <div className="text-xs font-semibold tracking-wide text-white/60">{unit}</div>
+                    )}
                   </div>
                 </div>
-                {p.bonus && <div className="mt-2 truncate whitespace-nowrap text-xs font-extrabold text-yellow-300">{p.bonus}</div>}
                 <div className="mt-3 flex items-center justify-between">
                   {on ? <MdCheckCircle size={20} className="text-yellow-300" /> : <span />}
                   <span className="rounded-lg bg-yellow-300/15 px-3 py-1 font-display text-xl font-extrabold text-yellow-300">Bs {p.price}</span>
