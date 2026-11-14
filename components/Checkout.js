@@ -496,7 +496,7 @@ export default function Checkout({ game }) {
                     <div className={`${num ? 'text-2xl' : 'text-base'} font-display font-extrabold leading-tight`}>
                       {topLabel}
                     </div>
-                    {unit && !bonusText && (
+                    {unit && (
                       <div className="text-xs font-semibold tracking-wide text-white/60">{unit}</div>
                     )}
                   </div>
