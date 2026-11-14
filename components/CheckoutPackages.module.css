@@ -1,0 +1,88 @@
+.wrap {
+  width: 100%;
+  min-width: 0;
+  margin-inline: auto;
+  padding: clamp(14px, 3vw, 30px);
+  background: #101116;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 28px;
+}
+
+.tabs {
+  display: flex !important;
+  grid-template-columns: none !important;
+  flex-wrap: nowrap;
+  gap: 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 4px 0 12px;
+  overscroll-behavior-x: contain;
+}
+.tabs::-webkit-scrollbar { display: none; }
+
+.tabs > button {
+  flex: 0 0 auto;
+  min-width: 112px;
+  max-width: 220px;
+  padding: 12px 17px;
+  border-radius: 999px;
+  white-space: nowrap;
+  font-size: clamp(12px, 2.8vw, 15px);
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(10px, 2.5vw, 20px);
+}
+
+.cards > button {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: clamp(150px, 24vw, 190px);
+  padding: clamp(14px, 3vw, 24px);
+  border-radius: 24px;
+  background: #0b0b10;
+  text-align: left;
+}
+
+.cards > button > div:first-of-type > span:first-child {
+  display: none;
+}
+
+.cards > button > div:first-of-type > div > div:first-child {
+  font-size: clamp(19px, 4vw, 30px);
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+}
+
+.cards > button > div:last-child {
+  margin-top: auto;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 18px;
+}
+
+.cards > button > div:last-child > span:last-child {
+  background: transparent;
+  color: #31d3ff;
+  padding: 0;
+  font-size: clamp(20px, 4.4vw, 30px);
+}
+
+.cards > button[aria-pressed="true"] {
+  border-color: #22d3ee;
+  box-shadow: 0 0 20px rgba(34,211,238,.18);
+}
+
+@media (max-width: 359px) {
+  .cards { grid-template-columns: 1fr; }
+}
+
+@media (min-width: 900px) {
+  .wrap { max-width: 960px; }
+}

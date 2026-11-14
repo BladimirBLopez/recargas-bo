@@ -15,15 +15,16 @@ import { motion } from 'framer-motion';
 import { MdPaid, MdSell } from 'react-icons/md';
 import OrderPay from '@/components/OrderPay';
 import FFDiscountOffer from '@/components/FFDiscountOffer';
+import styles from './CheckoutPackages.module.css';
 
 const inputCls =
   'w-full rounded-2xl border-2 border-white/15 bg-zinc-950 px-4 py-3.5 text-base outline-none placeholder:text-white/40 focus:border-yellow-300 focus:shadow-[0_0_18px_-4px_rgb(var(--accent)/0.7)]';
 const PAGE = 8;
 const ICONS = { diamond: IoDiamond, coin: MdPaid, tag: MdSell };
 
-function Step({ n, title, action, children }) {
+function Step({ n, title, action, children, className }) {
   return (
-    <section>
+    <section className={className}>
       <div className="mb-3 flex items-center gap-3">
         <span className="grid h-8 w-9 -skew-x-12 place-items-center rounded-md bg-yellow-300 font-display text-lg font-extrabold italic text-black shadow-[0_0_14px_rgb(var(--accent)/0.6)]">
           {n}
@@ -400,9 +401,9 @@ export default function Checkout({ game }) {
         </div>
       </Step>
 
-      <Step n="2" title="Elige tu paquete">
+      <Step n="2" title="Elige tu paquete" className={styles.wrap}>
         {(hasTabs || discOn) && (
-          <div className={`mb-4 grid gap-3 ${
+          <div className={`${styles.tabs} mb-4 grid gap-3 ${
   sectionTabs.length +
   (discOn ? 1 : 0) > 3
     ? 'grid-flow-col auto-cols-[minmax(112px,1fr)] overflow-x-auto'
@@ -460,7 +461,7 @@ export default function Checkout({ game }) {
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className={styles.cards}>
           {(discTab ? [] : shown).map((p) => {
             const { big, unit, num } = parse(p.label);
             const on = pkgId === p.id;
