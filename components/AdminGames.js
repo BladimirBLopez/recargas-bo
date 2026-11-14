@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { MdExpandMore, MdSave, MdRestartAlt, MdImage, MdSettings, MdInventory2 } from 'react-icons/md';
 import DetailBannerEditor from './admin/DetailBannerEditor';
 import GameProfileImageEditor from './admin/GameProfileImageEditor';
+import PackageSectionsEditor from './admin/PackageSectionsEditor';
 
 function PackageRow({ p, onChanged, onError, onNote = () => {}, canEdit = false }) {
   const [price, setPrice] = useState(String(p.price));
@@ -484,6 +485,7 @@ export default function AdminGames() {
                           onNote={(m, warn) => setPnote(m ? { slug: g.slug, m, tone: warn ? 'warn' : 'ok' } : null)}
                         />
                       )}
+                      <PackageSectionsEditor game={g} onChanged={load} />
                       {g.packages.map((p) => (
                         <PackageRow
                           key={p.id}

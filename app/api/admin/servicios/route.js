@@ -125,6 +125,19 @@ export async function PATCH(req) {
         SET name = ${name}, popular = ${popular}, kind = ${kind}, badge = ${badge}, id_label = ${idLabel}, packages = ${JSON.stringify(packages)}::jsonb
         WHERE slug = ${slug} RETURNING slug`;
       if (!r.length) return json({ error: 'no_editable' }, 400);
+
+      await q`
+        DELETE FROM package_section_links AS l
+        WHERE l.game_slug = ${slug}
+          AND NOT EXISTS (
+            SELECT 1 FROM custom_games AS cg
+            WHERE cg.slug = ${slug}
+              AND cg.packages @> jsonb_build_array(
+                jsonb_build_object('id', l.package_id)
+              )
+          )
+      `;
+
       return json({ ok: true });
     }
     return json({ error: 'datos_invalidos' }, 400);
@@ -146,6 +159,8 @@ export async function DELETE(req) {
       if ((cnt[0]?.n || 0) > 0 && body.force !== true) return json({ error: 'tiene_pedidos', pedidos: cnt[0].n }, 409);
       const r = await q`DELETE FROM custom_games WHERE slug = ${slug} RETURNING slug, packages`;
       if (!r.length) return json({ error: 'no_editable' }, 400);
+      await q`DELETE FROM package_sections
+        WHERE game_slug = ${slug}`;
       try {
         await q`DELETE FROM game_settings WHERE slug = ${slug}`;
       } catch (e) {}

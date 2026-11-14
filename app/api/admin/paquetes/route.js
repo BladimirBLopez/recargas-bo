@@ -111,6 +111,8 @@ export async function DELETE(req) {
     const q = sql();
     const r = await q`DELETE FROM custom_packages WHERE id = ${id} RETURNING id`;
     if (!r.length) return json({ error: 'no_editable' }, 400);
+    await q`DELETE FROM package_section_links
+      WHERE package_id = ${id}`;
     try {
       await q`DELETE FROM package_settings WHERE package_id = ${id}`;
     } catch (e) {}

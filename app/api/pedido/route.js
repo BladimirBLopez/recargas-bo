@@ -2,6 +2,7 @@ import { sql } from '../../../lib/db.js';
 import { getUser, SESSION_COOKIE } from '../../../lib/auth.js';
 import { limited } from '../../../lib/ratelimit.js';
 import { allGames, maintenanceMap, packageMap, applyPackages } from '../../../lib/games-state.js';
+import { loadPackageSections } from '../../../lib/package-sections.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -31,6 +32,31 @@ export async function POST(req) {
   const game = base ? applyPackages(base, await packageMap(), true) : null;
   const pkg = game?.packages.find((p) => p.id === body?.packageId);
   if (!game || !pkg || !pkg.active) return json({ error: 'pack_invalido' }, 400);
+  try {
+    const { sections, assignments } =
+      await loadPackageSections();
+
+    const sid = assignments
+      .get(game.slug)?.get(pkg.id);
+
+    if (sid) {
+      const section = (
+        sections.get(game.slug) || []
+      ).find(x => x.id === sid);
+
+      if (!section || !section.active) {
+        return json({
+          error: 'seccion_no_disponible'
+        }, 409);
+      }
+    }
+  } catch (e) {
+    console.error('pedido secciones', e?.code || '');
+    return json({
+      error: 'secciones_no_disponibles'
+    }, 503);
+  }
+
   const mnt = await maintenanceMap();
   if (mnt.has(game.slug) ? mnt.get(game.slug) : game.maintenance) return json({ error: 'mantenimiento' }, 409);
 

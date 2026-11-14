@@ -105,11 +105,39 @@ export default function Checkout({ game }) {
   }, [game.slug]);
 
   const pkg = game.packages.find((p) => p.id === pkgId);
-  const rec = game.packages.filter((p) => !isPass(p));
-  const pass = game.packages.filter(isPass);
-  const hasTabs = rec.length > 0 && pass.length > 0;
-  const active = hasTabs ? tab : rec.length ? 'rec' : 'pass';
-  const list = active === 'rec' ? rec : pass;
+  const sectionTabs = [
+    {
+      id: 'rec',
+      name: 'Recargas',
+      packages: game.packages.filter(
+        p => !p.sectionId && !isPass(p)
+      )
+    },
+    {
+      id: 'pass',
+      name: 'Pases',
+      packages: game.packages.filter(
+        p => !p.sectionId && isPass(p)
+      )
+    },
+    ...(game.sections || [])
+      .filter(s => s.active)
+      .map(s => ({
+        id: s.id,
+        name: s.name,
+        packages: game.packages.filter(
+          p => p.sectionId === s.id
+        )
+      }))
+  ].filter(s => s.packages.length > 0);
+
+  const hasTabs = sectionTabs.length > 1;
+  const active = sectionTabs.some(s => s.id === tab)
+    ? tab
+    : sectionTabs[0]?.id || 'rec';
+  const list = sectionTabs.find(
+    s => s.id === active
+  )?.packages || [];
   const shown = all ? list : list.slice(0, PAGE);
 
   const isFF = game.slug === 'free-fire';
@@ -169,7 +197,7 @@ export default function Checkout({ game }) {
   const discOn = isFF && idReady && discAvail;
   const discTab = discOn && tab === 'disc';
   useEffect(() => {
-    if (tab === 'disc' && !discOn) setTab('rec');
+    if (tab === 'disc' && !discOn) setTab(sectionTabs[0]?.id || 'rec');
   }, [tab, discOn]);
   const hint = !idReady
     ? isML
@@ -374,30 +402,41 @@ export default function Checkout({ game }) {
 
       <Step n="2" title="Elige tu paquete">
         {(hasTabs || discOn) && (
-          <div className={`mb-4 grid gap-3 ${discOn ? 'grid-cols-3' : 'grid-cols-2'}`}>
-            {[
-              ['rec', 'Recargas'],
-              ['pass', 'Pases'],
-            ].filter(() => hasTabs).map(([k, name]) => (
+          <div className={`mb-4 grid gap-3 ${
+  sectionTabs.length +
+  (discOn ? 1 : 0) > 3
+    ? 'grid-flow-col auto-cols-[minmax(112px,1fr)] overflow-x-auto'
+    : sectionTabs.length + (discOn ? 1 : 0) === 3
+      ? 'grid-cols-3'
+      : 'grid-cols-2'
+}`}>
+            {(hasTabs || discOn ? sectionTabs : []).map(s => (
               <button
-                key={k}
+                type="button"
+                key={s.id}
                 onClick={() => {
-                  setTab(k);
+                  setTab(s.id);
+                  setPkgId(null);
                   setAll(false);
                 }}
                 className={`rounded-xl border-2 py-2.5 font-display text-base font-bold uppercase tracking-wide transition ${
-                  active === k && !discTab
+                  active === s.id && !discTab
                     ? 'border-yellow-300 bg-gradient-to-r from-yellow-300 to-orange-400 text-black shadow-[0_0_16px_-4px_rgb(var(--accent)/0.7)]'
                     : 'border-white/10 bg-zinc-950 text-white/70'
                 }`}
               >
-                {name}
+                {s.name}
               </button>
             ))}
-          {discOn && (
+
+            {discOn && (
               <button
                 type="button"
-                onClick={() => setTab(discTab ? 'rec' : 'disc')}
+                onClick={() => {
+                  setTab(discTab ? active : 'disc');
+                  setPkgId(null);
+                  setAll(false);
+                }}
                 aria-pressed={discTab}
                 className={`rounded-xl border-2 py-2.5 font-display text-base font-bold uppercase tracking-wide transition ${
                   discTab
