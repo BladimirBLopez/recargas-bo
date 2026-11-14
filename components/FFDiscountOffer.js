@@ -11,7 +11,7 @@ function bs(value) {
 }
 
 function niceLabel(label) {
-  const m = String(label || '').match(/^\s*(\d+)\s*\+\s*(\d+)\s*$/);
+  const m = String(label || '').match(/^\s*(\d+)\s*\+\s*(\d+)\s*(?:💎)?\s*$/);
   return m ? m[1] + ' + ' + m[2] + ' BONO' : String(label || '');
 }
 
@@ -25,6 +25,7 @@ function pctOff(p) {
 export default function FFDiscountOffer({
   playerId,
   nickname = '',
+  onAvailable,
 }) {
   const { whatsapp } = useSettings();
 
@@ -105,6 +106,20 @@ export default function FFDiscountOffer({
     : null;
 
   const packages = current?.packages || [];
+
+  useEffect(() => {
+    if (typeof onAvailable === 'function') {
+      onAvailable(current?.enabled === true && packages.length > 0);
+    }
+  }, [current, packages.length, onAvailable]);
+
+  useEffect(
+    () => () => {
+      if (typeof onAvailable === 'function') onAvailable(false);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   const chosen = packages.find(
     (p) => p.id === selected && p.eligible

@@ -75,6 +75,7 @@ export default function Checkout({ game }) {
   const [err, setErr] = useState('');
   const [zone, setZone] = useState('');
   const [confirmed, setConfirmed] = useState(false);
+  const [discAvail, setDiscAvail] = useState(false);
 
   useEffect(() => {
     try {
@@ -165,6 +166,11 @@ export default function Checkout({ game }) {
       : id.length > 3;
   const ready = Boolean(pkg) && idReady;
   const showCard = hasVerif && verif?.state === 'ok';
+  const discOn = isFF && idReady && discAvail;
+  const discTab = discOn && tab === 'disc';
+  useEffect(() => {
+    if (tab === 'disc' && !discOn) setTab('rec');
+  }, [tab, discOn]);
   const hint = !idReady
     ? isML
       ? mlOk && verif?.state === 'loading'
@@ -261,16 +267,7 @@ export default function Checkout({ game }) {
               )}
             </div>
           )}
-          {isFF && idReady && (
-            <FFDiscountOffer
-              playerId={id}
-              nickname={
-                verif?.state === 'ok'
-                  ? verif.nickname
-                  : ''
-              }
-            />
-          )}
+          
           {isML && id !== '' && zoneT !== '' && !mlOk && (
             <p className="text-sm text-red-400">El ID debe tener solo números (5 a 12 dígitos) y la Zona hasta 5 dígitos.</p>
           )}
@@ -376,12 +373,12 @@ export default function Checkout({ game }) {
       </Step>
 
       <Step n="2" title="Elige tu paquete">
-        {hasTabs && (
-          <div className="mb-4 grid grid-cols-2 gap-3">
+        {(hasTabs || discOn) && (
+          <div className={`mb-4 grid gap-3 ${discOn ? 'grid-cols-3' : 'grid-cols-2'}`}>
             {[
               ['rec', 'Recargas'],
               ['pass', 'Pases'],
-            ].map(([k, name]) => (
+            ].filter(() => hasTabs).map(([k, name]) => (
               <button
                 key={k}
                 onClick={() => {
@@ -389,7 +386,7 @@ export default function Checkout({ game }) {
                   setAll(false);
                 }}
                 className={`rounded-xl border-2 py-2.5 font-display text-base font-bold uppercase tracking-wide transition ${
-                  active === k
+                  active === k && !discTab
                     ? 'border-yellow-300 bg-gradient-to-r from-yellow-300 to-orange-400 text-black shadow-[0_0_16px_-4px_rgb(var(--accent)/0.7)]'
                     : 'border-white/10 bg-zinc-950 text-white/70'
                 }`}
@@ -397,11 +394,35 @@ export default function Checkout({ game }) {
                 {name}
               </button>
             ))}
+          {discOn && (
+              <button
+                type="button"
+                onClick={() => setTab(discTab ? 'rec' : 'disc')}
+                aria-pressed={discTab}
+                className={`rounded-xl border-2 py-2.5 font-display text-base font-bold uppercase tracking-wide transition ${
+                  discTab
+                    ? 'border-red-500 bg-gradient-to-r from-red-500 to-rose-500 text-[#ffffff] shadow-[0_0_16px_-4px_rgb(239_68_68/0.8)]'
+                    : 'border-red-500/60 bg-zinc-950 text-red-300'
+                }`}
+              >
+                Descuento
+              </button>
+            )}
+          </div>
+        )}
+
+        {isFF && idReady && (
+          <div className={discTab ? 'mb-4' : 'hidden'}>
+            <FFDiscountOffer
+              playerId={id}
+              nickname={verif?.state === 'ok' ? verif.nickname : ''}
+              onAvailable={setDiscAvail}
+            />
           </div>
         )}
 
         <div className="grid grid-cols-2 gap-3">
-          {shown.map((p) => {
+          {(discTab ? [] : shown).map((p) => {
             const { big, unit, num } = parse(p.label);
             const on = pkgId === p.id;
             return (
@@ -442,7 +463,7 @@ export default function Checkout({ game }) {
           })}
         </div>
 
-        {list.length > PAGE && (
+        {!discTab && list.length > PAGE && (
           <button
             onClick={() => setAll(!all)}
             className="mx-auto mt-5 flex items-center gap-1 font-semibold text-yellow-300"
@@ -518,7 +539,7 @@ export default function Checkout({ game }) {
         </div>
       </section>
 
-      <div className="buybar fixed inset-x-0 bottom-0 z-10 border-t-2 border-yellow-300/60 bg-gradient-to-t from-black via-black/95 to-zinc-950/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur">
+      <div style={discTab ? { display: 'none' } : undefined} className="buybar fixed inset-x-0 bottom-0 z-10 border-t-2 border-yellow-300/60 bg-gradient-to-t from-black via-black/95 to-zinc-950/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-3">
           <div className="min-w-0 text-sm">
             {pkg ? (
