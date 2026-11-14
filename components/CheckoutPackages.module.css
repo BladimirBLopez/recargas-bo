@@ -297,3 +297,37 @@ span:last-child {
     padding: 8px !important;
   }
 }
+
+
+/* PROTECCION RESPONSIVE FINAL */
+
+/* Evitar que los nombres largos se salgan */
+.cards > button > div:first-of-type > div > div:first-child.ffTitle {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* Celulares pequeños */
+@media (max-width: 359px) {
+  .cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px;
+  }
+
+  .cards > button {
+    aspect-ratio: auto !important;
+    min-height: 82px !important;
+  }
+}
+
+/* Pantallas extremadamente estrechas */
+@media (max-width: 300px) {
+  .cards {
+    grid-template-columns: 1fr !important;
+  }
+
+  .cards > button {
+    min-height: 85px !important;
+  }
+}
