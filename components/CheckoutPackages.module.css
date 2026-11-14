@@ -230,8 +230,9 @@ span:last-child {
 }
 
 .cards > button {
-  min-height: clamp(110px, 27vw, 165px);
-  padding: clamp(12px, 2.4vw, 20px);
+  aspect-ratio: 1.34 / 1;
+  min-height: clamp(96px, 22vw, 138px);
+  padding: clamp(10px, 2vw, 16px);
   border-radius: 20px;
 }
 
@@ -255,22 +256,24 @@ span:last-child {
 
 @media (max-width: 340px) {
   .cards > button {
-    padding: 10px;
-    min-height: 105px;
+    padding: 9px 10px;
+    aspect-ratio: 1.22 / 1;
+    min-height: 96px;
   }
 
   .cards > button > div:first-of-type > div > div:first-child.ffTitle {
-    font-size: 10px;
+    font-size: 9px;
   }
 }
 
 @media (min-width: 768px) {
   .cards > button {
-    min-height: 155px;
-    padding: 22px;
+    aspect-ratio: 1.42 / 1;
+    min-height: 128px;
+    padding: 18px;
   }
 
   .cards > button > div:first-of-type > div > div:first-child.ffTitle {
-    font-size: clamp(19px, 2.8vw, 28px);
+    font-size: clamp(16px, 2.2vw, 24px);
   }
 }
