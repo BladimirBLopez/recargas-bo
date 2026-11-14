@@ -450,9 +450,9 @@ export default function Checkout({ game }) {
                   <div className="min-w-0">
                     <div className={`${num ? 'text-2xl' : 'text-base'} font-display font-extrabold leading-tight`}>
                       {big}
+                      {p.bonus && <span className="ml-1.5 text-sm font-extrabold text-yellow-300">{p.bonus}</span>}
                     </div>
                     {unit && <div className="text-xs font-semibold tracking-wide text-white/60">{unit}</div>}
-                    {p.bonus && <div className="mt-0.5 text-xs font-extrabold text-yellow-300">{p.bonus}</div>}
                   </div>
                 </div>
                 <div className="mt-3 flex items-center justify-between">
