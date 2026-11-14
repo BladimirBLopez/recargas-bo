@@ -56,7 +56,7 @@ function Acc({ icon: Icon, title, children }) {
 }
 
 function parse(label) {
-  const m = label.match(/^(\d[\d.,]*)\s*(.*)$/);
+  const m = label.match(/^(\d[\d.,]*(?:\s*\+\s*\d[\d.,]*)?)\s*(.*)$/);
   if (!m) return { big: label, unit: '', num: false };
   const hasGem = m[2].includes('💎');
   const unit = m[2].replace('💎', '').trim() || (hasGem ? 'DIAMANTES' : '');
@@ -496,8 +496,8 @@ export default function Checkout({ game }) {
                     <div className={`${num ? 'text-2xl' : 'text-base'} font-display font-extrabold leading-tight`}>
                       {topLabel}
                     </div>
-                    {unit && (
-                      <div className="text-xs font-semibold tracking-wide text-white/60">{unit}</div>
+                    {(unit || (isFF && num)) && (
+                      <div className="text-xs font-semibold tracking-wide text-white/60">{unit || 'DIAMANTES'}</div>
                     )}
                   </div>
                 </div>
