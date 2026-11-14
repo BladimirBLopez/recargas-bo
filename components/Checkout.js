@@ -493,7 +493,7 @@ export default function Checkout({ game }) {
                     <PkgIcon size={22} className="text-sky-400" />
                   </span>
                   <div className="min-w-0">
-                    <div className={`${num ? 'text-2xl' : 'text-base'} font-display font-extrabold leading-tight`}>
+                    <div className={`${num ? 'text-2xl' : 'text-base'} font-display font-extrabold leading-tight ${isFF && num ? styles.ffTitle : ''}`}>
                       {topLabel}
                     </div>
                     {(unit || (isFF && num)) && !(isFF && bonusText && num) && (
