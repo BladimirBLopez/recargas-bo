@@ -496,8 +496,8 @@ export default function Checkout({ game }) {
                     <div className={`${num ? 'text-2xl' : 'text-base'} font-display font-extrabold leading-tight`}>
                       {topLabel}
                     </div>
-                    {(unit || (isFF && num)) && (
-                      <div className="text-xs font-semibold tracking-wide text-white/60">{big} {unit || 'DIAMANTES'}</div>
+                    {(unit || (isFF && num)) && !(isFF && bonusText && num) && (
+                      <div className="text-xs font-semibold tracking-wide text-white/60">{unit || 'DIAMANTES'}</div>
                     )}
                   </div>
                 </div>
