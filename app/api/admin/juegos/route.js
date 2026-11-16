@@ -34,6 +34,7 @@ export async function GET(req) {
         packages: applyPackages(g, pm, true).packages.map((p) => ({
           id: p.id,
           label: p.label,
+          baseLabel: p.baseLabel || p.label,
           price: p.price,
           basePrice: p.basePrice,
           custom: Boolean(p.custom),

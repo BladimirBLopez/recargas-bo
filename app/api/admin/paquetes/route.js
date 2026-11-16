@@ -78,6 +78,7 @@ export async function PATCH(req) {
     }
     const price = num(body?.price, 0.01, 100000);
     const cost = num(body?.cost, 0, 100000);
+    let baseLabel;
     const hasBonus = body?.bonus !== undefined;
     const bonusRaw = hasBonus ? String(body.bonus ?? '').replace(/\s+/g, ' ').trim() : '';
     if (bonusRaw.length > 24 || /[\u0000-\u001f<>{}]/.test(bonusRaw)) return json({ error: 'bono_invalido' }, 400);
@@ -85,8 +86,9 @@ export async function PATCH(req) {
     if (!price.ok || !cost.ok || typeof body?.active !== 'boolean') return json({ error: 'datos_invalidos' }, 400);
     if (body?.label !== undefined) {
       const lab = String(body.label).trim().slice(0, 40);
-      if (!lab) return json({ error: 'datos_invalidos' }, 400);
-      const r = await q`UPDATE custom_packages SET label = ${lab} WHERE id = ${id} RETURNING id`;
+      if (!lab || /[\u0000-\u001f<>{}]/.test(lab)) return json({ error: 'datos_invalidos' }, 400);
+      const r = /^cp-/.test(id) ? await q`UPDATE custom_packages SET label = ${lab} WHERE id = ${id} RETURNING id` : [{ id }];
+      if (!/^cp-/.test(id)) baseLabel = lab;
       if (!r.length) return json({ error: 'no_editable' }, 400);
     }
     await q`INSERT INTO package_settings (package_id, price, cost, active, bonus, updated_at)
@@ -94,6 +96,11 @@ export async function PATCH(req) {
       ON CONFLICT (package_id) DO UPDATE
       SET price = EXCLUDED.price, cost = EXCLUDED.cost, active = EXCLUDED.active,
         bonus = CASE WHEN ${hasBonus}::boolean THEN EXCLUDED.bonus ELSE package_settings.bonus END, updated_at = now()`;
+    if (baseLabel !== undefined) {
+      const base = (await allGames()).flatMap((g) => g.packages || []).find((p) => p.id === id);
+      const val = !baseLabel || (base && baseLabel === String(base.label)) ? null : baseLabel;
+      await q`UPDATE package_settings SET label = ${val} WHERE package_id = ${id}`;
+    }
     return json({ ok: true });
   } catch (e) {
     console.error('paquetes patch error', e?.code || '', e?.message || '');
