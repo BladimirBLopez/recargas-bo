@@ -15,6 +15,7 @@ export const metadata = {
   applicationName: SITE_NAME,
   appleWebApp: { capable: true, title: SITE_NAME, statusBarStyle: 'black-translucent' },
   metadataBase: new URL('https://flakitogaming.store'),
+  manifest: '/manifest.webmanifest',
   icons: {
     icon: [{ url: '/icon-32.png', sizes: '32x32', type: 'image/png' }, { url: '/icon-192.png', sizes: '192x192', type: 'image/png' }],
     apple: '/icon-180.png',
