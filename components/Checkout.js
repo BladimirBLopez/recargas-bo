@@ -470,6 +470,7 @@ export default function Checkout({ game }) {
             const topLabel = bonusText && num
               ? `(${big} ${bonusText})`
               : big;
+            const inlineUnit = num && Boolean(unit) && !bonusText && unit.length <= 4;
 
             return (
               <button
@@ -495,9 +496,9 @@ export default function Checkout({ game }) {
                   </span>
                   <div className="min-w-0">
                     <div className={`${num ? 'text-2xl' : 'text-base'} font-display font-extrabold leading-tight ${isFF && num ? styles.ffTitle : ''}`}>
-                      {topLabel}
+                      <span className="whitespace-nowrap">{topLabel}{inlineUnit && <span className="ml-1.5 text-[0.6em] font-bold text-white/60">{unit}</span>}</span>
                     </div>
-                    {(unit || (isFF && num)) && !(isFF && bonusText && num) && (
+                    {(unit || (isFF && num)) && !(isFF && bonusText && num) && !inlineUnit && (
                       <div className="text-xs font-semibold tracking-wide text-white/60">{unit || 'DIAMANTES'}</div>
                     )}
                   </div>
