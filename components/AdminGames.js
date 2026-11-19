@@ -1,18 +1,29 @@
 'use client';
+import { MdEdit as MdEditPkg, MdDeleteOutline as MdDelPkg } from 'react-icons/md';
 import { useEffect, useState, useCallback } from 'react';
 import { MdExpandMore, MdSave, MdRestartAlt, MdImage, MdSettings, MdInventory2 } from 'react-icons/md';
 import DetailBannerEditor from './admin/DetailBannerEditor';
 import GameProfileImageEditor from './admin/GameProfileImageEditor';
 import PackageSectionsEditor from './admin/PackageSectionsEditor';
 
+function previewOf(label, bonus) {
+  const text = String(label || '');
+  const m = text.match(/^(\d[\d.,]*(?:\s*\+\s*\d[\d.,]*)?)\s*(.*)$/);
+  const b = bonus ? String(bonus).replace(/^\+?\s*/, '+ ').replace(/\s+/g, ' ').trim().toUpperCase() : '';
+  if (!m) return { top: text, unit: '', num: false };
+  const hasGem = m[2].includes('💎');
+  const unit = (m[2].replace('💎', '').trim() || (hasGem ? 'DIAMANTES' : '')).toUpperCase();
+  return { top: b ? '(' + m[1] + ' ' + b + ')' : m[1], unit, num: true };
+}
+
 function PackageRow({ p, onChanged, onError, onNote = () => {}, canEdit = false }) {
   const [price, setPrice] = useState(String(p.price));
   const [cost, setCost] = useState(p.cost === null ? '' : String(p.cost));
   const [active, setActive] = useState(p.active);
   const [bonus, setBonus] = useState(p.bonus || '');
-  const [busy, setBusy] = useState(false);
-  const [editing, setEditing] = useState(false);
   const [name, setName] = useState(p.label);
+  const [editing, setEditing] = useState(false);
+  const [busy, setBusy] = useState(false);
   const [askDel, setAskDel] = useState(false);
 
   useEffect(() => {
@@ -20,19 +31,28 @@ function PackageRow({ p, onChanged, onError, onNote = () => {}, canEdit = false 
     setCost(p.cost === null ? '' : String(p.cost));
     setActive(p.active);
     setBonus(p.bonus || '');
-  }, [p.price, p.cost, p.active, p.bonus]);
+    setName(p.label);
+  }, [p.price, p.cost, p.active, p.bonus, p.label]);
 
+  const nameEditable = canEdit || !p.custom;
+  const nameClean = name.replace(/\s+/g, ' ').trim();
+  const nameChanged = nameClean !== p.label;
+  const renamedBase = Boolean(p.baseLabel) && p.baseLabel !== p.label;
   const dirty =
+    nameChanged ||
     Number(price) !== p.price ||
     (cost === '' ? p.cost !== null : Number(cost) !== p.cost) ||
     active !== p.active ||
     bonus.trim() !== (p.bonus || '');
-  const modified = p.price !== p.basePrice || p.cost !== null || !p.active;
+  const modified = p.price !== p.basePrice || p.cost !== null || !p.active || Boolean(p.bonus) || renamedBase;
   const gan = price !== '' && cost !== '' ? Number(price) - Number(cost) : null;
+  const passFlip = nameChanged && /pase/i.test(nameClean) !== /pase/i.test(p.label);
+  const pv = previewOf(nameClean || p.label, bonus.trim());
 
   async function send(payload) {
     setBusy(true);
     onError('');
+    let ok = false;
     try {
       const r = await fetch('/api/admin/paquetes', {
         method: 'PATCH',
@@ -40,37 +60,40 @@ function PackageRow({ p, onChanged, onError, onNote = () => {}, canEdit = false 
         body: JSON.stringify({ id: p.id, ...payload }),
       });
       if (!r.ok) onError('No se pudo guardar (' + r.status + '). Inténtalo otra vez.');
-      else await onChanged();
-    } catch (e) {
-      onError('Sin conexión');
-    }
-    setBusy(false);
-  }
-
-  async function rename() {
-    const lab = name.trim();
-    if (!lab || lab === p.label) {
-      setEditing(false);
-      setName(p.label);
-      return;
-    }
-    setBusy(true);
-    onError('');
-    try {
-      const r = await fetch('/api/admin/paquetes', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: p.id, label: lab, price: p.price, cost: p.cost, active: p.active }),
-      });
-      if (!r.ok) onError('No se pudo cambiar el nombre (' + r.status + ').');
       else {
-        setEditing(false);
         await onChanged();
+        ok = true;
       }
     } catch (e) {
       onError('Sin conexión');
     }
     setBusy(false);
+    return ok;
+  }
+
+  async function save() {
+    if (!nameClean) {
+      onError('El nombre no puede estar vacío.');
+      return;
+    }
+    const payload = {
+      price: price === '' ? null : Number(price),
+      cost: cost === '' ? null : Number(cost),
+      active,
+      bonus: bonus.trim(),
+    };
+    if (nameChanged) payload.label = nameClean;
+    if (await send(payload)) setEditing(false);
+  }
+
+  function discard() {
+    setPrice(String(p.price));
+    setCost(p.cost === null ? '' : String(p.cost));
+    setActive(p.active);
+    setBonus(p.bonus || '');
+    setName(p.label);
+    setEditing(false);
+    onError('');
   }
 
   async function remove() {
@@ -102,26 +125,72 @@ function PackageRow({ p, onChanged, onError, onNote = () => {}, canEdit = false 
   }
 
   const inp =
-    'mt-1 w-full rounded-xl border border-white/15 bg-[#081A2F]/80 px-3 py-2.5 text-sm font-semibold text-white outline-none transition focus:border-cyan-400/70 focus:ring-1 focus:ring-cyan-400/20';
+    'mt-1 w-full rounded-xl border border-white/15 bg-[#081A2F]/80 px-3 py-2.5 text-sm font-semibold text-white outline-none focus:border-cyan-400/60';
 
   return (
-    <div className={'rounded-2xl border p-3.5 transition-colors ' + (active ? 'border-cyan-400/15 bg-[#102B49]/80' : 'border-red-400/25 bg-red-400/5')}>
-      <div className="flex items-center justify-between gap-2">
-        <div className="min-w-0">
-          {editing ? (
-            <input value={name} onChange={(e) => setName(e.target.value)} maxLength={40} autoFocus className={inp} />
+    <div className={'rounded-2xl border p-3.5 transition-colors ' + (active ? 'border-cyan-400/15 bg-[#102B49]/80' : 'border-amber-400/20 bg-[#102B49]/50')}>
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0 flex-1">
+          {editing && nameEditable ? (
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              maxLength={40}
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') save();
+                if (e.key === 'Escape') discard();
+              }}
+              className={inp}
+            />
           ) : (
-            <div className="truncate text-sm font-extrabold text-white">{p.label}</div>
+            <div className="flex items-center gap-1.5">
+              <div className="truncate text-sm font-extrabold text-white">{p.label}</div>
+              {nameEditable && (
+                <button
+                  type="button"
+                  aria-label="Editar nombre"
+                  disabled={busy}
+                  onClick={() => setEditing(true)}
+                  className="grid h-6 w-6 shrink-0 place-items-center rounded-lg border border-cyan-400/25 bg-[#163554] text-slate-200 disabled:opacity-50"
+                >
+                  <MdEditPkg className="text-sm" />
+                </button>
+              )}
+            </div>
           )}
-          <div className="text-[11px] text-slate-400">Base: Bs {p.basePrice}</div>
+          <div className="mt-0.5 text-[11px] text-slate-400">
+            {renamedBase ? 'Original: ' + p.baseLabel : p.custom ? 'Paquete propio' : 'Paquete del catálogo'}
+            {!p.custom && ' · Precio base: Bs ' + p.basePrice}
+          </div>
         </div>
         <button
+          type="button"
           onClick={() => setActive((v) => !v)}
-          className={'rounded-full border px-3 py-1 text-xs font-bold ' + (active ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300' : 'border-red-400/30 bg-red-400/10 text-red-300')}
+          className={'shrink-0 rounded-full border px-3 py-1 text-xs font-bold ' + (active ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300' : 'border-amber-400/30 bg-amber-400/10 text-amber-200')}
         >
           {active ? 'Activo' : 'Pausado'}
         </button>
       </div>
+
+      <div className="mt-3 rounded-xl border border-white/10 bg-[#081A2F]/60 p-2.5">
+        <div className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Así se ve en la tienda</div>
+        <div className="mt-1.5 flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <div className={'font-display font-extrabold leading-tight text-white ' + (pv.num ? 'text-2xl' : 'text-base')}>{pv.top}</div>
+            {pv.unit && <div className="text-xs font-semibold tracking-wide text-white/60">{pv.unit}</div>}
+          </div>
+          <div className="shrink-0 rounded-lg bg-cyan-400/15 px-3 py-1 font-display text-xl font-extrabold text-cyan-300">
+            Bs {Number(price) || p.basePrice}
+          </div>
+        </div>
+      </div>
+      {passFlip && (
+        <p className="mt-2 text-[11px] font-semibold text-amber-200">
+          Ojo: con ese nombre el paquete cambia de sección automática (Recargas y Pases), si no lo moviste a mano.
+        </p>
+      )}
+
       <div className="mt-3 grid grid-cols-2 gap-3">
         <label className="text-[11px] text-white/50">
           Precio (Bs)
@@ -129,12 +198,12 @@ function PackageRow({ p, onChanged, onError, onNote = () => {}, canEdit = false 
         </label>
         <label className="text-[11px] text-white/50">
           Costo (Bs)
-          <input type="number" inputMode="decimal" min="0" step="0.5" value={cost} onChange={(e) => setCost(e.target.value)} placeholder="Sin costo" className={inp} />
+          <input type="number" inputMode="decimal" min="0" step="0.5" value={cost} onChange={(e) => setCost(e.target.value)} className={inp} />
         </label>
       </div>
       <label className="mt-3 block text-[11px] text-white/50">
         Bono (opcional, máx. 24 letras)
-        <input type="text" maxLength={24} value={bonus} onChange={(e) => setBonus(e.target.value)} placeholder="Ej: +10% extra" className={inp} />
+        <input type="text" maxLength={24} value={bonus} onChange={(e) => setBonus(e.target.value)} placeholder="Ej: +10" className={inp} />
       </label>
       {gan !== null && (
         <div className={'mt-2 text-xs font-semibold ' + (gan >= 0 ? 'text-emerald-300' : 'text-red-300')}>
@@ -142,80 +211,26 @@ function PackageRow({ p, onChanged, onError, onNote = () => {}, canEdit = false 
           {Number(price) > 0 ? ' (' + Math.round((gan / Number(price)) * 100) + '%)' : ''}
         </div>
       )}
-      {(canEdit || !p.custom) && (
-        <div className="mt-3 border-t border-white/10 pt-3">
-          {editing ? (
-            <div className="flex gap-2">
+
+      {(dirty || modified) && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {dirty && (
+            <>
               <button
-                disabled={busy || !name.trim()}
-                onClick={rename}
+                disabled={busy}
+                onClick={save}
                 className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#00D9FF] to-[#007BFF] py-2.5 text-sm font-extrabold text-slate-950 transition active:scale-95 disabled:opacity-50"
               >
-                <MdSave className="text-lg" /> Guardar nombre
+                <MdSave className="text-lg" /> Guardar cambios
               </button>
               <button
                 disabled={busy}
-                onClick={() => {
-                  setEditing(false);
-                  setName(p.label);
-                }}
-                className="rounded-xl border border-white/15 bg-[#163554] px-4 py-2 text-xs font-bold text-slate-200 transition active:scale-95"
+                onClick={discard}
+                className="rounded-xl border border-white/15 bg-[#163554] px-3 py-2 text-xs font-bold text-slate-200 transition active:scale-95 disabled:opacity-50"
               >
-                Cancelar
+                Descartar
               </button>
-            </div>
-          ) : askDel ? (
-            <div className="rounded-xl border border-red-400/30 bg-red-400/10 p-3">
-              <p className="text-xs text-red-200">¿Borrar este paquete? Los pedidos ya creados no se borran.</p>
-              <div className="mt-2 flex gap-2">
-                <button
-                  disabled={busy}
-                  onClick={remove}
-                  className="flex-1 rounded-xl bg-red-500 py-2 text-sm font-extrabold text-white transition active:scale-95 disabled:opacity-50"
-                >
-                  Sí, borrar
-                </button>
-                <button
-                  disabled={busy}
-                  onClick={() => setAskDel(false)}
-                  className="rounded-xl border border-white/15 bg-[#163554] px-4 py-2 text-xs font-bold text-slate-200 transition active:scale-95"
-                >
-                  Cancelar
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="flex gap-2">
-              <button
-                onClick={() => {
-                  setName(p.label);
-                  setEditing(true);
-                }}
-                className="flex-1 rounded-xl border border-cyan-400/20 bg-[#163554] py-2 text-xs font-bold text-slate-200 transition active:scale-95"
-              >
-                Editar nombre
-              </button>
-              <button
-                hidden={!p.custom}
-                onClick={() => setAskDel(true)}
-                className="rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-2 text-xs font-bold text-red-300 transition active:scale-95"
-              >
-                Borrar
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-      {(dirty || modified) && (
-        <div className="mt-2 flex gap-2">
-          {dirty && (
-            <button
-              disabled={busy}
-              onClick={() => send({ price: price === '' ? null : Number(price), cost: cost === '' ? null : Number(cost), active, bonus: bonus.trim() })}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#00D9FF] to-[#007BFF] py-2.5 text-sm font-extrabold text-slate-950 shadow-md shadow-cyan-500/15 transition active:scale-95 disabled:opacity-50"
-            >
-              <MdSave className="text-lg" /> Guardar
-            </button>
+            </>
           )}
           {modified && (
             <button
@@ -226,6 +241,35 @@ function PackageRow({ p, onChanged, onError, onNote = () => {}, canEdit = false 
               <MdRestartAlt className="text-lg" /> Restablecer
             </button>
           )}
+        </div>
+      )}
+
+      {canEdit && !askDel && (
+        <div className="mt-2 text-right">
+          <button type="button" disabled={busy} onClick={() => setAskDel(true)} className="inline-flex items-center gap-1 text-[11px] font-bold text-red-300/80 disabled:opacity-50">
+            <MdDelPkg className="text-sm" /> Borrar paquete
+          </button>
+        </div>
+      )}
+      {canEdit && askDel && (
+        <div className="mt-3 rounded-xl border border-red-400/30 bg-red-400/10 p-3">
+          <p className="text-xs text-red-200">¿Borrar este paquete? Los pedidos ya creados no se borran.</p>
+          <div className="mt-2 flex gap-2">
+            <button
+              disabled={busy}
+              onClick={remove}
+              className="flex-1 rounded-xl bg-red-500 py-2 text-sm font-extrabold text-white transition active:scale-95 disabled:opacity-50"
+            >
+              Sí, borrar
+            </button>
+            <button
+              disabled={busy}
+              onClick={() => setAskDel(false)}
+              className="rounded-xl border border-white/15 bg-[#163554] px-4 py-2 text-xs font-bold text-slate-200 transition active:scale-95 disabled:opacity-50"
+            >
+              Cancelar
+            </button>
+          </div>
         </div>
       )}
     </div>
