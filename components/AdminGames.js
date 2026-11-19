@@ -6,16 +6,6 @@ import DetailBannerEditor from './admin/DetailBannerEditor';
 import GameProfileImageEditor from './admin/GameProfileImageEditor';
 import PackageSectionsEditor from './admin/PackageSectionsEditor';
 
-function previewOf(label, bonus) {
-  const text = String(label || '');
-  const m = text.match(/^(\d[\d.,]*(?:\s*\+\s*\d[\d.,]*)?)\s*(.*)$/);
-  const b = bonus ? String(bonus).replace(/^\+?\s*/, '+ ').replace(/\s+/g, ' ').trim().toUpperCase() : '';
-  if (!m) return { top: text, unit: '', num: false };
-  const hasGem = m[2].includes('💎');
-  const unit = (m[2].replace('💎', '').trim() || (hasGem ? 'DIAMANTES' : '')).toUpperCase();
-  return { top: b ? '(' + m[1] + ' ' + b + ')' : m[1], unit, num: true };
-}
-
 function PackageRow({ p, onChanged, onError, onNote = () => {}, canEdit = false }) {
   const [price, setPrice] = useState(String(p.price));
   const [cost, setCost] = useState(p.cost === null ? '' : String(p.cost));
@@ -47,7 +37,6 @@ function PackageRow({ p, onChanged, onError, onNote = () => {}, canEdit = false 
   const modified = p.price !== p.basePrice || p.cost !== null || !p.active || Boolean(p.bonus) || renamedBase;
   const gan = price !== '' && cost !== '' ? Number(price) - Number(cost) : null;
   const passFlip = nameChanged && /pase/i.test(nameClean) !== /pase/i.test(p.label);
-  const pv = previewOf(nameClean || p.label, bonus.trim());
 
   async function send(payload) {
     setBusy(true);
@@ -173,18 +162,6 @@ function PackageRow({ p, onChanged, onError, onNote = () => {}, canEdit = false 
         </button>
       </div>
 
-      <div className="mt-3 rounded-xl border border-white/10 bg-[#081A2F]/60 p-2.5">
-        <div className="text-[10px] font-bold uppercase tracking-wide text-slate-500">Así se ve en la tienda</div>
-        <div className="mt-1.5 flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <div className={'font-display font-extrabold leading-tight text-white ' + (pv.num ? 'text-2xl' : 'text-base')}>{pv.top}</div>
-            {pv.unit && <div className="text-xs font-semibold tracking-wide text-white/60">{pv.unit}</div>}
-          </div>
-          <div className="shrink-0 rounded-lg bg-cyan-400/15 px-3 py-1 font-display text-xl font-extrabold text-cyan-300">
-            Bs {Number(price) || p.basePrice}
-          </div>
-        </div>
-      </div>
       {passFlip && (
         <p className="mt-2 text-[11px] font-semibold text-amber-200">
           Ojo: con ese nombre el paquete cambia de sección automática (Recargas y Pases), si no lo moviste a mano.
