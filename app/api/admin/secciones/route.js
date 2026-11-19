@@ -119,6 +119,28 @@ export async function PATCH(req) {
   const hasActive = b?.active !== undefined;
   const hasSort = b?.sort !== undefined;
 
+  // Secciones fijas (Recargas / Pases): solo se puede cambiar el nombre, por juego.
+  if (id === 'rec' || id === 'pass') {
+    if (!/^[a-z0-9-]{1,60}$/.test(slug) || !hasName || hasActive || hasSort) {
+      return json({ error: 'datos_invalidos' }, 400);
+    }
+    const fixedName = String(b.name || '').replace(/\s+/g, ' ').trim();
+    const other = id === 'rec' ? 'pases' : 'recargas';
+    if (!fixedName || fixedName.length > 40 || fixedName.toLowerCase() === 'descuento' || fixedName.toLowerCase() === other) {
+      return json({ error: 'nombre_invalido' }, 400);
+    }
+    try {
+      await sql()`INSERT INTO package_sections (game_slug, id, name, sort, active)
+        VALUES (${slug}, ${id}, ${fixedName}, ${id === 'rec' ? -2 : -1}, true)
+        ON CONFLICT (game_slug, id) DO UPDATE SET name = EXCLUDED.name`;
+      return json({ ok: true });
+    } catch (e) {
+      if (e?.code === '23505') return json({ error: 'nombre_repetido' }, 409);
+      console.error('secciones patch fija', e);
+      return json({ error: 'db' }, 500);
+    }
+  }
+
   if (!slug || !/^sec-[0-9a-f-]{36}$/.test(id))
     return json({ error: 'datos_invalidos' }, 400);
 

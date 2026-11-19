@@ -106,17 +106,18 @@ export default function Checkout({ game }) {
   }, [game.slug]);
 
   const pkg = game.packages.find((p) => p.id === pkgId);
+  const secName = (id, d) => (game.sections || []).find((s) => s.id === id)?.name || d;
   const sectionTabs = [
     {
       id: 'rec',
-      name: 'Recargas',
+      name: secName('rec', 'Recargas'),
       packages: game.packages.filter(
         p => p.sectionId === 'rec' || (!p.sectionId && !isPass(p))
       )
     },
     {
       id: 'pass',
-      name: 'Pases',
+      name: secName('pass', 'Pases'),
       packages: game.packages.filter(
         p => p.sectionId === 'pass' || (!p.sectionId && isPass(p))
       )
