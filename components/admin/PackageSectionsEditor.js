@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { MdEdit, MdCheck, MdClose } from 'react-icons/md';
 
 const btn = 'rounded-xl border border-cyan-400/25 bg-[#163554] px-3 py-2 text-xs font-bold text-white disabled:opacity-40';
 const inp = 'w-full min-w-0 rounded-xl border border-white/15 bg-[#081A2F] px-3 py-2.5 text-sm text-white';
@@ -14,6 +15,8 @@ export default function PackageSectionsEditor({
   const [form, setForm] = useState(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState('');
+  const [editId, setEditId] = useState(null);
+  const [editName, setEditName] = useState('');
 
   async function load() {
     const r = await fetch(
@@ -58,11 +61,22 @@ export default function PackageSectionsEditor({
       setMsg('Guardado correctamente');
       return true;
     } catch (e) {
-      setMsg('Error: ' + e.message);
+      setMsg(({ nombre_invalido: 'Ese nombre no es válido.', nombre_repetido: 'Ya existe una sección con ese nombre.', datos_invalidos: 'Revisa los datos.', no_autorizado: 'Tu sesión venció. Vuelve a entrar al panel.' })[e.message] || 'Error: ' + e.message);
       return false;
     } finally {
       setBusy(false);
     }
+  }
+
+  async function saveName(s) {
+    const n = editName.replace(/\s+/g, ' ').trim();
+    if (!n) return;
+    if (n === s.name) {
+      setEditId(null);
+      return;
+    }
+    const ok = await send('PATCH', { id: s.id, name: n });
+    if (ok) setEditId(null);
   }
 
   const custom = sections
@@ -70,8 +84,8 @@ export default function PackageSectionsEditor({
     .sort((a, b) => Number(a.sort) - Number(b.sort));
 
   const groups = [
-    { id: 'rec', name: 'Recargas', active: true, fixed: true },
-    { id: 'pass', name: 'Pases', active: true, fixed: true },
+    { id: 'rec', name: sections.find(x => x.id === 'rec')?.name || 'Recargas', active: true, fixed: true },
+    { id: 'pass', name: sections.find(x => x.id === 'pass')?.name || 'Pases', active: true, fixed: true },
     ...custom
   ];
 
@@ -145,10 +159,45 @@ export default function PackageSectionsEditor({
           >
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
-                <h3 className="font-bold text-white">
-                  {s.name}
-                  {!s.active && ' (Oculta)'}
-                </h3>
+                {editId === s.id ? (
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      className={inp}
+                      value={editName}
+                      maxLength={40}
+                      autoFocus
+                      onChange={e => setEditName(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') saveName(s);
+                        if (e.key === 'Escape') setEditId(null);
+                      }}
+                    />
+                    <button className={btn} disabled={busy || !editName.trim()}
+                      aria-label="Guardar nombre" onClick={() => saveName(s)}>
+                      <MdCheck className="text-base" />
+                    </button>
+                    <button className={btn} disabled={busy}
+                      aria-label="Cancelar" onClick={() => setEditId(null)}>
+                      <MdClose className="text-base" />
+                    </button>
+                  </div>
+                ) : (
+                  <h3 className="flex items-center gap-1.5 font-bold text-white">
+                    {s.name}
+                    {!s.active && ' (Oculta)'}
+                    <button
+                      aria-label="Editar nombre de la sección"
+                      className="grid h-7 w-7 place-items-center rounded-lg border border-cyan-400/25 bg-[#163554] text-slate-200 disabled:opacity-50"
+                      disabled={busy}
+                      onClick={() => {
+                        setEditId(s.id);
+                        setEditName(s.name);
+                      }}
+                    >
+                      <MdEdit className="text-sm" />
+                    </button>
+                  </h3>
+                )}
                 <p className="text-xs text-slate-400">
                   {items.length} paquetes
                 </p>
@@ -156,16 +205,6 @@ export default function PackageSectionsEditor({
 
               {!s.fixed && (
                 <div className="flex flex-wrap gap-1">
-                  <button className={btn} disabled={busy}
-                    onClick={() => {
-                      const n = prompt('Nuevo nombre', s.name);
-                      if (n && n.trim())
-                        send('PATCH', {
-                          id: s.id, name: n.trim()
-                        });
-                    }}>
-                    Editar
-                  </button>
                   <button className={btn} disabled={busy}
                     onClick={() => send('PATCH', {
                       id: s.id, active: !s.active
