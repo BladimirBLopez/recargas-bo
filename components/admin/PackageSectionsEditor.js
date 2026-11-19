@@ -256,8 +256,8 @@ export default function PackageSectionsEditor({
                     }, '/asignar')}
                   >
                     <option value="">Automático</option>
-                    <option value="rec">Recargas</option>
-                    <option value="pass">Pases</option>
+                    <option value="rec">{groups[0].name}</option>
+                    <option value="pass">{groups[1].name}</option>
                     {custom.map(t => (
                       <option key={t.id} value={t.id}>
                         {t.name}
