@@ -82,12 +82,23 @@ span:first-child {
   min-width: 0;
 }
 
-/* CANTIDAD DEL PAQUETE */
+/* TITULOS DE PAQUETES */
 .cards > button > div:first-of-type >
-div > div:first-child {
+div > div:first-child.packageTitle {
+  font-size: clamp(14px, 2.4vw, 22px);
+  line-height: 1.15;
+  font-weight: 900;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* CANTIDADES DESTACADAS */
+.cards > button > div:first-of-type >
+div > div:first-child.numericTitle {
   font-size: clamp(22px, 3.5vw, 31px);
   line-height: 1.07;
   font-weight: 900;
+  white-space: normal;
   overflow-wrap: anywhere;
 }
 
@@ -247,9 +258,9 @@ span:last-child {
   font-size: clamp(12px, 3.4vw, 24px);
   line-height: 1.15;
   letter-spacing: -0.02em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
 }
 
 .cards > button > div:last-child {

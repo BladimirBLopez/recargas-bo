@@ -495,8 +495,8 @@ export default function Checkout({ game }) {
                     <PkgIcon size={22} className="text-sky-400" />
                   </span>
                   <div className="min-w-0">
-                    <div className={`${num ? 'text-2xl' : 'text-base'} font-display font-extrabold leading-tight ${isFF && num ? styles.ffTitle : ''}`}>
-                      <span className={num ? 'whitespace-nowrap' : 'whitespace-normal break-words'}>{topLabel}{inlineUnit && <span className="ml-1.5 text-[0.6em] font-bold text-white/60">{unit}</span>}</span>
+                    <div className={`${num ? styles.numericTitle : styles.packageTitle} font-display font-extrabold leading-tight ${isFF && num ? styles.ffTitle : ''}`}>
+                      <span className="block min-w-0 whitespace-normal break-words">{topLabel}{inlineUnit && <span className="ml-1.5 text-[0.6em] font-bold text-white/60">{unit}</span>}</span>
                     </div>
                     {(unit || (isFF && num)) && !(isFF && bonusText && num) && !inlineUnit && (
                       <div className="text-xs font-semibold tracking-wide text-white/60">{unit || 'DIAMANTES'}</div>
