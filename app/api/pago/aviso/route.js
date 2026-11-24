@@ -73,6 +73,7 @@ export async function POST(req) {
           AND payment_mode = 'AUTOMATICO' RETURNING id`;
       if (upd[0]) {
         await q`UPDATE pagos_recibidos SET status = 'confirmado', order_code = ${o.code} WHERE msg_id = ${msgId}`;
+        try { const { entregar } = await import('../../../../lib/centralone.js'); await entregar(o.code); } catch (e) { console.error('entregar error', e?.message || ''); }
         await telegram('✅ Pago automático Bs ' + amount + ' · ' + o.code + ' pasó a PAGADO\nPanel: ' + origin + '/admin');
         return json({ ok: true, confirmed: o.code });
       }

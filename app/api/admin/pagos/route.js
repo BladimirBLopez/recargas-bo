@@ -76,6 +76,7 @@ export async function POST(req) {
       RETURNING id`;
     if (!upd[0]) return json({ error: 'pedido_no_valido' }, 409);
     await q`UPDATE pagos_recibidos SET status = 'confirmado', order_code = ${code} WHERE msg_id = ${msgId}`;
+    try { const { entregar } = await import('../../../../lib/centralone.js'); await entregar(code); } catch (e) { console.error('entregar error', e?.message || ''); }
     return json({ ok: true });
   } catch (e) {
     console.error('admin pagos post error', e?.code || '', e?.message || '');

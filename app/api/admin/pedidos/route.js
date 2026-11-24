@@ -161,6 +161,12 @@ export async function PATCH(req) {
       SELECT id, status, paid_at FROM u`;
     }
     if (!upd[0]) return json({ error: 'cambio_concurrente' }, 409);
+    if (to === 'PAGADO') {
+      try {
+        const r = await q`SELECT code FROM orders WHERE id = ${id}`;
+        if (r[0]) { const { entregar } = await import('../../../../lib/centralone.js'); await entregar(r[0].code); }
+      } catch (e) { console.error('entregar error', e?.message || ''); }
+    }
     return json({ ok: true, order: upd[0] });
   } catch (e) {
     console.error('admin patch error', e?.code || '', e?.message || '');
