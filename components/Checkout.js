@@ -496,7 +496,7 @@ export default function Checkout({ game }) {
                   </span>
                   <div className="min-w-0">
                     <div className={`${num ? 'text-2xl' : 'text-base'} font-display font-extrabold leading-tight ${isFF && num ? styles.ffTitle : ''}`}>
-                      <span className="whitespace-nowrap">{topLabel}{inlineUnit && <span className="ml-1.5 text-[0.6em] font-bold text-white/60">{unit}</span>}</span>
+                      <span className={num ? 'whitespace-nowrap' : 'whitespace-normal break-words'}>{topLabel}{inlineUnit && <span className="ml-1.5 text-[0.6em] font-bold text-white/60">{unit}</span>}</span>
                     </div>
                     {(unit || (isFF && num)) && !(isFF && bonusText && num) && !inlineUnit && (
                       <div className="text-xs font-semibold tracking-wide text-white/60">{unit || 'DIAMANTES'}</div>
