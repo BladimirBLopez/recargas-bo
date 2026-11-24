@@ -1,6 +1,5 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { IoDiamond } from 'react-icons/io5';
 import {
   MdQrCode2,
   MdAccountBalanceWallet,
@@ -9,10 +8,8 @@ import {
   MdDescription,
   MdListAlt,
   MdLock,
-  MdCheckCircle,
 } from 'react-icons/md';
 import { motion } from 'framer-motion';
-import { MdPaid, MdSell } from 'react-icons/md';
 import OrderPay from '@/components/OrderPay';
 import FFDiscountOffer from '@/components/FFDiscountOffer';
 import styles from './CheckoutPackages.module.css';
@@ -20,7 +17,6 @@ import styles from './CheckoutPackages.module.css';
 const inputCls =
   'w-full rounded-2xl border-2 border-white/15 bg-zinc-950 px-4 py-3.5 text-base outline-none placeholder:text-white/40 focus:border-yellow-300 focus:shadow-[0_0_18px_-4px_rgb(var(--accent)/0.7)]';
 const PAGE = 8;
-const ICONS = { diamond: IoDiamond, coin: MdPaid, tag: MdSell };
 
 function Step({ n, title, action, children, className }) {
   return (
@@ -148,7 +144,6 @@ export default function Checkout({ game }) {
   const id = playerId.trim();
   const idFormatOk = /^\d{8,12}$/.test(id);
   const isML = game.slug === 'mobile-legends';
-  const PkgIcon = ICONS[game.icon] || IoDiamond;
   const zoneT = zone.trim();
   const formatOk = isRbx ? /^[A-Za-z0-9_]{3,20}$/.test(id) : isML ? /^\d{5,12}$/.test(id) && /^\d{1,5}$/.test(zoneT) : /^\d{8,12}$/.test(id);
   const mlOk = /^\d{5,12}$/.test(id) && /^\d{1,5}$/.test(zoneT);
@@ -477,7 +472,7 @@ export default function Checkout({ game }) {
                 key={p.id}
                 onClick={() => setPkgId(p.id)}
                 aria-pressed={on}
-                className={`relative rounded-2xl border-2 p-4 text-left transition active:scale-95 ${
+                className={`relative flex min-h-[142px] w-full min-w-0 flex-col rounded-2xl border-2 p-3 text-left transition active:scale-95 sm:min-h-[160px] sm:p-4 ${
                   on
                     ? 'border-yellow-300 bg-gradient-to-br from-yellow-300/25 to-yellow-300/5 shadow-[0_0_26px_-4px_rgb(var(--accent)/0.8)]'
                     : p.recommended
@@ -490,22 +485,16 @@ export default function Checkout({ game }) {
                     RECOMENDADO
                   </span>
                 )}
-                <div className="flex items-start gap-3">
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-yellow-300/10">
-                    <PkgIcon size={22} className="text-sky-400" />
-                  </span>
-                  <div className="min-w-0">
-                    <div className={`${num ? styles.numericTitle : styles.packageTitle} font-display font-extrabold leading-tight ${isFF && num ? styles.ffTitle : ''}`}>
-                      <span className="block min-w-0 whitespace-normal break-words">{topLabel}{inlineUnit && <span className="ml-1.5 text-[0.6em] font-bold text-white/60">{unit}</span>}</span>
-                    </div>
-                    {(unit || (isFF && num)) && !(isFF && bonusText && num) && !inlineUnit && (
-                      <div className="text-xs font-semibold tracking-wide text-white/60">{unit || 'DIAMANTES'}</div>
-                    )}
+                <div className="w-full min-w-0">
+                  <div className={`${num ? styles.numericTitle : styles.packageTitle} font-display font-extrabold leading-tight ${isFF && num ? styles.ffTitle : ''}`}>
+                    <span className="block min-w-0 whitespace-normal break-words">{topLabel}{inlineUnit && <span className="ml-1.5 text-[0.6em] font-bold text-white/60">{unit}</span>}</span>
                   </div>
+                  {(unit || (isFF && num)) && !(isFF && bonusText && num) && !inlineUnit && (
+                    <div className="mt-1 text-xs font-semibold tracking-wide text-white/60">{unit || 'DIAMANTES'}</div>
+                  )}
                 </div>
-                <div className="mt-3 flex items-center justify-between">
-                  {on ? <MdCheckCircle size={20} className="text-yellow-300" /> : <span />}
-                  <span className="rounded-lg bg-yellow-300/15 px-3 py-1 font-display text-xl font-extrabold text-yellow-300">Bs {p.price}</span>
+                <div className="mt-auto flex w-full items-center justify-start pt-5">
+                  <span className={`${styles.price} font-display text-xl font-extrabold`}>Bs {p.price}</span>
                 </div>
               </button>
             );

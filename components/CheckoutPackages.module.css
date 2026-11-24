@@ -1,12 +1,11 @@
+/* CONTENEDOR DEL PASO */
 .wrap {
   width: 100%;
   min-width: 0;
-  padding: clamp(14px, 3vw, 24px);
+  padding: clamp(12px, 2.8vw, 25px);
   border: 1px solid rgba(255,255,255,.12);
   border-radius: 26px;
-  background: linear-gradient(
-    180deg, #101218 0%, #0b0d13 100%
-  );
+  background: linear-gradient(180deg, #101218 0%, #0b0d13 100%);
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.04),
     0 10px 30px rgba(0,0,0,.12);
@@ -15,9 +14,10 @@
 /* PESTAÑAS */
 .tabs {
   display: flex !important;
-  grid-template-columns: none !important;
   flex-wrap: nowrap;
   gap: 8px;
+  width: 100%;
+  margin-bottom: 14px;
   overflow-x: auto;
   padding: 3px 0 8px;
   scrollbar-width: none;
@@ -30,8 +30,8 @@
 }
 
 .tabs > button {
-  flex: 0 0 auto;
-  min-width: 110px;
+  flex: 1 0 auto;
+  min-width: 100px;
   min-height: 43px;
   max-width: 220px;
   padding: 10px 14px;
@@ -42,11 +42,15 @@
   scroll-snap-align: start;
 }
 
-/* CUADRICULA */
+/* CUADRICULA: SIEMPRE DOS COLUMNAS */
 .cards {
   display: grid !important;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(10px, 2vw, 16px);
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-auto-flow: row;
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
+  gap: clamp(8px, 2vw, 16px);
 }
 
 /* TARJETAS */
@@ -54,37 +58,22 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  width: 100%;
   min-width: 0;
   min-height: 142px;
-  padding: clamp(13px, 2.4vw, 20px);
+  box-sizing: border-box;
+  padding: clamp(10px, 2.2vw, 18px);
   border-radius: 20px;
   background: #0a0c12;
   text-align: left;
   box-shadow: 0 4px 16px rgba(0,0,0,.14);
-  transition:
-    border-color .2s ease,
-    box-shadow .2s ease,
-    transform .2s ease;
-}
-
-/* OCULTAR ICONO SIN AFECTAR EL TEXTO */
-.cards > button > div:first-of-type >
-span:first-child {
-  display: none;
-}
-
-.cards > button > div:first-of-type {
-  gap: 0;
-}
-
-.cards > button > div:first-of-type > div {
-  width: 100%;
-  min-width: 0;
+  transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
 }
 
 /* TITULOS DE PAQUETES */
-.cards > button > div:first-of-type >
-div > div:first-child.packageTitle {
+.packageTitle {
+  width: 100%;
+  min-width: 0;
   font-size: clamp(14px, 2.4vw, 22px);
   line-height: 1.15;
   font-weight: 900;
@@ -92,9 +81,10 @@ div > div:first-child.packageTitle {
   overflow-wrap: anywhere;
 }
 
-/* CANTIDADES DESTACADAS */
-.cards > button > div:first-of-type >
-div > div:first-child.numericTitle {
+/* CANTIDADES NUMERICAS */
+.numericTitle {
+  width: 100%;
+  min-width: 0;
   font-size: clamp(22px, 3.5vw, 31px);
   line-height: 1.07;
   font-weight: 900;
@@ -102,87 +92,72 @@ div > div:first-child.numericTitle {
   overflow-wrap: anywhere;
 }
 
-/* TIPO: DIAMANTES, UC, ETC. */
-.cards > button > div:first-of-type >
-div > div:nth-child(2) {
-  margin-top: 5px;
-  font-size: clamp(10px, 1.8vw, 13px);
-  line-height: 1.2;
-  letter-spacing: .025em;
+/* TITULOS ESPECIALES FREE FIRE */
+.ffTitle {
+  max-width: 100%;
+  font-size: clamp(12px, 3.4vw, 24px);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  white-space: normal;
   overflow-wrap: anywhere;
 }
 
-/* BONO */
-.cards > button >
-div:not(:first-of-type):not(:last-of-type) {
-  width: fit-content;
-  max-width: 100%;
-  margin-top: 9px;
-  padding: 3px 0;
-  color: #36d5ff;
-  font-size: clamp(10px, 1.8vw, 12px);
-  font-weight: 800;
-}
-
-/* PRECIO INFERIOR */
-.cards > button > div:last-child {
-  display: flex;
-  flex-direction: row-reverse;
-  justify-content: flex-end;
+/* PRECIO ABAJO A LA IZQUIERDA */
+.price {
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  margin-top: auto;
-  padding-top: 12px;
-}
-
-.cards > button > div:last-child >
-span:last-child {
-  padding: 0;
-  background: transparent;
-  color: #31d3ff;
-  font-size: clamp(22px, 3.6vw, 30px);
-  font-weight: 900;
+  max-width: 100%;
+  padding: 4px 12px;
+  border-radius: 10px;
+  background: rgb(var(--accent) / .12);
+  color: rgb(var(--accent));
+  font-size: clamp(16px, 4.4vw, 30px);
+  line-height: 1.2;
   white-space: nowrap;
 }
 
-/* PAQUETE SELECCIONADO */
+/* PAQUETE SELECCIONADO: COLORES DEL SISTEMA */
 .cards > button[aria-pressed="true"] {
-  border-color: #22d3ee;
+  border-color: rgb(var(--accent));
   background: linear-gradient(
-    155deg, #10212c 0%, #0a1019 90%
+    155deg,
+    rgb(var(--accent) / .13),
+    rgb(var(--accent2) / .08)
   );
   box-shadow:
-    0 0 0 1px rgba(34,211,238,.25),
-    0 0 20px rgba(34,211,238,.14);
+    0 0 0 1px rgb(var(--accent) / .25),
+    0 0 20px rgb(var(--accent) / .14);
 }
 
-/* CELULARES MUY PEQUEÑOS */
+/* CELULARES */
 @media (max-width: 340px) {
   .wrap {
-    padding: 11px;
+    padding: 10px;
+  }
+
+  .cards {
+    gap: 8px;
+  }
+
+  .cards > button {
+    min-height: 132px;
+    padding: 9px;
+    border-radius: 16px;
+  }
+
+  .packageTitle {
+    font-size: clamp(13px, 3.8vw, 17px);
+  }
+
+  .price {
+    padding: 4px 7px;
+    font-size: clamp(15px, 4.6vw, 19px);
   }
 
   .tabs > button {
     min-width: 94px;
     padding: 9px 11px;
     font-size: 11px;
-  }
-
-  .cards {
-    gap: 9px;
-  }
-
-  .cards > button {
-    min-height: 135px;
-    padding: 11px;
-    border-radius: 16px;
-  }
-}
-
-/* PANTALLAS EXTREMADAMENTE ESTRECHAS */
-@media (max-width: 290px) {
-  .cards {
-    grid-template-columns: 1fr;
   }
 }
 
@@ -196,6 +171,7 @@ span:last-child {
 
   .cards > button {
     min-height: 170px;
+    padding: 18px;
     border-radius: 24px;
   }
 
@@ -206,7 +182,7 @@ span:last-child {
 
 @media (hover: hover) and (pointer: fine) {
   .cards > button:hover {
-    border-color: rgba(34,211,238,.55);
+    border-color: rgb(var(--accent) / .55);
     box-shadow: 0 6px 20px rgba(0,0,0,.25);
   }
 }
@@ -214,96 +190,5 @@ span:last-child {
 @media (prefers-reduced-motion: reduce) {
   .cards > button {
     transition: none;
-  }
-}
-
-
-/* TARJETAS DE PAQUETES: BLOQUE UNICO RESPONSIVE */
-.wrap {
-  padding: clamp(12px, 2.8vw, 25px);
-}
-
-.tabs {
-  gap: 8px;
-  margin-bottom: 14px;
-}
-
-.tabs > button {
-  min-height: 42px;
-  padding: 10px 14px;
-  border-radius: 13px;
-}
-
-.cards {
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  gap: clamp(8px, 2vw, 16px);
-  align-items: stretch;
-}
-
-.cards > button {
-  min-width: 0;
-  height: auto;
-  aspect-ratio: auto;
-  min-height: 96px;
-  padding: clamp(9px, 2.2vw, 16px);
-  border-radius: 20px;
-}
-
-.cards > button > div:first-of-type {
-  min-width: 0;
-}
-
-.cards > button > div:first-of-type > div > div:first-child.ffTitle {
-  max-width: 100%;
-  font-size: clamp(12px, 3.4vw, 24px);
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  white-space: normal;
-  overflow-wrap: anywhere;
-  word-break: normal;
-}
-
-.cards > button > div:last-child {
-  margin-top: auto;
-  padding-top: 8px;
-  flex-wrap: wrap;
-  gap: 4px;
-  min-width: 0;
-}
-
-.cards > button > div:last-child > span:last-child {
-  max-width: 100%;
-  padding-inline: clamp(6px, 1.8vw, 12px);
-  font-size: clamp(16px, 4.4vw, 30px);
-  white-space: nowrap;
-}
-
-@media (max-width: 340px) {
-  .cards {
-    gap: 8px;
-  }
-
-  .cards > button {
-    min-height: 88px;
-    padding: 8px 9px;
-    border-radius: 16px;
-  }
-}
-
-@media (max-width: 299px) {
-  .cards {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-@media (min-width: 768px) {
-  .cards > button {
-    min-height: 128px;
-    padding: 18px;
-    border-radius: 22px;
-  }
-
-  .cards > button > div:first-of-type > div > div:first-child.ffTitle {
-    font-size: clamp(16px, 2.2vw, 24px);
   }
 }
