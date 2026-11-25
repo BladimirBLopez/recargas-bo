@@ -32,6 +32,27 @@ export async function POST(req) {
   const game = base ? applyPackages(base, await packageMap(), true) : null;
   const pkg = game?.packages.find((p) => p.id === body?.packageId);
   if (!game || !pkg || !pkg.active) return json({ error: 'pack_invalido' }, 400);
+
+  // Nombre comercial del paquete, incluyendo su bono.
+  const packageLabel = (() => {
+    const label = String(pkg.label || '').trim();
+    const bonus = String(pkg.bonus || '').replace(/^\+?\s*/, '').trim();
+
+    if (!bonus) return label;
+
+    const diamond = /💎/.test(label) || /💎/.test(bonus);
+    const base = label.replace(/\s*💎\s*$/, '').trim();
+    const extra = bonus.replace(/\s*💎\s*$/, '').trim();
+
+    if (!extra) return label;
+
+    if (base.replace(/\s/g, '').toLowerCase()
+        .includes('+' + extra.replace(/\s/g, '').toLowerCase())) {
+      return label;
+    }
+
+    return `${base} + ${extra}${diamond ? ' 💎' : ''}`;
+  })();
   try {
     const { sections, assignments } =
       await loadPackageSections();
@@ -109,7 +130,7 @@ export async function POST(req) {
 
     // Reutilizar solo pedidos de la misma cuenta autenticada.
     try {
-      const ex = await q`SELECT id, code, created_at, price FROM orders
+      const ex = await q`SELECT id, code, created_at, price, package_label FROM orders
         WHERE status = 'PENDIENTE' AND game_slug = ${game.slug} AND package_id = ${pkg.id}
           AND player_id = ${playerId}
           AND user_id = ${userId}::bigint
@@ -122,7 +143,7 @@ export async function POST(req) {
           code: ex[0].code,
           ts: new Date(ex[0].created_at).getTime(),
           game: game.name,
-          pkg: pkg.label,
+          pkg: ex[0].package_label || packageLabel,
           price: Number(ex[0].price),
           reused: true,
         });
@@ -133,7 +154,7 @@ export async function POST(req) {
       const code = newCode();
       try {
         const rows = await q`INSERT INTO orders (code, game_slug, package_id, package_label, price, player_id, nickname, user_id)
-          VALUES (${code}, ${game.slug}, ${pkg.id}, ${pkg.label}, ${pkg.price}, ${playerId}, ${nickname}, ${userId})
+          VALUES (${code}, ${game.slug}, ${pkg.id}, ${packageLabel}, ${pkg.price}, ${playerId}, ${nickname}, ${userId})
           RETURNING id, code, created_at`;
         const r = rows[0];
         if (pkg.cost !== null) {
@@ -146,7 +167,7 @@ export async function POST(req) {
           code: r.code,
           ts: new Date(r.created_at).getTime(),
           game: game.name,
-          pkg: pkg.label,
+          pkg: packageLabel,
           price: pkg.price,
         });
       } catch (e) {

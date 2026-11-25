@@ -236,7 +236,7 @@ export default function Checkout({ game }) {
         slug: game.slug,
         ts: Date.now(),
         game: game.name,
-        pkg: pkg.label,
+        pkg: d.pkg || pkg.label,
         price: d.price,
         idLabel: game.idLabel,
         id: fullId,
