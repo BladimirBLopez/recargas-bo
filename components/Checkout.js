@@ -462,10 +462,13 @@ export default function Checkout({ game }) {
             const { big, unit, num } = parse(p.label);
             const on = pkgId === p.id;
             const bonusText = p.bonus ? String(p.bonus).replace(/^\+?\s*/, '+ ').replace(/\s+/g, ' ').trim().toUpperCase() : '';
-            const topLabel = bonusText && num
-              ? `(${big} ${bonusText})`
-              : big;
-            const inlineUnit = num && Boolean(unit) && !bonusText && unit.length <= 4;
+            const displayUnit = isFF && bonusText && num
+              ? ''
+              : unit || (isFF && num ? 'DIAMANTES' : '');
+            const displayLabel = [
+              bonusText && num ? `(${big} ${bonusText})` : big,
+              displayUnit
+            ].filter(Boolean).join(' ');
 
             return (
               <button
@@ -486,12 +489,13 @@ export default function Checkout({ game }) {
                   </span>
                 )}
                 <div className="w-full min-w-0">
-                  <div className={`${num ? styles.numericTitle : styles.packageTitle} font-display font-extrabold leading-tight ${isFF && num ? styles.ffTitle : ''} uppercase`}>
-                    <span className="block min-w-0 whitespace-normal break-words">{topLabel}{inlineUnit && <span className="ml-1.5 text-[0.6em] font-bold text-white/60">{unit}</span>}</span>
+                  <div
+                    className={`${styles.packageTitle} font-display font-extrabold leading-tight uppercase text-white`}
+                    title={displayLabel}
+                    aria-label={displayLabel}
+                  >
+                    {displayLabel}
                   </div>
-                  {(unit || (isFF && num)) && !(isFF && bonusText && num) && !inlineUnit && (
-                    <div className="mt-1 text-xs font-semibold tracking-wide text-white">{unit || 'DIAMANTES'}</div>
-                  )}
                 </div>
                 <div className="mt-auto flex w-full items-center justify-start pt-2">
                   <span className={`${styles.price} font-display font-extrabold`}>Bs {p.price}</span>
