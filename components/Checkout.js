@@ -490,7 +490,7 @@ export default function Checkout({ game }) {
                     <span className="block min-w-0 whitespace-normal break-words">{topLabel}{inlineUnit && <span className="ml-1.5 text-[0.6em] font-bold text-white/60">{unit}</span>}</span>
                   </div>
                   {(unit || (isFF && num)) && !(isFF && bonusText && num) && !inlineUnit && (
-                    <div className="mt-1 text-xs font-semibold tracking-wide text-white/60">{unit || 'DIAMANTES'}</div>
+                    <div className="mt-1 text-xs font-semibold tracking-wide text-white">{unit || 'DIAMANTES'}</div>
                   )}
                 </div>
                 <div className="mt-auto flex w-full items-center justify-start pt-2">
