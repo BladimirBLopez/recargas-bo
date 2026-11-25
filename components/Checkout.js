@@ -472,7 +472,7 @@ export default function Checkout({ game }) {
                 key={p.id}
                 onClick={() => setPkgId(p.id)}
                 aria-pressed={on}
-                className={`relative flex min-h-[142px] w-full min-w-0 flex-col rounded-2xl border-2 p-3 text-left transition active:scale-95 sm:min-h-[160px] sm:p-4 ${
+                className={`relative flex w-full min-w-0 flex-col rounded-2xl border-2 p-3 text-left transition active:scale-95 sm:p-4 ${
                   on
                     ? 'border-yellow-300 bg-gradient-to-br from-yellow-300/25 to-yellow-300/5 shadow-[0_0_26px_-4px_rgb(var(--accent)/0.8)]'
                     : p.recommended
@@ -486,15 +486,15 @@ export default function Checkout({ game }) {
                   </span>
                 )}
                 <div className="w-full min-w-0">
-                  <div className={`${num ? styles.numericTitle : styles.packageTitle} font-display font-extrabold leading-tight ${isFF && num ? styles.ffTitle : ''}`}>
+                  <div className={`${num ? styles.numericTitle : styles.packageTitle} font-display font-extrabold leading-tight ${isFF && num ? styles.ffTitle : ''} uppercase`}>
                     <span className="block min-w-0 whitespace-normal break-words">{topLabel}{inlineUnit && <span className="ml-1.5 text-[0.6em] font-bold text-white/60">{unit}</span>}</span>
                   </div>
                   {(unit || (isFF && num)) && !(isFF && bonusText && num) && !inlineUnit && (
                     <div className="mt-1 text-xs font-semibold tracking-wide text-white/60">{unit || 'DIAMANTES'}</div>
                   )}
                 </div>
-                <div className="mt-auto flex w-full items-center justify-start pt-5">
-                  <span className={`${styles.price} font-display text-xl font-extrabold`}>Bs {p.price}</span>
+                <div className="mt-auto flex w-full items-center justify-start pt-2">
+                  <span className={`${styles.price} font-display font-extrabold`}>Bs {p.price}</span>
                 </div>
               </button>
             );
